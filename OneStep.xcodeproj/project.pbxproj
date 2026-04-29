@@ -15,6 +15,9 @@
 		A10000000000000000000006 /* OneStepWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* OneStepWidget.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A10000000000000000000007 /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B1 /* OneStepCore */; };
 		A10000000000000000000008 /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B2 /* OneStepCore */; };
+		A10000000000000000000009 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001A /* AppConstants.swift */; };
+		A1000000000000000000000A /* OneStepTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001B /* OneStepTimelineProvider.swift */; };
+		A1000000000000000000000B /* CompleteGoalIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001C /* CompleteGoalIntent.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +54,9 @@
 		A10000000000000000000017 /* OneStepWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepWidget.swift; sourceTree = "<group>"; };
 		A10000000000000000000018 /* OneStepWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OneStepWidget.entitlements; sourceTree = "<group>"; };
 		A10000000000000000000019 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1000000000000000000001A /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		A1000000000000000000001B /* OneStepTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepTimelineProvider.swift; sourceTree = "<group>"; };
+		A1000000000000000000001C /* CompleteGoalIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteGoalIntent.swift; sourceTree = "<group>"; };
 		A10000000000000000000021 /* OneStep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OneStep.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000022 /* OneStepWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneStepWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E23586A12FA1FD1400E2888E /* one-step-design.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-design.md"; sourceTree = "<group>"; };
@@ -126,7 +132,10 @@
 		A10000000000000000000045 /* OneStepWidget */ = {
 			isa = PBXGroup;
 			children = (
+				A1000000000000000000001A /* AppConstants.swift */,
 				A10000000000000000000016 /* OneStepWidgetBundle.swift */,
+				A1000000000000000000001B /* OneStepTimelineProvider.swift */,
+				A1000000000000000000001C /* CompleteGoalIntent.swift */,
 				A10000000000000000000017 /* OneStepWidget.swift */,
 				A10000000000000000000018 /* OneStepWidget.entitlements */,
 				A10000000000000000000019 /* Info.plist */,
@@ -302,7 +311,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000000009 /* AppConstants.swift in Sources */,
 				A10000000000000000000004 /* OneStepWidgetBundle.swift in Sources */,
+				A1000000000000000000000A /* OneStepTimelineProvider.swift in Sources */,
+				A1000000000000000000000B /* CompleteGoalIntent.swift in Sources */,
 				A10000000000000000000005 /* OneStepWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
