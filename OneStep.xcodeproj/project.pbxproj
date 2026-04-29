@@ -26,6 +26,7 @@
 		A10000000000000000000024 /* RecentActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* RecentActivityView.swift */; };
 		A10000000000000000000025 /* GoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000028 /* GoalRowView.swift */; };
 		A10000000000000000000026 /* GoalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* GoalListView.swift */; };
+		A1000000000000000000002A /* WidgetGoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000002B /* WidgetGoalRowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		A10000000000000000000027 /* RecentActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentActivityView.swift; sourceTree = "<group>"; };
 		A10000000000000000000028 /* GoalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalRowView.swift; sourceTree = "<group>"; };
 		A10000000000000000000029 /* GoalListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListView.swift; sourceTree = "<group>"; };
+		A1000000000000000000002B /* WidgetGoalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGoalRowView.swift; sourceTree = "<group>"; };
 		E23586A12FA1FD1400E2888E /* one-step-design.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-design.md"; sourceTree = "<group>"; };
 		E23586A22FA1FD1400E2888E /* one-step-engineering-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-engineering-plan.md"; sourceTree = "<group>"; };
 		E23586A32FA1FD1400E2888E /* one-step-test-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-test-plan.md"; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				A1000000000000000000001B /* OneStepTimelineProvider.swift */,
 				A1000000000000000000001C /* CompleteGoalIntent.swift */,
 				A10000000000000000000017 /* OneStepWidget.swift */,
+				A1000000000000000000002B /* WidgetGoalRowView.swift */,
 				A10000000000000000000018 /* OneStepWidget.entitlements */,
 				A10000000000000000000019 /* Info.plist */,
 			);
@@ -402,6 +405,7 @@
 				A1000000000000000000000A /* OneStepTimelineProvider.swift in Sources */,
 				A1000000000000000000000B /* CompleteGoalIntent.swift in Sources */,
 				A10000000000000000000005 /* OneStepWidget.swift in Sources */,
+				A1000000000000000000002A /* WidgetGoalRowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
