@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 71;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,7 +12,7 @@
 		A10000000000000000000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* ContentView.swift */; };
 		A10000000000000000000004 /* OneStepWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* OneStepWidgetBundle.swift */; };
 		A10000000000000000000005 /* OneStepWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* OneStepWidget.swift */; };
-		A10000000000000000000006 /* OneStepWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* OneStepWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, CodeSignOnCopy, ); }; };
+		A10000000000000000000006 /* OneStepWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* OneStepWidget.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A10000000000000000000007 /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B1 /* OneStepCore */; };
 		A10000000000000000000008 /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B2 /* OneStepCore */; };
 /* End PBXBuildFile section */
@@ -53,6 +53,16 @@
 		A10000000000000000000019 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A10000000000000000000021 /* OneStep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OneStep.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000022 /* OneStepWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneStepWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E23586A12FA1FD1400E2888E /* one-step-design.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-design.md"; sourceTree = "<group>"; };
+		E23586A22FA1FD1400E2888E /* one-step-engineering-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-engineering-plan.md"; sourceTree = "<group>"; };
+		E23586A32FA1FD1400E2888E /* one-step-test-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-test-plan.md"; sourceTree = "<group>"; };
+		E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp.md"; sourceTree = "<group>"; };
+		E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-01-scaffold.md"; sourceTree = "<group>"; };
+		E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-02-core-data.md"; sourceTree = "<group>"; };
+		E23586A82FA1FD1400E2888E /* 2026-04-29-one-step-mvp-03-app-group-widget-spike.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-03-app-group-widget-spike.md"; sourceTree = "<group>"; };
+		E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-04-main-app.md"; sourceTree = "<group>"; };
+		E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-05-widget.md"; sourceTree = "<group>"; };
+		E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-06-verification-docs.md"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +91,7 @@
 				A10000000000000000000042 /* OneStep */,
 				A10000000000000000000045 /* OneStepWidget */,
 				A10000000000000000000046 /* Products */,
+				E23586AE2FA1FD1400E2888E /* docs */,
 			);
 			sourceTree = "<group>";
 		};
@@ -130,6 +141,47 @@
 				A10000000000000000000022 /* OneStepWidget.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E23586A42FA1FD1400E2888E /* plans */ = {
+			isa = PBXGroup;
+			children = (
+				E23586A12FA1FD1400E2888E /* one-step-design.md */,
+				E23586A22FA1FD1400E2888E /* one-step-engineering-plan.md */,
+				E23586A32FA1FD1400E2888E /* one-step-test-plan.md */,
+			);
+			path = plans;
+			sourceTree = "<group>";
+		};
+		E23586AC2FA1FD1400E2888E /* plans */ = {
+			isa = PBXGroup;
+			children = (
+				E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */,
+				E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */,
+				E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */,
+				E23586A82FA1FD1400E2888E /* 2026-04-29-one-step-mvp-03-app-group-widget-spike.md */,
+				E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */,
+				E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */,
+				E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */,
+			);
+			path = plans;
+			sourceTree = "<group>";
+		};
+		E23586AD2FA1FD1400E2888E /* superpowers */ = {
+			isa = PBXGroup;
+			children = (
+				E23586AC2FA1FD1400E2888E /* plans */,
+			);
+			path = superpowers;
+			sourceTree = "<group>";
+		};
+		E23586AE2FA1FD1400E2888E /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				E23586A42FA1FD1400E2888E /* plans */,
+				E23586AD2FA1FD1400E2888E /* superpowers */,
+			);
+			path = docs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -206,9 +258,8 @@
 			mainGroup = A10000000000000000000041;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				A100000000000000000000B0 /* XCLocalSwiftPackageReference "OneStepCore" */,
+				A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */,
 			);
-			preferredProjectObjectVersion = 77;
 			productRefGroup = A10000000000000000000046 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -389,10 +440,10 @@
 		A10000000000000000000082 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = OneStep/OneStep.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CODE_SIGNING_ALLOWED = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
@@ -410,10 +461,10 @@
 		A10000000000000000000083 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = OneStep/OneStep.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CODE_SIGNING_ALLOWED = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
@@ -432,10 +483,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = OneStepWidget/OneStepWidget.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CODE_SIGNING_ALLOWED = NO;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = OneStepWidget/Info.plist;
@@ -455,10 +506,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = OneStepWidget/OneStepWidget.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CODE_SIGNING_ALLOWED = NO;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = OneStepWidget/Info.plist;
@@ -507,7 +558,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		A100000000000000000000B0 /* XCLocalSwiftPackageReference "OneStepCore" */ = {
+		A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/OneStepCore;
 		};
@@ -516,12 +567,12 @@
 /* Begin XCSwiftPackageProductDependency section */
 		A100000000000000000000B1 /* OneStepCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A100000000000000000000B0 /* XCLocalSwiftPackageReference "OneStepCore" */;
+			package = A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */;
 			productName = OneStepCore;
 		};
 		A100000000000000000000B2 /* OneStepCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A100000000000000000000B0 /* XCLocalSwiftPackageReference "OneStepCore" */;
+			package = A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */;
 			productName = OneStepCore;
 		};
 /* End XCSwiftPackageProductDependency section */
