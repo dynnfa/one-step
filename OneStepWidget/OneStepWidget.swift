@@ -1,43 +1,43 @@
-import WidgetKit
+import AppIntents
+import OneStepCore
 import SwiftUI
-
-struct OneStepWidgetEntry: TimelineEntry {
-    let date: Date
-}
-
-struct OneStepWidgetProvider: TimelineProvider {
-    func placeholder(in context: Context) -> OneStepWidgetEntry {
-        OneStepWidgetEntry(date: Date())
-    }
-
-    func getSnapshot(in context: Context, completion: @escaping (OneStepWidgetEntry) -> Void) {
-        completion(OneStepWidgetEntry(date: Date()))
-    }
-
-    func getTimeline(in context: Context, completion: @escaping (Timeline<OneStepWidgetEntry>) -> Void) {
-        completion(Timeline(entries: [OneStepWidgetEntry(date: Date())], policy: .never))
-    }
-}
-
-struct OneStepWidgetEntryView: View {
-    let entry: OneStepWidgetEntry
-
-    var body: some View {
-        Text("One Step")
-            .font(.headline)
-            .containerBackground(.fill.tertiary, for: .widget)
-    }
-}
+import WidgetKit
 
 struct OneStepWidget: Widget {
-    let kind = "OneStepWidget"
+    static let kind = "OneStepWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: OneStepWidgetProvider()) { entry in
-            OneStepWidgetEntryView(entry: entry)
+        StaticConfiguration(kind: Self.kind, provider: OneStepTimelineProvider()) { entry in
+            VStack(alignment: .leading, spacing: 8) {
+                if entry.goals.isEmpty {
+                    Text("One Step")
+                        .font(.headline)
+                    Text("Create a goal in the app.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(entry.goals) { goal in
+                        Button(intent: CompleteGoalIntent(goalID: goal.id)) {
+                            HStack {
+                                Image(systemName: goal.isCompletedToday ? "checkmark.circle.fill" : "circle")
+                                VStack(alignment: .leading) {
+                                    Text(goal.title).lineLimit(1)
+                                    Text("\(goal.completedDays)/\(goal.targetCompletionDays)")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(goal.isCompletedToday)
+                    }
+                }
+            }
+            .padding()
+            .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("One Step")
-        .description("Track today's long-term goal progress.")
-        .supportedFamilies([.systemSmall])
+        .description("Complete today's long-term goals from the desktop.")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
