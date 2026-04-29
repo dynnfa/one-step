@@ -1,0 +1,754 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 71;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* AppConstants.swift */; };
+		A10000000000000000000002 /* OneStepApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* OneStepApp.swift */; };
+		A10000000000000000000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* ContentView.swift */; };
+		A10000000000000000000004 /* OneStepWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* OneStepWidgetBundle.swift */; };
+		A10000000000000000000005 /* OneStepWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* OneStepWidget.swift */; };
+		A10000000000000000000006 /* OneStepWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* OneStepWidget.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A10000000000000000000007 /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B1 /* OneStepCore */; };
+		A10000000000000000000008 /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B2 /* OneStepCore */; };
+		A10000000000000000000009 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001A /* AppConstants.swift */; };
+		A1000000000000000000000A /* OneStepTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001B /* OneStepTimelineProvider.swift */; };
+		A1000000000000000000000B /* CompleteGoalIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001C /* CompleteGoalIntent.swift */; };
+		A1000000000000000000000C /* GoalStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001D /* GoalStoreTests.swift */; };
+		A1000000000000000000000D /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B3 /* OneStepCore */; };
+		A1000000000000000000000E /* GoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* GoalStore.swift */; };
+		A1000000000000000000000F /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* EmptyStateView.swift */; };
+		A10000000000000000000010 /* GoalEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000020 /* GoalEditorView.swift */; };
+		A10000000000000000000024 /* RecentActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* RecentActivityView.swift */; };
+		A10000000000000000000025 /* GoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000028 /* GoalRowView.swift */; };
+		A10000000000000000000026 /* GoalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* GoalListView.swift */; };
+		A1000000000000000000002A /* WidgetGoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000002B /* WidgetGoalRowView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000000000000000000030 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000040 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000052;
+			remoteInfo = OneStepWidget;
+		};
+		A10000000000000000000032 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000040 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000051;
+			remoteInfo = OneStep;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A10000000000000000000063 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A10000000000000000000006 /* OneStepWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A10000000000000000000011 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		A10000000000000000000012 /* OneStepApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepApp.swift; sourceTree = "<group>"; };
+		A10000000000000000000013 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A10000000000000000000014 /* OneStep.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OneStep.entitlements; sourceTree = "<group>"; };
+		A10000000000000000000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000016 /* OneStepWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepWidgetBundle.swift; sourceTree = "<group>"; };
+		A10000000000000000000017 /* OneStepWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepWidget.swift; sourceTree = "<group>"; };
+		A10000000000000000000018 /* OneStepWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OneStepWidget.entitlements; sourceTree = "<group>"; };
+		A10000000000000000000019 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1000000000000000000001A /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		A1000000000000000000001B /* OneStepTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepTimelineProvider.swift; sourceTree = "<group>"; };
+		A1000000000000000000001C /* CompleteGoalIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteGoalIntent.swift; sourceTree = "<group>"; };
+		A10000000000000000000021 /* OneStep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OneStep.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000022 /* OneStepWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneStepWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000023 /* OneStepTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OneStepTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1000000000000000000001D /* GoalStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalStoreTests.swift; sourceTree = "<group>"; };
+		A1000000000000000000001E /* GoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalStore.swift; sourceTree = "<group>"; };
+		A1000000000000000000001F /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		A10000000000000000000020 /* GoalEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditorView.swift; sourceTree = "<group>"; };
+		A10000000000000000000027 /* RecentActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentActivityView.swift; sourceTree = "<group>"; };
+		A10000000000000000000028 /* GoalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalRowView.swift; sourceTree = "<group>"; };
+		A10000000000000000000029 /* GoalListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListView.swift; sourceTree = "<group>"; };
+		A1000000000000000000002B /* WidgetGoalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGoalRowView.swift; sourceTree = "<group>"; };
+		E23586A12FA1FD1400E2888E /* one-step-design.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-design.md"; sourceTree = "<group>"; };
+		E23586A22FA1FD1400E2888E /* one-step-engineering-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-engineering-plan.md"; sourceTree = "<group>"; };
+		E23586A32FA1FD1400E2888E /* one-step-test-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-test-plan.md"; sourceTree = "<group>"; };
+		E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp.md"; sourceTree = "<group>"; };
+		E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-01-scaffold.md"; sourceTree = "<group>"; };
+		E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-02-core-data.md"; sourceTree = "<group>"; };
+		E23586A82FA1FD1400E2888E /* 2026-04-29-one-step-mvp-03-app-group-widget-spike.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-03-app-group-widget-spike.md"; sourceTree = "<group>"; };
+		E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-04-main-app.md"; sourceTree = "<group>"; };
+		E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-05-widget.md"; sourceTree = "<group>"; };
+		E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-06-verification-docs.md"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10000000000000000000061 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000007 /* OneStepCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000071 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000008 /* OneStepCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000075 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000000D /* OneStepCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000000000000000000041 = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000042 /* OneStep */,
+				A10000000000000000000045 /* OneStepWidget */,
+				A10000000000000000000047 /* OneStepTests */,
+				A10000000000000000000046 /* Products */,
+				E23586AE2FA1FD1400E2888E /* docs */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000000000000000000042 /* OneStep */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000043 /* App */,
+				A10000000000000000000044 /* Views */,
+				A10000000000000000000014 /* OneStep.entitlements */,
+				A10000000000000000000015 /* Info.plist */,
+			);
+			path = OneStep;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000043 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000011 /* AppConstants.swift */,
+				A1000000000000000000001E /* GoalStore.swift */,
+				A10000000000000000000012 /* OneStepApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000044 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000013 /* ContentView.swift */,
+				A1000000000000000000001F /* EmptyStateView.swift */,
+				A10000000000000000000020 /* GoalEditorView.swift */,
+				A10000000000000000000029 /* GoalListView.swift */,
+				A10000000000000000000028 /* GoalRowView.swift */,
+				A10000000000000000000027 /* RecentActivityView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000045 /* OneStepWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A1000000000000000000001A /* AppConstants.swift */,
+				A10000000000000000000016 /* OneStepWidgetBundle.swift */,
+				A1000000000000000000001B /* OneStepTimelineProvider.swift */,
+				A1000000000000000000001C /* CompleteGoalIntent.swift */,
+				A10000000000000000000017 /* OneStepWidget.swift */,
+				A1000000000000000000002B /* WidgetGoalRowView.swift */,
+				A10000000000000000000018 /* OneStepWidget.entitlements */,
+				A10000000000000000000019 /* Info.plist */,
+			);
+			path = OneStepWidget;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000046 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000021 /* OneStep.app */,
+				A10000000000000000000022 /* OneStepWidget.appex */,
+				A10000000000000000000023 /* OneStepTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000047 /* OneStepTests */ = {
+			isa = PBXGroup;
+			children = (
+				A1000000000000000000001D /* GoalStoreTests.swift */,
+			);
+			path = OneStepTests;
+			sourceTree = "<group>";
+		};
+		E23586A42FA1FD1400E2888E /* plans */ = {
+			isa = PBXGroup;
+			children = (
+				E23586A12FA1FD1400E2888E /* one-step-design.md */,
+				E23586A22FA1FD1400E2888E /* one-step-engineering-plan.md */,
+				E23586A32FA1FD1400E2888E /* one-step-test-plan.md */,
+			);
+			path = plans;
+			sourceTree = "<group>";
+		};
+		E23586AC2FA1FD1400E2888E /* plans */ = {
+			isa = PBXGroup;
+			children = (
+				E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */,
+				E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */,
+				E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */,
+				E23586A82FA1FD1400E2888E /* 2026-04-29-one-step-mvp-03-app-group-widget-spike.md */,
+				E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */,
+				E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */,
+				E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */,
+			);
+			path = plans;
+			sourceTree = "<group>";
+		};
+		E23586AD2FA1FD1400E2888E /* superpowers */ = {
+			isa = PBXGroup;
+			children = (
+				E23586AC2FA1FD1400E2888E /* plans */,
+			);
+			path = superpowers;
+			sourceTree = "<group>";
+		};
+		E23586AE2FA1FD1400E2888E /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				E23586A42FA1FD1400E2888E /* plans */,
+				E23586AD2FA1FD1400E2888E /* superpowers */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000051 /* OneStep */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000091 /* Build configuration list for PBXNativeTarget "OneStep" */;
+			buildPhases = (
+				A10000000000000000000060 /* Sources */,
+				A10000000000000000000061 /* Frameworks */,
+				A10000000000000000000062 /* Resources */,
+				A10000000000000000000063 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10000000000000000000031 /* PBXTargetDependency */,
+			);
+			name = OneStep;
+			packageProductDependencies = (
+				A100000000000000000000B1 /* OneStepCore */,
+			);
+			productName = OneStep;
+			productReference = A10000000000000000000021 /* OneStep.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A10000000000000000000052 /* OneStepWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000092 /* Build configuration list for PBXNativeTarget "OneStepWidget" */;
+			buildPhases = (
+				A10000000000000000000070 /* Sources */,
+				A10000000000000000000071 /* Frameworks */,
+				A10000000000000000000072 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OneStepWidget;
+			packageProductDependencies = (
+				A100000000000000000000B2 /* OneStepCore */,
+			);
+			productName = OneStepWidget;
+			productReference = A10000000000000000000022 /* OneStepWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		A10000000000000000000053 /* OneStepTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000093 /* Build configuration list for PBXNativeTarget "OneStepTests" */;
+			buildPhases = (
+				A10000000000000000000074 /* Sources */,
+				A10000000000000000000075 /* Frameworks */,
+				A10000000000000000000076 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10000000000000000000033 /* PBXTargetDependency */,
+			);
+			name = OneStepTests;
+			packageProductDependencies = (
+				A100000000000000000000B3 /* OneStepCore */,
+			);
+			productName = OneStepTests;
+			productReference = A10000000000000000000023 /* OneStepTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000040 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					A10000000000000000000051 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					A10000000000000000000052 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					A10000000000000000000053 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = A10000000000000000000051;
+					};
+				};
+			};
+			buildConfigurationList = A10000000000000000000090 /* Build configuration list for PBXProject "OneStep" */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A10000000000000000000041;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */,
+			);
+			productRefGroup = A10000000000000000000046 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000000000000000000051 /* OneStep */,
+				A10000000000000000000052 /* OneStepWidget */,
+				A10000000000000000000053 /* OneStepTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10000000000000000000062 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000072 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000076 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000000000000000000060 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* AppConstants.swift in Sources */,
+				A1000000000000000000000E /* GoalStore.swift in Sources */,
+				A10000000000000000000002 /* OneStepApp.swift in Sources */,
+				A10000000000000000000003 /* ContentView.swift in Sources */,
+				A1000000000000000000000F /* EmptyStateView.swift in Sources */,
+				A10000000000000000000010 /* GoalEditorView.swift in Sources */,
+				A10000000000000000000026 /* GoalListView.swift in Sources */,
+				A10000000000000000000025 /* GoalRowView.swift in Sources */,
+				A10000000000000000000024 /* RecentActivityView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000070 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000009 /* AppConstants.swift in Sources */,
+				A10000000000000000000004 /* OneStepWidgetBundle.swift in Sources */,
+				A1000000000000000000000A /* OneStepTimelineProvider.swift in Sources */,
+				A1000000000000000000000B /* CompleteGoalIntent.swift in Sources */,
+				A10000000000000000000005 /* OneStepWidget.swift in Sources */,
+				A1000000000000000000002A /* WidgetGoalRowView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000074 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000000C /* GoalStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A10000000000000000000031 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000052 /* OneStepWidget */;
+			targetProxy = A10000000000000000000030 /* PBXContainerItemProxy */;
+		};
+		A10000000000000000000033 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000051 /* OneStep */;
+			targetProxy = A10000000000000000000032 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A10000000000000000000080 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A10000000000000000000081 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A10000000000000000000082 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = OneStep/OneStep.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = OneStep/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		A10000000000000000000083 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = OneStep/OneStep.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = OneStep/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		A10000000000000000000084 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = OneStepWidget/OneStepWidget.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = OneStepWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep.OneStepWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		A10000000000000000000085 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = OneStepWidget/OneStepWidget.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = OneStepWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep.OneStepWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		A10000000000000000000086 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStepTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OneStep.app/Contents/MacOS/OneStep";
+			};
+			name = Debug;
+		};
+		A10000000000000000000087 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStepTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OneStep.app/Contents/MacOS/OneStep";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000090 /* Build configuration list for PBXProject "OneStep" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000080 /* Debug */,
+				A10000000000000000000081 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000091 /* Build configuration list for PBXNativeTarget "OneStep" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000082 /* Debug */,
+				A10000000000000000000083 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000092 /* Build configuration list for PBXNativeTarget "OneStepWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000084 /* Debug */,
+				A10000000000000000000085 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000093 /* Build configuration list for PBXNativeTarget "OneStepTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000086 /* Debug */,
+				A10000000000000000000087 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/OneStepCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A100000000000000000000B1 /* OneStepCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */;
+			productName = OneStepCore;
+		};
+		A100000000000000000000B2 /* OneStepCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */;
+			productName = OneStepCore;
+		};
+		A100000000000000000000B3 /* OneStepCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A100000000000000000000B0 /* XCLocalSwiftPackageReference "Packages/OneStepCore" */;
+			productName = OneStepCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A10000000000000000000040 /* Project object */;
+}
