@@ -30,4 +30,17 @@ One Step is not a general task manager, streak repair tool, notes app, reminder 
 
 ## Data
 
-The MVP stores local data with SwiftData in the app group container `group.dev.dynnfa.OneStep`. Import/export and iCloud sync are not part of the MVP.
+The current app stores local data with SwiftData in the app group container `group.dev.dynnfa.OneStep`. Import/export is a possible v1.x improvement; iCloud sync is a possible v2 direction.
+
+## Documentation
+
+- [Roadmap](ROADMAP.md) — development scope and out-of-scope boundaries
+- [Contributing](CONTRIBUTING.md) — build, test, and PR expectations
+- [Privacy](PRIVACY.md) — local-first privacy promise
+- [V1 Product Spec](docs/product/v1-product-spec.md) — current source of truth for product behavior
+- [Architecture](docs/engineering/architecture.md) — app, Widget, core, and data boundaries
+- [Data Schema and Migration](docs/engineering/data-schema-and-migration.md) — schema, invariants, migration policy
+- [Release Checklist](docs/qa/release-checklist.md) — open-source release gate
+- [Widget/App Group Troubleshooting](docs/troubleshooting/widget-app-group.md) — common Widget empty-data causes and fixes
+
+The `docs/plans/` directory contains historical MVP planning context and is not the current source of truth.
