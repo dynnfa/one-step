@@ -1,40 +1,52 @@
-import OneStepCore
 import SwiftUI
 
 struct ContentView: View {
-    @State private var message = "Create a spike goal, then add the Widget."
+    @State private var store: GoalStore?
+    @State private var startupError: String?
+    @State private var isShowingCreateGoal = false
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text("One Step")
-                .font(.largeTitle.bold())
-
-            Text(message)
-                .foregroundStyle(.secondary)
-
-            Button("Create Spike Goal") {
-                createSpikeGoal()
+        Group {
+            if let store {
+                GoalListView(store: store, isShowingCreateGoal: $isShowingCreateGoal)
+            } else {
+                ContentUnavailableView(
+                    "One Step could not open the shared store",
+                    systemImage: "exclamationmark.triangle",
+                    description: Text(startupError ?? "Unknown error")
+                )
             }
-            .buttonStyle(.borderedProminent)
         }
-        .frame(minWidth: 640, minHeight: 420)
-    }
-
-    @MainActor
-    private func createSpikeGoal() {
-        do {
-            let repository = try GoalRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier)
-            let id = try repository.createGoal(CreateGoalInput(
-                title: "Vocabulary",
-                dailyAction: "Study 30 minutes",
-                targetCompletionDays: 200,
-                startDay: .today
-            ))
-            message = "Created spike goal \(id.uuidString.prefix(8)). Add or refresh the Widget."
-        } catch {
-            OneStepLog.store.error("Spike goal creation failed: \(error.localizedDescription)")
-            message = error.localizedDescription
+        .task {
+            guard store == nil else { return }
+            do {
+                let liveStore = try GoalStore.live()
+                liveStore.refresh()
+                store = liveStore
+            } catch {
+                startupError = error.localizedDescription
+            }
         }
+        .sheet(isPresented: $isShowingCreateGoal) {
+            if let store {
+                GoalEditorView(mode: .create) { title, action, target in
+                    store.createGoal(title: title, dailyAction: action, targetCompletionDays: target)
+                    isShowingCreateGoal = false
+                }
+            }
+        }
+        .alert(
+            "Add the One Step Widget",
+            isPresented: Binding(
+                get: { store?.didCreateFirstGoal == true },
+                set: { _ in store?.didCreateFirstGoal = false }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Your first goal is ready. Add the One Step Widget to complete it from the desktop.")
+        }
+        .frame(minWidth: 860, minHeight: 560)
     }
 }
 

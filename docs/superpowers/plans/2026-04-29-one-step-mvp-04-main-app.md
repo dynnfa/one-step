@@ -26,7 +26,7 @@ Execute only the main app UI. Do not redesign the Widget in this plan.
 
 ## Task 1: Store Adapter
 
-- [ ] **Step 1: Write GoalStore**
+- [x] **Step 1: Write GoalStore**
 
 Write `OneStep/App/GoalStore.swift`:
 
@@ -132,7 +132,7 @@ final class GoalStore {
 
 ## Task 2: First-Run and Editor Views
 
-- [ ] **Step 1: Write EmptyStateView**
+- [x] **Step 1: Write EmptyStateView**
 
 Write `OneStep/Views/EmptyStateView.swift`:
 
@@ -162,7 +162,7 @@ struct EmptyStateView: View {
 }
 ```
 
-- [ ] **Step 2: Write GoalEditorView**
+- [x] **Step 2: Write GoalEditorView**
 
 Write `OneStep/Views/GoalEditorView.swift`:
 
@@ -229,7 +229,7 @@ struct GoalEditorView: View {
 
 ## Task 3: Goal List Views
 
-- [ ] **Step 1: Write RecentActivityView**
+- [x] **Step 1: Write RecentActivityView**
 
 Write `OneStep/Views/RecentActivityView.swift`:
 
@@ -253,7 +253,7 @@ struct RecentActivityView: View {
 }
 ```
 
-- [ ] **Step 2: Write GoalRowView**
+- [x] **Step 2: Write GoalRowView**
 
 Write `OneStep/Views/GoalRowView.swift`:
 
@@ -304,7 +304,7 @@ struct GoalRowView: View {
 }
 ```
 
-- [ ] **Step 3: Write GoalListView**
+- [x] **Step 3: Write GoalListView**
 
 Write `OneStep/Views/GoalListView.swift`:
 
@@ -406,7 +406,7 @@ struct GoalListView: View {
 
 ## Task 4: ContentView Integration
 
-- [ ] **Step 1: Write ContentView**
+- [x] **Step 1: Write ContentView**
 
 Write `OneStep/Views/ContentView.swift`:
 
@@ -454,7 +454,7 @@ struct ContentView: View {
 }
 ```
 
-- [ ] **Step 2: Build app**
+- [x] **Step 2: Build app**
 
 ```bash
 xcodebuild -project OneStep.xcodeproj -scheme OneStep -destination 'platform=macOS' build
@@ -478,7 +478,7 @@ Archive removes the goal from active section and shows it in archived section.
 Reorder active goals and confirm app order changes.
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add OneStep
