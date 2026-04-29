@@ -34,7 +34,7 @@ struct OneStepTimelineProvider: TimelineProvider {
             let goals = try repository.activeGoalsForWidget(limit: family.goalLimit, day: .today)
             return OneStepWidgetEntry(date: Date(), goals: goals)
         } catch {
-            OneStepLog.widget.error("Timeline load failed: \(error.localizedDescription)")
+            OneStepLog.widget.error("Timeline load failed: \(error.localizedDescription, privacy: .public)")
             return OneStepWidgetEntry(date: Date(), goals: [])
         }
     }
