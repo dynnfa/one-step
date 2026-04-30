@@ -7,22 +7,23 @@ One Step has three main areas.
 ```text
 one-step/
     OneStep/              macOS app (SwiftUI)
-        App/              app entry, constants, GoalStore
-        Views/            goal list, forms, empty states
+        App/              app entry, constants, FinalGoalStore, MilestoneGoalStore
+        Views/            goal list, detail, forms, empty states
         OneStep.entitlements
     OneStepWidget/        Widget extension (WidgetKit + AppIntent)
         OneStepWidget.swift
         CompleteGoalIntent.swift
         OneStepTimelineProvider.swift
+        WidgetGoalRowView.swift
         AppConstants.swift
         OneStepWidget.entitlements
     Packages/
         OneStepCore/      shared local Swift package
             Sources/OneStepCore/
-                Models/         Goal, DailyCompletion (SwiftData @Model)
+                Models/         FinalGoal, MilestoneGoal, DailyCompletion (SwiftData @Model)
                 Persistence/    OneStepModelContainerFactory
-                Repositories/   GoalRepository
-                Snapshots/      WidgetGoalSnapshot, GoalListSnapshot, CreateGoalInput, UpdateGoalInput
+                Repositories/   FinalGoalRepository, MilestoneGoalRepository
+                Snapshots/      FinalGoalListSnapshot, MilestoneGoalSnapshot, WidgetMilestoneSnapshot, Create/Update input structs
                 Dates/          LocalDay
                 Logging/        OneStepLog
             Tests/OneStepCoreTests/
@@ -40,7 +41,7 @@ OneStepWidgetExtension ────┘
 
 `OneStepCore` owns models, persistence, repository logic, date normalization, snapshot structs, and domain errors. It does not import SwiftUI view types or WidgetKit UI types.
 
-The app and Widget depend on `OneStepCore`. Neither the app nor the Widget should contain direct SwiftData fetches, model mutations, or date normalization logic outside the repository.
+The app and Widget depend on `OneStepCore`. Neither the app nor the Widget should contain direct SwiftData fetches, model mutations, or date normalization logic outside the repository layer.
 
 ## Shared Persistence
 
@@ -52,29 +53,34 @@ The app and Widget share a SwiftData `ModelContainer` stored in the App Group co
 
 ## Repository Boundary
 
-`GoalRepository` is the single owner of all persistence rules.
+`FinalGoalRepository` and `MilestoneGoalRepository` own all persistence rules.
 
-- All reads and writes go through the repository. App views and Widget code do not touch SwiftData models directly.
-- The repository returns plain snapshot structs (`WidgetGoalSnapshot`, `GoalListSnapshot`). UI code renders these snapshots.
-- `GoalRepository.shared(appGroupIdentifier:)` creates a repository backed by the shared App Group store.
-- Tests use `GoalRepository` backed by an in-memory container from `OneStepModelContainerFactory.makeInMemory()`.
+- All reads and writes go through the repositories. App views and Widget code do not touch SwiftData models directly.
+- The repositories return plain snapshot structs (`FinalGoalListSnapshot`, `MilestoneGoalSnapshot`, `WidgetMilestoneSnapshot`). UI code renders these snapshots.
+- `FinalGoalRepository.shared(appGroupIdentifier:)` and `MilestoneGoalRepository.shared(appGroupIdentifier:)` create repositories backed by the shared App Group store.
+- Tests use repositories backed by an in-memory container from `OneStepModelContainerFactory.makeInMemory()`.
+
+## Current Active Milestone
+
+Each active FinalGoal has one **current active milestone**: the first `MilestoneGoal` where `isActive` is true, ordered by `sortOrder`. Only the current active milestone accepts check-ins. When it completes (or is archived), the next active milestone becomes current automatically.
 
 ## Widget Tap Flow
 
 ```text
 Widget tap
     → CompleteGoalIntent.perform()
-        → GoalRepository.completeToday(goalID, LocalDay.today)
+        → MilestoneGoalRepository.completeToday(milestoneGoalID, LocalDay.today)
+            → validates milestone is current and parent FinalGoal is active
             → SwiftData store in App Group container
                 → WidgetCenter.shared.reloadTimelines(ofKind:)
                     → Widget shows completed state
 ```
 
-`CompleteGoalIntent` catches repository errors and logs them via `OneStepLog.appIntent`. Stale taps for missing or archived goals are logged and no-oped without crashing.
+`CompleteGoalIntent` catches repository errors and logs them via `OneStepLog.appIntent`. Stale taps for missing, archived, or non-current milestones are logged and no-oped without crashing.
 
 ## Timeline Provider
 
-`OneStepTimelineProvider` loads goals on a 15-minute refresh cycle. Each refresh calls `GoalRepository.activeGoalsForWidget(limit:day:)` with a limit determined by the Widget family.
+`OneStepTimelineProvider` loads milestones on a 15-minute refresh cycle. Each refresh calls `MilestoneGoalRepository.activeMilestonesForWidget(limit:day:)` with a limit determined by the Widget family. The method returns one current milestone per active FinalGoal.
 
 ## Logging
 
@@ -88,7 +94,7 @@ All categories use `os.Logger` with the subsystem `dev.dynnfa.OneStep`. Filter C
 
 ## Rules
 
-1. **Do not duplicate persistence logic.** SwiftData models stay in `OneStepCore`. The app and Widget go through `GoalRepository`.
+1. **Do not duplicate persistence logic.** SwiftData models stay in `OneStepCore`. The app and Widget go through `FinalGoalRepository` and `MilestoneGoalRepository`.
 2. **Render snapshots, not models.** UI code receives snapshot structs. It does not own data rules or validation.
 3. **Keep the App Group identifier consistent.** Both `AppConstants.swift` files and both entitlements files must match.
 4. **Log failures visibly.** Widget timeline errors use `privacy: .public` so they appear in Console without needing a debug build.

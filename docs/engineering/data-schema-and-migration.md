@@ -2,21 +2,43 @@
 
 ## Current Schema
 
-### Goal
+### FinalGoal
 
-Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Models/Goal.swift`.
+Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Models/FinalGoal.swift`.
 
 | Field | Type | Notes |
 |-------|------|-------|
 | `id` | UUID | `@Attribute(.unique)`. Stable identifier. Never reused. |
 | `title` | String | Non-empty after trim. User-editable. |
-| `dailyAction` | String | Non-empty after trim. User-editable. |
-| `targetCompletionDays` | Int | Must be > 0. Represents intended completed days, not calendar duration. |
-| `startDayKey` | String | YYYY-MM-DD format. Set on creation. Locked after first completion. |
+| `goalDescription` | String? | Optional longer description. `nil` when unset. |
+| `targetCalendarDays` | Int? | Optional deadline in calendar days from creation. `nil` means no deadline. |
+| `startDayKey` | String | YYYY-MM-DD format. Set on creation. |
 | `sortOrder` | Int | Manual ordering. Defaults to creation order (incrementing). |
+| `completedAt` | Date? | `nil` while in progress. Set when all milestones are done. |
+| `archivedAt` | Date? | `nil` when active. Set when archived. |
 | `createdAt` | Date | Set once on creation. |
 | `updatedAt` | Date | Updated on every mutation. |
+
+Computed: `isActive = archivedAt == nil && completedAt == nil`.
+
+### MilestoneGoal
+
+Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Models/MilestoneGoal.swift`.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | UUID | `@Attribute(.unique)`. Stable identifier. Never reused. |
+| `title` | String | Non-empty after trim. User-editable. |
+| `targetCompletionDays` | Int | Must be > 0. Represents intended completed days, not calendar duration. |
+| `finalGoalID` | UUID | Foreign key to `FinalGoal.id`. |
+| `sortOrder` | Int | Determines milestone sequence within a FinalGoal. |
+| `startDayKey` | String? | YYYY-MM-DD format. Set on first check-in. `nil` until then. |
+| `completedAt` | Date? | `nil` while in progress. Auto-set when `completedDays >= targetCompletionDays`. |
 | `archivedAt` | Date? | `nil` when active. Set when archived. |
+| `createdAt` | Date | Set once on creation. |
+| `updatedAt` | Date | Updated on every mutation. |
+
+Computed: `isActive = archivedAt == nil && completedAt == nil`.
 
 ### DailyCompletion
 
@@ -25,10 +47,10 @@ Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Mode
 | Field | Type | Notes |
 |-------|------|-------|
 | `id` | UUID | Row identifier. |
-| `goalID` | UUID | Foreign key to `Goal.id`. |
+| `goalID` | UUID | Foreign key to `MilestoneGoal.id`. |
 | `dayKey` | String | YYYY-MM-DD format, normalized to the user's local calendar at completion time. |
 | `completedAt` | Date | Actual timestamp of the completion event. |
-| `uniqueKey` | String | `@Attribute(.unique)`. Computed as `"{goalID}#{dayKey}"`. Enforces one completion per goal per day. |
+| `uniqueKey` | String | `@Attribute(.unique)`. Computed as `"{goalID}#{dayKey}"`. Enforces one completion per milestone per day. |
 
 ## Storage Location
 
@@ -38,11 +60,17 @@ Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Mode
 
 ## Data Invariants
 
-1. **One completion per goal per local day.** Enforced by the unique `uniqueKey` on `DailyCompletion`. Duplicate same-day writes are repository-level no-ops.
-2. **Archived goals cannot be completed.** `GoalRepository.completeToday` checks `goal.isActive` before writing.
-3. **Progress uses completion count, not elapsed days.** Progress = `completedDays / targetCompletionDays`.
-4. **Target completion days cannot drop below completed count.** Enforced in `GoalRepository.updateGoal`.
-5. **Goal IDs are stable UUIDs.** Never reused or recycled.
+1. **One completion per milestone per local day.** Enforced by the unique `uniqueKey` on `DailyCompletion`. Duplicate same-day writes are repository-level no-ops.
+2. **Only the current active milestone can receive check-ins.** `MilestoneGoalRepository.completeToday` verifies the milestone is the first active milestone (ordered by `sortOrder`) within its parent FinalGoal.
+3. **Check-in requires an active parent FinalGoal.** `completeToday` rejects if the parent FinalGoal is archived or completed.
+4. **Milestone auto-completes when target is reached.** `completedAt` is set automatically when `completedDays >= targetCompletionDays`.
+5. **Archiving the current active milestone promotes the next one.** The next incomplete milestone in sort order becomes current.
+6. **FinalGoal completion requires all milestones done.** `FinalGoalRepository.completeFinalGoal` rejects if any milestone is still active.
+7. **Archive cascades from FinalGoal to milestones.** Archiving a FinalGoal also archives all its incomplete milestones.
+8. **Delete cascades.** Deleting a FinalGoal removes all its milestones and their completions. Deleting a MilestoneGoal removes its completions.
+9. **Progress uses completion count, not elapsed days.** Progress = `completedDays / targetCompletionDays`.
+10. **Target completion days cannot drop below completed count.** Enforced in `MilestoneGoalRepository.updateMilestoneGoal`.
+11. **IDs are stable UUIDs.** Never reused or recycled.
 
 ## Migration Policy
 
