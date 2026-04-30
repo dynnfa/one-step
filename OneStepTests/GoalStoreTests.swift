@@ -4,90 +4,152 @@ import OneStepCore
 @testable import OneStep
 
 @MainActor
-final class GoalStoreTests: XCTestCase {
-    func testRefreshLoadsGoalsFromRepositoryForRequestedDay() throws {
-        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+final class FinalGoalStoreTests: XCTestCase {
+    func testRefreshLoadsFinalGoalsFromRepository() throws {
         let fixture = try makeFixture()
 
-        _ = try fixture.repository.createGoal(CreateGoalInput(
-            title: "Vocabulary",
-            dailyAction: "Study 30 minutes",
-            targetCompletionDays: 200,
-            startDay: day
+        _ = try fixture.finalGoalRepo.createFinalGoal(CreateFinalGoalInput(
+            title: "Pass IELTS",
+            startDay: fixture.day
         ))
 
-        fixture.store.refresh(day: day)
+        fixture.store.refresh()
 
-        XCTAssertEqual(fixture.store.goals.map(\.title), ["Vocabulary"])
+        XCTAssertEqual(fixture.store.finalGoals.map(\.title), ["Pass IELTS"])
         XCTAssertNil(fixture.store.errorMessage)
     }
 
-    func testCreateGoalMarksFirstGoalAndRefreshesList() throws {
+    func testCreateFinalGoalMarksFirstGoalAndRefreshes() throws {
         let fixture = try makeFixture()
 
-        fixture.store.createGoal(
-            title: "Vocabulary",
-            dailyAction: "Study 30 minutes",
-            targetCompletionDays: 200
-        )
+        fixture.store.createFinalGoal(title: "Pass IELTS", goalDescription: nil, targetCalendarDays: nil)
 
         XCTAssertTrue(fixture.store.didCreateFirstGoal)
-        XCTAssertEqual(fixture.store.goals.map(\.dailyAction), ["Study 30 minutes"])
+        XCTAssertEqual(fixture.store.finalGoals.map(\.title), ["Pass IELTS"])
     }
 
-    func testUpdateGoalRefreshesListAndReportsRepositoryErrors() throws {
+    func testUpdateFinalGoalRefreshesListAndReportsErrors() throws {
         let fixture = try makeFixture()
-        fixture.store.createGoal(title: "Vocabulary", dailyAction: "Study 30 minutes", targetCompletionDays: 2)
-        let goalID = try XCTUnwrap(fixture.store.goals.first?.id)
-        fixture.store.completeToday(goalID: goalID)
+        fixture.store.createFinalGoal(title: "Old", goalDescription: nil, targetCalendarDays: nil)
+        let fgID = try XCTUnwrap(fixture.store.finalGoals.first?.id)
 
-        fixture.store.updateGoal(
-            goalID: goalID,
-            title: "Language",
-            dailyAction: "Review cards",
-            targetCompletionDays: 1
-        )
-        XCTAssertEqual(fixture.store.goals.first?.title, "Language")
+        fixture.store.updateFinalGoal(finalGoalID: fgID, title: "New", goalDescription: "Updated", targetCalendarDays: 200)
+        XCTAssertEqual(fixture.store.finalGoals.first?.title, "New")
         XCTAssertNil(fixture.store.errorMessage)
 
-        fixture.store.updateGoal(
-            goalID: goalID,
-            title: "Language",
-            dailyAction: "Review cards",
-            targetCompletionDays: 0
-        )
-        XCTAssertEqual(fixture.store.errorMessage, GoalRepositoryError.invalidTargetCompletionDays.localizedDescription)
+        fixture.store.updateFinalGoal(finalGoalID: fgID, title: "   ", goalDescription: nil, targetCalendarDays: nil)
+        XCTAssertEqual(fixture.store.errorMessage, GoalRepositoryError.invalidTitle.localizedDescription)
     }
 
-    func testCompleteUndoArchiveAndMoveRefreshListState() throws {
+    func testCompleteArchiveAndMoveRefreshListState() throws {
         let fixture = try makeFixture()
-        fixture.store.createGoal(title: "First", dailyAction: "Do first", targetCompletionDays: 10)
-        fixture.store.createGoal(title: "Second", dailyAction: "Do second", targetCompletionDays: 10)
-        let firstID = try XCTUnwrap(fixture.store.goals.first { $0.title == "First" }?.id)
-        let secondID = try XCTUnwrap(fixture.store.goals.first { $0.title == "Second" }?.id)
+        fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(title: "Second", goalDescription: nil, targetCalendarDays: nil)
+        let firstID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "First" }?.id)
+        let secondID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Second" }?.id)
 
-        fixture.store.completeToday(goalID: firstID)
-        XCTAssertTrue(try XCTUnwrap(fixture.store.goals.first { $0.id == firstID }).isCompletedToday)
+        // Add a milestone and complete it so we can complete the final goal
+        _ = try fixture.finalGoalRepo.createMilestoneGoal(CreateMilestoneGoalInput(
+            title: "Phase 1", targetCompletionDays: 1, finalGoalID: firstID
+        ))
+        // Complete the milestone manually
+        let context = fixture.modelContext
+        let desc = FetchDescriptor<MilestoneGoal>(predicate: #Predicate { $0.finalGoalID == firstID })
+        let milestones = try context.fetch(desc)
+        milestones.first?.completedAt = Date()
+        try context.save()
 
-        fixture.store.uncompleteToday(goalID: firstID)
-        XCTAssertFalse(try XCTUnwrap(fixture.store.goals.first { $0.id == firstID }).isCompletedToday)
+        fixture.store.completeFinalGoal(finalGoalID: firstID)
+        XCTAssertNotNil(fixture.store.finalGoals.first { $0.id == firstID }?.completedAt)
 
         fixture.store.move(from: IndexSet(integer: 1), to: 0)
-        XCTAssertEqual(fixture.store.goals.map(\.id), [secondID, firstID])
+        let activeGoals = fixture.store.finalGoals.filter { $0.archivedAt == nil && $0.completedAt == nil }
+        XCTAssertEqual(activeGoals.map(\.id), [secondID])
 
-        fixture.store.archiveGoal(goalID: secondID)
-        XCTAssertNotNil(try XCTUnwrap(fixture.store.goals.first { $0.id == secondID }).archivedAt)
+        fixture.store.archiveFinalGoal(finalGoalID: secondID)
+        XCTAssertNotNil(fixture.store.finalGoals.first { $0.id == secondID }?.archivedAt)
     }
 
     private func makeFixture() throws -> Fixture {
         let container = try OneStepModelContainerFactory.makeInMemory()
-        let repository = GoalRepository(modelContext: ModelContext(container))
-        return Fixture(repository: repository, store: GoalStore(repository: repository))
+        let context = ModelContext(container)
+        let fgRepo = FinalGoalRepository(modelContext: context)
+        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        return Fixture(
+            modelContext: context,
+            finalGoalRepo: fgRepo,
+            store: FinalGoalStore(repository: fgRepo),
+            day: day
+        )
     }
 }
 
 @MainActor
 private struct Fixture {
-    let repository: GoalRepository
-    let store: GoalStore
+    let modelContext: ModelContext
+    let finalGoalRepo: FinalGoalRepository
+    let store: FinalGoalStore
+    let day: LocalDay
+}
+
+@MainActor
+final class MilestoneGoalStoreTests: XCTestCase {
+    func testRefreshLoadsMilestonesForFinalGoal() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
+
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+
+        XCTAssertEqual(fixture.store.milestones.map(\.title), ["Phase 1"])
+        XCTAssertTrue(fixture.store.milestones.first?.isCurrent ?? false)
+    }
+
+    func testCreateAndCheckInRefreshesState() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+
+        fixture.store.createMilestone(title: "Phase 1", targetCompletionDays: 5, finalGoalID: fgID)
+        let mID = try XCTUnwrap(fixture.store.milestones.first?.id)
+
+        fixture.store.completeToday(milestoneGoalID: mID, finalGoalID: fgID)
+        XCTAssertEqual(fixture.store.milestones.first?.completedDays, 1)
+        XCTAssertTrue(fixture.store.milestones.first?.isCompletedToday ?? false)
+
+        fixture.store.uncompleteToday(milestoneGoalID: mID, finalGoalID: fgID)
+        XCTAssertEqual(fixture.store.milestones.first?.completedDays, 0)
+    }
+
+    private func makeFixture() throws -> MilestoneStoreFixture {
+        let container = try OneStepModelContainerFactory.makeInMemory()
+        let context = ModelContext(container)
+        let fgRepo = FinalGoalRepository(modelContext: context)
+        let msRepo = MilestoneGoalRepository(modelContext: context)
+        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        return MilestoneStoreFixture(
+            fgRepo: fgRepo,
+            msRepo: msRepo,
+            store: MilestoneGoalStore(repository: msRepo),
+            day: day
+        )
+    }
+}
+
+@MainActor
+private struct MilestoneStoreFixture {
+    let fgRepo: FinalGoalRepository
+    let msRepo: MilestoneGoalRepository
+    let store: MilestoneGoalStore
+    let day: LocalDay
+
+    func createFinalGoal() throws -> UUID {
+        try fgRepo.createFinalGoal(CreateFinalGoalInput(title: "Test Goal", startDay: day))
+    }
+
+    func createMilestone(title: String, targetDays: Int, finalGoalID: UUID) throws -> UUID {
+        try msRepo.createMilestoneGoal(CreateMilestoneGoalInput(
+            title: title, targetCompletionDays: targetDays, finalGoalID: finalGoalID
+        ))
+    }
 }
