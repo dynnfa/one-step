@@ -20,7 +20,9 @@
 		A1000000000000000000000B /* CompleteGoalIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001C /* CompleteGoalIntent.swift */; };
 		A1000000000000000000000C /* GoalStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001D /* GoalStoreTests.swift */; };
 		A1000000000000000000000D /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B3 /* OneStepCore */; };
-		A1000000000000000000000E /* GoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* GoalStore.swift */; };
+		A1000000000000000000000E /* FinalGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* FinalGoalStore.swift */; };
+		A100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C2 /* MilestoneGoalStore.swift */; };
+		A100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C4 /* FinalGoalDetailView.swift */; };
 		A1000000000000000000000F /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* EmptyStateView.swift */; };
 		A10000000000000000000010 /* GoalEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000020 /* GoalEditorView.swift */; };
 		A10000000000000000000024 /* RecentActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* RecentActivityView.swift */; };
@@ -74,7 +76,9 @@
 		A1000000000000000000001B /* OneStepTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepTimelineProvider.swift; sourceTree = "<group>"; };
 		A1000000000000000000001C /* CompleteGoalIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteGoalIntent.swift; sourceTree = "<group>"; };
 		A1000000000000000000001D /* GoalStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalStoreTests.swift; sourceTree = "<group>"; };
-		A1000000000000000000001E /* GoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalStore.swift; sourceTree = "<group>"; };
+		A1000000000000000000001E /* FinalGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalStore.swift; sourceTree = "<group>"; };
+		A100000000000000000000C2 /* MilestoneGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneGoalStore.swift; sourceTree = "<group>"; };
+		A100000000000000000000C4 /* FinalGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalDetailView.swift; sourceTree = "<group>"; };
 		A1000000000000000000001F /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		A10000000000000000000020 /* GoalEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditorView.swift; sourceTree = "<group>"; };
 		A10000000000000000000021 /* OneStep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OneStep.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,7 +154,8 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000011 /* AppConstants.swift */,
-				A1000000000000000000001E /* GoalStore.swift */,
+				A1000000000000000000001E /* FinalGoalStore.swift */,
+				A100000000000000000000C2 /* MilestoneGoalStore.swift */,
 				A10000000000000000000012 /* OneStepApp.swift */,
 			);
 			path = App;
@@ -161,6 +166,7 @@
 			children = (
 				A10000000000000000000013 /* ContentView.swift */,
 				A1000000000000000000001F /* EmptyStateView.swift */,
+				A100000000000000000000C4 /* FinalGoalDetailView.swift */,
 				A10000000000000000000020 /* GoalEditorView.swift */,
 				A10000000000000000000029 /* GoalListView.swift */,
 				A10000000000000000000028 /* GoalRowView.swift */,
@@ -385,7 +391,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000001 /* AppConstants.swift in Sources */,
-				A1000000000000000000000E /* GoalStore.swift in Sources */,
+				A1000000000000000000000E /* FinalGoalStore.swift in Sources */,
+				A100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */,
+				A100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */,
 				A10000000000000000000002 /* OneStepApp.swift in Sources */,
 				A10000000000000000000003 /* ContentView.swift in Sources */,
 				A1000000000000000000000F /* EmptyStateView.swift in Sources */,

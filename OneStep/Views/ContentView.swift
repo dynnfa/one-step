@@ -1,14 +1,19 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var store: GoalStore?
+    @State private var finalGoalStore: FinalGoalStore?
+    @State private var milestoneStore: MilestoneGoalStore?
     @State private var startupError: String?
     @State private var isShowingCreateGoal = false
 
     var body: some View {
         Group {
-            if let store {
-                GoalListView(store: store, isShowingCreateGoal: $isShowingCreateGoal)
+            if let finalGoalStore, let milestoneStore {
+                GoalListView(
+                    finalGoalStore: finalGoalStore,
+                    milestoneStore: milestoneStore,
+                    isShowingCreateGoal: $isShowingCreateGoal
+                )
             } else {
                 ContentUnavailableView(
                     "One Step could not open the shared store",
@@ -18,19 +23,24 @@ struct ContentView: View {
             }
         }
         .task {
-            guard store == nil else { return }
+            guard finalGoalStore == nil else { return }
             do {
-                let liveStore = try GoalStore.live()
-                liveStore.refresh()
-                store = liveStore
+                let fgStore = try FinalGoalStore.live()
+                fgStore.refresh()
+                finalGoalStore = fgStore
+
+                let msStore = try MilestoneGoalStore.live()
+                milestoneStore = msStore
             } catch {
                 startupError = error.localizedDescription
             }
         }
         .sheet(isPresented: $isShowingCreateGoal) {
-            if let store {
-                GoalEditorView(mode: .create) { title, action, target in
-                    store.createGoal(title: title, dailyAction: action, targetCompletionDays: target)
+            if let finalGoalStore {
+                FinalGoalEditorView(mode: .create) { title, description, target in
+                    finalGoalStore.createFinalGoal(
+                        title: title, goalDescription: description, targetCalendarDays: target
+                    )
                     isShowingCreateGoal = false
                 }
             }
@@ -38,13 +48,13 @@ struct ContentView: View {
         .alert(
             "Add the One Step Widget",
             isPresented: Binding(
-                get: { store?.didCreateFirstGoal == true },
-                set: { _ in store?.didCreateFirstGoal = false }
+                get: { finalGoalStore?.didCreateFirstGoal == true },
+                set: { _ in finalGoalStore?.didCreateFirstGoal = false }
             )
         ) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Your first goal is ready. Add the One Step Widget to complete it from the desktop.")
+            Text("Your first goal is ready. Add the One Step Widget to check in from the desktop.")
         }
         .frame(minWidth: 860, minHeight: 560)
     }

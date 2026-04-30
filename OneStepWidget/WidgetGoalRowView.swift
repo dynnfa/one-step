@@ -4,27 +4,27 @@ import SwiftUI
 import WidgetKit
 
 struct WidgetGoalRowView: View {
-    let goal: WidgetGoalSnapshot
+    let milestone: WidgetMilestoneSnapshot
     let compact: Bool
 
     var body: some View {
-        Button(intent: CompleteGoalIntent(goalID: goal.id)) {
+        Button(intent: CompleteGoalIntent(goalID: milestone.id)) {
             HStack(spacing: 8) {
-                Image(systemName: goal.isCompletedToday ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(goal.isCompletedToday ? .green : .secondary)
+                Image(systemName: milestone.isCompletedToday ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(milestone.isCompletedToday ? .green : .secondary)
                     .font(compact ? .body : .title3)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(goal.title)
+                    Text(milestone.title)
                         .font(compact ? .caption.bold() : .headline)
                         .lineLimit(1)
                     if !compact {
-                        Text(goal.dailyAction)
+                        Text(milestone.parentFinalGoalTitle)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
-                    Text("\(goal.completedDays)/\(goal.targetCompletionDays)")
+                    Text("\(milestone.completedDays)/\(milestone.targetCompletionDays)")
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(.secondary)
                 }
@@ -34,6 +34,6 @@ struct WidgetGoalRowView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .disabled(goal.isCompletedToday)
+        .disabled(milestone.isCompletedToday)
     }
 }

@@ -2,108 +2,145 @@ import OneStepCore
 import SwiftUI
 
 struct GoalListView: View {
-    @Bindable var store: GoalStore
+    @Bindable var finalGoalStore: FinalGoalStore
+    @Bindable var milestoneStore: MilestoneGoalStore
     @Binding var isShowingCreateGoal: Bool
-    @State private var editingGoal: GoalListSnapshot?
+    @State private var editingFinalGoal: FinalGoalListSnapshot?
+    @State private var editingMilestone: MilestoneGoalSnapshot?
+    @State private var isAddingMilestone = false
 
-    private var activeGoals: [GoalListSnapshot] { store.goals.filter { $0.archivedAt == nil } }
-    private var archivedGoals: [GoalListSnapshot] { store.goals.filter { $0.archivedAt != nil } }
+    private var activeGoals: [FinalGoalListSnapshot] {
+        finalGoalStore.finalGoals.filter { $0.archivedAt == nil && $0.completedAt == nil }
+    }
+
+    private var completedGoals: [FinalGoalListSnapshot] {
+        finalGoalStore.finalGoals.filter { $0.completedAt != nil }
+    }
+
+    private var archivedGoals: [FinalGoalListSnapshot] {
+        finalGoalStore.finalGoals.filter { $0.archivedAt != nil && $0.completedAt == nil }
+    }
 
     var body: some View {
         NavigationSplitView {
-            List {
-                Section("Active") {
-                    ForEach(activeGoals) { goal in
-                        Text(goal.title)
-                    }
-                    .onMove(perform: store.move)
-                }
-                if !archivedGoals.isEmpty {
-                    Section("Archived") {
-                        ForEach(archivedGoals) { goal in
-                            Text(goal.title).foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button { isShowingCreateGoal = true } label: {
-                        Label("Add Goal", systemImage: "plus")
-                    }
-                }
-            }
+            sidebar
         } detail: {
-            VStack(alignment: .leading, spacing: 0) {
-                header
-                if let error = store.errorMessage {
-                    Text(error)
-                        .foregroundStyle(.red)
-                        .padding(.horizontal)
-                        .padding(.bottom, 8)
-                }
-                if store.goals.isEmpty {
-                    EmptyStateView { isShowingCreateGoal = true }
-                } else {
-                    List {
-                        Section("Active Goals") {
-                            ForEach(activeGoals) { goal in
-                                GoalRowView(
-                                    goal: goal,
-                                    onComplete: { store.completeToday(goalID: goal.id) },
-                                    onUndo: { store.uncompleteToday(goalID: goal.id) },
-                                    onEdit: { editingGoal = goal },
-                                    onArchive: { store.archiveGoal(goalID: goal.id) }
-                                )
-                            }
-                            .onMove(perform: store.move)
-                        }
-                        if !archivedGoals.isEmpty {
-                            Section("Archived Goals") {
-                                ForEach(archivedGoals) { goal in
-                                    GoalRowView(
-                                        goal: goal,
-                                        onComplete: {},
-                                        onUndo: {},
-                                        onEdit: { editingGoal = goal },
-                                        onArchive: {}
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    .listStyle(.inset)
-                }
+            detailPane
+        }
+        .onAppear { finalGoalStore.refresh() }
+        .onChange(of: finalGoalStore.selectedFinalGoalID) { _, newID in
+            if let newID {
+                milestoneStore.refresh(finalGoalID: newID)
             }
         }
-        .onAppear { store.refresh() }
-        .sheet(item: $editingGoal) { goal in
-            GoalEditorView(
+        .sheet(item: $editingFinalGoal) { goal in
+            FinalGoalEditorView(
                 mode: .edit(
                     title: goal.title,
-                    dailyAction: goal.dailyAction,
-                    targetCompletionDays: goal.targetCompletionDays
+                    goalDescription: goal.goalDescription,
+                    targetCalendarDays: goal.targetCalendarDays
                 )
-            ) { title, action, target in
-                store.updateGoal(goalID: goal.id, title: title, dailyAction: action, targetCompletionDays: target)
-                editingGoal = nil
+            ) { title, description, target in
+                finalGoalStore.updateFinalGoal(
+                    finalGoalID: goal.id, title: title,
+                    goalDescription: description, targetCalendarDays: target
+                )
+                editingFinalGoal = nil
+            }
+        }
+        .sheet(item: $editingMilestone) { milestone in
+            MilestoneGoalEditorView(
+                mode: .edit(
+                    title: milestone.title,
+                    targetCompletionDays: milestone.targetCompletionDays
+                )
+            ) { title, targetDays in
+                milestoneStore.updateMilestone(
+                    milestoneGoalID: milestone.id,
+                    finalGoalID: milestone.finalGoalID,
+                    title: title,
+                    targetCompletionDays: targetDays
+                )
+                editingMilestone = nil
+            }
+        }
+        .sheet(isPresented: $isAddingMilestone) {
+            if let fgID = finalGoalStore.selectedFinalGoalID {
+                MilestoneGoalEditorView(mode: .create) { title, targetDays in
+                    milestoneStore.createMilestone(
+                        title: title, targetCompletionDays: targetDays, finalGoalID: fgID
+                    )
+                    isAddingMilestone = false
+                }
             }
         }
     }
 
-    private var header: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("One Step").font(.largeTitle.bold())
-                Text("Confirm today's progress without turning it into a task manager.")
-                    .foregroundStyle(.secondary)
+    // MARK: - Sidebar
+
+    private var sidebar: some View {
+        List(selection: $finalGoalStore.selectedFinalGoalID) {
+            Section("Active") {
+                ForEach(activeGoals) { goal in
+                    FinalGoalRowView(goal: goal)
+                        .tag(goal.id)
+                }
+                .onMove(perform: finalGoalStore.move)
             }
-            Spacer()
-            Button { isShowingCreateGoal = true } label: {
-                Label("Add Goal", systemImage: "plus")
+            if !completedGoals.isEmpty {
+                Section("Completed") {
+                    ForEach(completedGoals) { goal in
+                        FinalGoalRowView(goal: goal)
+                            .tag(goal.id)
+                    }
+                }
             }
-            .buttonStyle(.borderedProminent)
+            if !archivedGoals.isEmpty {
+                Section("Archived") {
+                    ForEach(archivedGoals) { goal in
+                        FinalGoalRowView(goal: goal)
+                            .tag(goal.id)
+                    }
+                }
+            }
         }
-        .padding()
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { isShowingCreateGoal = true } label: {
+                    Label("Add Goal", systemImage: "plus")
+                }
+            }
+        }
+    }
+
+    // MARK: - Detail
+
+    private var detailPane: some View {
+        Group {
+            if let selectedID = finalGoalStore.selectedFinalGoalID,
+               let goal = finalGoalStore.finalGoals.first(where: { $0.id == selectedID }) {
+                FinalGoalDetailView(
+                    goal: goal,
+                    milestones: milestoneStore.milestones,
+                    errorMessage: milestoneStore.errorMessage ?? finalGoalStore.errorMessage,
+                    onAddMilestone: { isAddingMilestone = true },
+                    onComplete: { finalGoalStore.completeFinalGoal(finalGoalID: goal.id) },
+                    onArchive: { finalGoalStore.archiveFinalGoal(finalGoalID: goal.id) },
+                    onEditGoal: { editingFinalGoal = goal },
+                    onCheckIn: { msID in milestoneStore.completeToday(milestoneGoalID: msID, finalGoalID: goal.id) },
+                    onUndo: { msID in milestoneStore.uncompleteToday(milestoneGoalID: msID, finalGoalID: goal.id) },
+                    onEditMilestone: { ms in editingMilestone = ms },
+                    onArchiveMilestone: { msID in milestoneStore.archiveMilestone(milestoneGoalID: msID, finalGoalID: goal.id) }
+                )
+            } else if finalGoalStore.finalGoals.isEmpty {
+                EmptyStateView { isShowingCreateGoal = true }
+            } else {
+                ContentUnavailableView(
+                    "Select a Goal",
+                    systemImage: "target",
+                    description: Text("Choose a goal from the sidebar to view its milestones.")
+                )
+            }
+        }
     }
 }

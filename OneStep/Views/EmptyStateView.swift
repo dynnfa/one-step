@@ -10,7 +10,7 @@ struct EmptyStateView: View {
                 .foregroundStyle(.tint)
             Text("Start with one long-term goal.")
                 .font(.title2.bold())
-            Text("Pick a daily action you can honestly confirm from the desktop.")
+            Text("Break it into milestones. Complete one day at a time.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 360)
