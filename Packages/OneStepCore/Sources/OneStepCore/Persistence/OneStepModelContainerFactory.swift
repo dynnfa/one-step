@@ -5,7 +5,7 @@ public enum OneStepModelContainerFactory {
     public static let storeFileName = "OneStep.sqlite"
 
     public static func makeInMemory() throws -> ModelContainer {
-        let schema = Schema([Goal.self, DailyCompletion.self])
+        let schema = Schema([FinalGoal.self, MilestoneGoal.self, DailyCompletion.self])
         let configuration = ModelConfiguration("OneStepTests", schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [configuration])
     }
@@ -16,7 +16,7 @@ public enum OneStepModelContainerFactory {
         }
         let url = storeURL(appGroupContainerURL: appGroupURL)
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        let schema = Schema([Goal.self, DailyCompletion.self])
+        let schema = Schema([FinalGoal.self, MilestoneGoal.self, DailyCompletion.self])
         let configuration = ModelConfiguration("OneStep", schema: schema, url: url)
         return try ModelContainer(for: schema, configurations: [configuration])
     }
