@@ -72,15 +72,6 @@ final class MilestoneGoalStore {
         }
     }
 
-    func archiveMilestone(milestoneGoalID: UUID, finalGoalID: UUID) {
-        do {
-            try repository.archiveMilestoneGoal(milestoneGoalID: milestoneGoalID, archivedAt: Date())
-            refreshAndReloadWidget(finalGoalID: finalGoalID)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
     private func refreshAndReloadWidget(finalGoalID: UUID) {
         refresh(finalGoalID: finalGoalID)
         WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")

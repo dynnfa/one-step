@@ -4,13 +4,11 @@ public enum GoalRepositoryError: Error, Equatable, LocalizedError {
     case finalGoalNotFound
     case milestoneGoalNotFound
     case finalGoalNotActive
-    case milestoneGoalNotActive
     case invalidTitle
     case invalidTargetCalendarDays
     case invalidTargetCompletionDays
     case targetBelowCompletedCount
     case notCurrentMilestone
-    case milestonesIncomplete
     case storeUnavailable
     case saveFailed(String)
 
@@ -21,9 +19,7 @@ public enum GoalRepositoryError: Error, Equatable, LocalizedError {
         case .milestoneGoalNotFound:
             return "Milestone goal not found."
         case .finalGoalNotActive:
-            return "Final goal is archived or completed."
-        case .milestoneGoalNotActive:
-            return "Milestone goal is archived or completed."
+            return "Final goal is archived."
         case .invalidTitle:
             return "Title is required."
         case .invalidTargetCalendarDays:
@@ -34,8 +30,6 @@ public enum GoalRepositoryError: Error, Equatable, LocalizedError {
             return "Target completion days cannot be below completed days."
         case .notCurrentMilestone:
             return "Only the current active milestone can receive check-ins."
-        case .milestonesIncomplete:
-            return "All milestones must be completed before completing the final goal."
         case .storeUnavailable:
             return "Shared store is unavailable."
         case .saveFailed(let message):

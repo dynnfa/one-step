@@ -10,7 +10,6 @@ public final class MilestoneGoal {
     public var sortOrder: Int
     public var startDayKey: String?
     public var completedAt: Date?
-    public var archivedAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
 
@@ -22,7 +21,6 @@ public final class MilestoneGoal {
         sortOrder: Int,
         startDayKey: String? = nil,
         completedAt: Date? = nil,
-        archivedAt: Date? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     ) {
@@ -33,10 +31,9 @@ public final class MilestoneGoal {
         self.sortOrder = sortOrder
         self.startDayKey = startDayKey
         self.completedAt = completedAt
-        self.archivedAt = archivedAt
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
 
-    public var isActive: Bool { archivedAt == nil && completedAt == nil }
+    public var isActive: Bool { completedAt == nil }
 }

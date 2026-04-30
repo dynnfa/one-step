@@ -153,18 +153,19 @@ final class MilestoneGoalRepositoryTests: XCTestCase {
         XCTAssertTrue(afterUndo[0].isCurrent)
     }
 
-    // MARK: - Archive
+    // MARK: - Current Progression
 
-    func testArchivingCurrentMakesNextCurrent() throws {
+    func testCompletedCurrentMakesNextCurrent() throws {
         let fixture = try makeFixture()
         let fgID = try fixture.createFinalGoal()
-        let m1 = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
-        let m2 = try fixture.createMilestone(title: "Phase 2", targetDays: 5, finalGoalID: fgID)
+        let m1 = try fixture.createMilestone(title: "Phase 1", targetDays: 1, finalGoalID: fgID)
+        _ = try fixture.createMilestone(title: "Phase 2", targetDays: 5, finalGoalID: fgID)
 
-        try fixture.repository.archiveMilestoneGoal(milestoneGoalID: m1, archivedAt: Date())
+        try fixture.repository.completeToday(milestoneGoalID: m1, day: fixture.day)
 
         let milestones = try fixture.repository.milestonesForFinalGoal(finalGoalID: fgID, day: fixture.day)
-        XCTAssertNotNil(milestones[0].archivedAt)
+        XCTAssertNotNil(milestones[0].completedAt)
+        XCTAssertFalse(milestones[0].isCurrent)
         XCTAssertTrue(milestones[1].isCurrent)
     }
 
@@ -199,20 +200,30 @@ final class MilestoneGoalRepositoryTests: XCTestCase {
         XCTAssertTrue(titles.contains("B1"))
     }
 
-    func testActiveMilestonesForWidgetExcludesCompletedFinalGoals() throws {
+    func testActiveMilestonesForWidgetExcludesArchivedFinalGoals() throws {
         let fixture = try makeFixture()
         let fgID = try fixture.createFinalGoal()
         _ = try fixture.createMilestone(title: "Phase 1", targetDays: 1, finalGoalID: fgID)
 
-        // Complete the final goal
         let fgRepo = FinalGoalRepository(modelContext: fixture.modelContext)
-        let milestones = try fixture.fetchMilestones(for: fgID)
-        milestones.first?.completedAt = Date()
-        try fixture.modelContext.save()
-        try fgRepo.completeFinalGoal(finalGoalID: fgID, completedAt: Date())
+        try fgRepo.archiveFinalGoal(finalGoalID: fgID, archivedAt: Date())
 
         let snapshots = try fixture.repository.activeMilestonesForWidget(limit: 10, day: fixture.day)
         XCTAssertEqual(snapshots.count, 0)
+    }
+
+    func testActiveMilestonesForWidgetFillsLimitAfterGoalsWithoutCurrentMilestone() throws {
+        let fixture = try makeFixture()
+        let firstGoal = try fixture.createFinalGoal()
+        let secondGoal = try fixture.createFinalGoal()
+        let firstMilestone = try fixture.createMilestone(title: "Already done", targetDays: 1, finalGoalID: firstGoal)
+        _ = try fixture.createMilestone(title: "Still active", targetDays: 5, finalGoalID: secondGoal)
+
+        try fixture.repository.completeToday(milestoneGoalID: firstMilestone, day: fixture.day)
+
+        let snapshots = try fixture.repository.activeMilestonesForWidget(limit: 1, day: fixture.day)
+
+        XCTAssertEqual(snapshots.map(\.title), ["Still active"])
     }
 
     func testActiveMilestonesForWidgetExcludesArchived() throws {

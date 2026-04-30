@@ -15,10 +15,7 @@ struct FinalGoalRowView: View {
                 }
             }
             Spacer()
-            if goal.completedAt != nil {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-            } else if goal.archivedAt != nil {
+            if goal.archivedAt != nil {
                 Image(systemName: "archivebox")
                     .foregroundStyle(.secondary)
             }
@@ -31,7 +28,6 @@ struct MilestoneGoalRowView: View {
     let onCheckIn: () -> Void
     let onUndo: () -> Void
     let onEdit: () -> Void
-    let onArchive: () -> Void
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
@@ -40,7 +36,7 @@ struct MilestoneGoalRowView: View {
                     .font(.title2)
             }
             .buttonStyle(.plain)
-            .disabled(!milestone.isCurrent && milestone.completedAt == nil)
+            .disabled(!milestone.isCurrent || milestone.completedAt != nil)
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
@@ -77,8 +73,6 @@ struct MilestoneGoalRowView: View {
 
             Menu {
                 Button("Edit", action: onEdit)
-                Button("Archive", role: .destructive, action: onArchive)
-                    .disabled(milestone.archivedAt != nil)
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
