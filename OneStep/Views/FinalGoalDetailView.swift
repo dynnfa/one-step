@@ -7,20 +7,10 @@ struct FinalGoalDetailView: View {
     let errorMessage: String?
     let onAddMilestone: () -> Void
     let onComplete: () -> Void
-    let onArchive: () -> Void
     let onEditGoal: () -> Void
     let onCheckIn: (UUID) -> Void
     let onUndo: (UUID) -> Void
     let onEditMilestone: (MilestoneGoalSnapshot) -> Void
-    let onArchiveMilestone: (UUID) -> Void
-
-    private var activeMilestones: [MilestoneGoalSnapshot] {
-        milestones.filter { $0.archivedAt == nil }
-    }
-
-    private var allMilestonesDone: Bool {
-        !milestones.isEmpty && milestones.allSatisfy { $0.completedAt != nil || $0.archivedAt != nil }
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -65,9 +55,7 @@ struct FinalGoalDetailView: View {
                 Button("Add Milestone", action: onAddMilestone)
                 Divider()
                 Button("Complete Goal", action: onComplete)
-                    .disabled(!allMilestonesDone)
-                Button("Archive", role: .destructive, action: onArchive)
-                    .disabled(goal.archivedAt != nil || goal.completedAt != nil)
+                    .disabled(goal.archivedAt != nil)
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
@@ -97,13 +85,12 @@ struct FinalGoalDetailView: View {
     private var milestoneList: some View {
         List {
             Section {
-                ForEach(activeMilestones) { milestone in
+                ForEach(milestones) { milestone in
                     MilestoneGoalRowView(
                         milestone: milestone,
                         onCheckIn: { onCheckIn(milestone.id) },
                         onUndo: { onUndo(milestone.id) },
-                        onEdit: { onEditMilestone(milestone) },
-                        onArchive: { onArchiveMilestone(milestone.id) }
+                        onEdit: { onEditMilestone(milestone) }
                     )
                 }
             }

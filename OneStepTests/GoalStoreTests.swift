@@ -41,33 +41,19 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertEqual(fixture.store.errorMessage, GoalRepositoryError.invalidTitle.localizedDescription)
     }
 
-    func testCompleteArchiveAndMoveRefreshListState() throws {
+    func testCompleteFinalGoalArchivesItAndRefreshesListState() throws {
         let fixture = try makeFixture()
         fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
         fixture.store.createFinalGoal(title: "Second", goalDescription: nil, targetCalendarDays: nil)
         let firstID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "First" }?.id)
         let secondID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Second" }?.id)
 
-        // Add a milestone and complete it so we can complete the final goal
-        _ = try fixture.finalGoalRepo.createMilestoneGoal(CreateMilestoneGoalInput(
-            title: "Phase 1", targetCompletionDays: 1, finalGoalID: firstID
-        ))
-        // Complete the milestone manually
-        let context = fixture.modelContext
-        let desc = FetchDescriptor<MilestoneGoal>(predicate: #Predicate { $0.finalGoalID == firstID })
-        let milestones = try context.fetch(desc)
-        milestones.first?.completedAt = Date()
-        try context.save()
-
         fixture.store.completeFinalGoal(finalGoalID: firstID)
-        XCTAssertNotNil(fixture.store.finalGoals.first { $0.id == firstID }?.completedAt)
+        XCTAssertNotNil(fixture.store.finalGoals.first { $0.id == firstID }?.archivedAt)
 
         fixture.store.move(from: IndexSet(integer: 1), to: 0)
-        let activeGoals = fixture.store.finalGoals.filter { $0.archivedAt == nil && $0.completedAt == nil }
+        let activeGoals = fixture.store.finalGoals.filter { $0.archivedAt == nil }
         XCTAssertEqual(activeGoals.map(\.id), [secondID])
-
-        fixture.store.archiveFinalGoal(finalGoalID: secondID)
-        XCTAssertNotNil(fixture.store.finalGoals.first { $0.id == secondID }?.archivedAt)
     }
 
     private func makeFixture() throws -> Fixture {

@@ -60,7 +60,6 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
     public let remainingCalendarDays: Int?
     public let sortOrder: Int
     public let archivedAt: Date?
-    public let completedAt: Date?
 
     public init(
         id: UUID,
@@ -73,8 +72,7 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
         currentMilestoneTitle: String?,
         remainingCalendarDays: Int?,
         sortOrder: Int,
-        archivedAt: Date?,
-        completedAt: Date?
+        archivedAt: Date?
     ) {
         self.id = id
         self.title = title
@@ -87,7 +85,6 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
         self.remainingCalendarDays = remainingCalendarDays
         self.sortOrder = sortOrder
         self.archivedAt = archivedAt
-        self.completedAt = completedAt
     }
 }
 
@@ -103,7 +100,6 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
     public let completionRate: Double
     public let isCompletedToday: Bool
     public let startDayKey: String?
-    public let archivedAt: Date?
     public let completedAt: Date?
     public let recentActivity: [RecentActivityDay]
 
@@ -119,7 +115,6 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
         completionRate: Double,
         isCompletedToday: Bool,
         startDayKey: String?,
-        archivedAt: Date?,
         completedAt: Date?,
         recentActivity: [RecentActivityDay]
     ) {
@@ -134,7 +129,6 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
         self.completionRate = completionRate
         self.isCompletedToday = isCompletedToday
         self.startDayKey = startDayKey
-        self.archivedAt = archivedAt
         self.completedAt = completedAt
         self.recentActivity = recentActivity
     }

@@ -9,7 +9,6 @@ public final class FinalGoal {
     public var targetCalendarDays: Int?
     public var startDayKey: String
     public var sortOrder: Int
-    public var completedAt: Date?
     public var archivedAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
@@ -21,7 +20,6 @@ public final class FinalGoal {
         targetCalendarDays: Int? = nil,
         startDayKey: String,
         sortOrder: Int,
-        completedAt: Date? = nil,
         archivedAt: Date? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
@@ -32,11 +30,10 @@ public final class FinalGoal {
         self.targetCalendarDays = targetCalendarDays
         self.startDayKey = startDayKey
         self.sortOrder = sortOrder
-        self.completedAt = completedAt
         self.archivedAt = archivedAt
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
 
-    public var isActive: Bool { archivedAt == nil && completedAt == nil }
+    public var isActive: Bool { archivedAt == nil }
 }

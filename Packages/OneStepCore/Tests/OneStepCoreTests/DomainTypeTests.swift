@@ -2,10 +2,10 @@ import XCTest
 @testable import OneStepCore
 
 final class DomainTypeTests: XCTestCase {
-    func testFinalGoalTracksActiveState() {
+    func testFinalGoalActiveStateOnlyDependsOnArchivedAt() {
         let goal = FinalGoal(
             title: "Pass IELTS",
-            startDayKey: "2026-04-29",
+            startDayKey: "2026-04-30",
             sortOrder: 0
         )
 
@@ -13,27 +13,18 @@ final class DomainTypeTests: XCTestCase {
 
         goal.archivedAt = Date()
         XCTAssertFalse(goal.isActive)
-
-        goal.archivedAt = nil
-        goal.completedAt = Date()
-        XCTAssertFalse(goal.isActive)
     }
 
-    func testMilestoneGoalTracksActiveState() {
-        let parentID = UUID()
+    func testMilestoneGoalActiveStateOnlyDependsOnCompletedAt() {
         let milestone = MilestoneGoal(
-            title: "Vocabulary",
+            title: "Finish vocabulary",
             targetCompletionDays: 30,
-            finalGoalID: parentID,
+            finalGoalID: UUID(),
             sortOrder: 0
         )
 
         XCTAssertTrue(milestone.isActive)
 
-        milestone.archivedAt = Date()
-        XCTAssertFalse(milestone.isActive)
-
-        milestone.archivedAt = nil
         milestone.completedAt = Date()
         XCTAssertFalse(milestone.isActive)
     }
@@ -74,8 +65,7 @@ final class DomainTypeTests: XCTestCase {
             currentMilestoneTitle: "Vocabulary",
             remainingCalendarDays: 150,
             sortOrder: 0,
-            archivedAt: nil,
-            completedAt: nil
+            archivedAt: nil
         )
 
         XCTAssertEqual(createInput.startDay, startDay)
@@ -102,7 +92,6 @@ final class DomainTypeTests: XCTestCase {
             completionRate: 0.4,
             isCompletedToday: true,
             startDayKey: "2026-04-17",
-            archivedAt: nil,
             completedAt: nil,
             recentActivity: [recentActivity]
         )
@@ -129,8 +118,8 @@ final class DomainTypeTests: XCTestCase {
     func testRepositoryErrorsExposeDescriptions() {
         XCTAssertEqual(GoalRepositoryError.finalGoalNotFound.errorDescription, "Final goal not found.")
         XCTAssertEqual(GoalRepositoryError.milestoneGoalNotFound.errorDescription, "Milestone goal not found.")
+        XCTAssertEqual(GoalRepositoryError.finalGoalNotActive.errorDescription, "Final goal is archived.")
         XCTAssertEqual(GoalRepositoryError.notCurrentMilestone.errorDescription, "Only the current active milestone can receive check-ins.")
-        XCTAssertEqual(GoalRepositoryError.milestonesIncomplete.errorDescription, "All milestones must be completed before completing the final goal.")
         XCTAssertEqual(GoalRepositoryError.saveFailed("disk").errorDescription, "Save failed: disk")
     }
 }

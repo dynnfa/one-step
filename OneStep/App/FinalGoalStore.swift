@@ -33,7 +33,7 @@ final class FinalGoalStore {
 
     func createFinalGoal(title: String, goalDescription: String?, targetCalendarDays: Int?) {
         do {
-            let wasEmpty = finalGoals.filter { $0.archivedAt == nil && $0.completedAt == nil }.isEmpty
+            let wasEmpty = finalGoals.filter { $0.archivedAt == nil }.isEmpty
             _ = try repository.createFinalGoal(CreateFinalGoalInput(
                 title: title,
                 goalDescription: goalDescription,
@@ -61,15 +61,6 @@ final class FinalGoalStore {
 
     func completeFinalGoal(finalGoalID: UUID) {
         do {
-            try repository.completeFinalGoal(finalGoalID: finalGoalID, completedAt: Date())
-            refreshAndReloadWidget()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    func archiveFinalGoal(finalGoalID: UUID) {
-        do {
             try repository.archiveFinalGoal(finalGoalID: finalGoalID, archivedAt: Date())
             refreshAndReloadWidget()
         } catch {
@@ -79,7 +70,7 @@ final class FinalGoalStore {
 
     func move(from source: IndexSet, to destination: Int) {
         guard let sourceIndex = source.first else { return }
-        let activeGoals = finalGoals.filter { $0.archivedAt == nil && $0.completedAt == nil }
+        let activeGoals = finalGoals.filter { $0.archivedAt == nil }
         guard sourceIndex < activeGoals.count else { return }
 
         do {

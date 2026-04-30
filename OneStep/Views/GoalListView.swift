@@ -10,15 +10,11 @@ struct GoalListView: View {
     @State private var isAddingMilestone = false
 
     private var activeGoals: [FinalGoalListSnapshot] {
-        finalGoalStore.finalGoals.filter { $0.archivedAt == nil && $0.completedAt == nil }
-    }
-
-    private var completedGoals: [FinalGoalListSnapshot] {
-        finalGoalStore.finalGoals.filter { $0.completedAt != nil }
+        finalGoalStore.finalGoals.filter { $0.archivedAt == nil }
     }
 
     private var archivedGoals: [FinalGoalListSnapshot] {
-        finalGoalStore.finalGoals.filter { $0.archivedAt != nil && $0.completedAt == nil }
+        finalGoalStore.finalGoals.filter { $0.archivedAt != nil }
     }
 
     var body: some View {
@@ -87,14 +83,6 @@ struct GoalListView: View {
                 }
                 .onMove(perform: finalGoalStore.move)
             }
-            if !completedGoals.isEmpty {
-                Section("Completed") {
-                    ForEach(completedGoals) { goal in
-                        FinalGoalRowView(goal: goal)
-                            .tag(goal.id)
-                    }
-                }
-            }
             if !archivedGoals.isEmpty {
                 Section("Archived") {
                     ForEach(archivedGoals) { goal in
@@ -125,12 +113,10 @@ struct GoalListView: View {
                     errorMessage: milestoneStore.errorMessage ?? finalGoalStore.errorMessage,
                     onAddMilestone: { isAddingMilestone = true },
                     onComplete: { finalGoalStore.completeFinalGoal(finalGoalID: goal.id) },
-                    onArchive: { finalGoalStore.archiveFinalGoal(finalGoalID: goal.id) },
                     onEditGoal: { editingFinalGoal = goal },
                     onCheckIn: { msID in milestoneStore.completeToday(milestoneGoalID: msID, finalGoalID: goal.id) },
                     onUndo: { msID in milestoneStore.uncompleteToday(milestoneGoalID: msID, finalGoalID: goal.id) },
-                    onEditMilestone: { ms in editingMilestone = ms },
-                    onArchiveMilestone: { msID in milestoneStore.archiveMilestone(milestoneGoalID: msID, finalGoalID: goal.id) }
+                    onEditMilestone: { ms in editingMilestone = ms }
                 )
             } else if finalGoalStore.finalGoals.isEmpty {
                 EmptyStateView { isShowingCreateGoal = true }

@@ -8,7 +8,7 @@ The current goal system is flat — each Goal directly contains `title`, `dailyA
 
 ## Decision
 
-Split the single `Goal` model into two models: **FinalGoal** (the long-term aspiration) and **MilestoneGoal** (a sequential phase within that aspiration). Daily check-ins happen against MilestoneGoals. MilestoneGoals advance in strict order — only the current active milestone can receive check-ins. When all milestones are complete, the user manually confirms the FinalGoal as done.
+Split the single `Goal` model into two models: **FinalGoal** (the long-term aspiration) and **MilestoneGoal** (a sequential phase within that aspiration). Daily check-ins happen against MilestoneGoals. MilestoneGoals advance in strict order — only the current active milestone can receive check-ins. Completing a FinalGoal is the same state transition as archiving it, and it can happen at any time.
 
 Old Goal data is not migrated. The project is pre-v1.0 and the schema starts fresh.
 
@@ -24,12 +24,11 @@ Old Goal data is not migrated. The project is pre-v1.0 and the schema starts fre
 | `targetCalendarDays` | `Int?` | Optional, > 0 if set | Motivational deadline in calendar days from creation |
 | `startDayKey` | `String` | YYYY-MM-DD | Set on creation |
 | `sortOrder` | `Int` | | Manual ordering in the sidebar |
-| `completedAt` | `Date?` | `nil` when incomplete | Set manually when user confirms completion |
-| `archivedAt` | `Date?` | `nil` when active | Set when archived |
+| `archivedAt` | `Date?` | `nil` when active | Set when completed/ended/archived |
 | `createdAt` | `Date` | | Set once |
 | `updatedAt` | `Date` | | Updated on every mutation |
 
-Computed: `isActive` = `archivedAt == nil && completedAt == nil`
+Computed: `isActive` = `archivedAt == nil`
 
 ### MilestoneGoal
 
@@ -42,11 +41,10 @@ Computed: `isActive` = `archivedAt == nil && completedAt == nil`
 | `sortOrder` | `Int` | | Order within the parent FinalGoal |
 | `startDayKey` | `String?` | YYYY-MM-DD | Set on first check-in, locked after that |
 | `completedAt` | `Date?` | `nil` when incomplete | Auto-set when `completedDays >= targetCompletionDays` |
-| `archivedAt` | `Date?` | `nil` when active | Set when archived |
 | `createdAt` | `Date` | | Set once |
 | `updatedAt` | `Date` | | Updated on every mutation |
 
-Computed: `isActive` = `archivedAt == nil && completedAt == nil`
+Computed: `isActive` = `completedAt == nil`
 
 ### DailyCompletion (unchanged)
 
@@ -66,12 +64,12 @@ Computed: `isActive` = `archivedAt == nil && completedAt == nil`
 - The **current active milestone** is the one with the smallest `sortOrder` that is `isActive`.
 - Only the current active milestone can receive check-ins.
 - When `completedDays >= targetCompletionDays` for a milestone, `completedAt` is auto-set and the next milestone becomes active.
-- All milestones must be completed before the FinalGoal can be manually confirmed as complete.
 
 ### Check-in Rules
 
 - One check-in per MilestoneGoal per day (enforced by `DailyCompletion.uniqueKey`).
-- Archived milestones cannot receive check-ins.
+- Only the current active milestone of an active FinalGoal can receive check-ins.
+- Completed milestones cannot receive new check-ins.
 - Undo (app only): delete today's `DailyCompletion` for a milestone.
 
 ### Calendar Day Limit
@@ -79,16 +77,20 @@ Computed: `isActive` = `archivedAt == nil && completedAt == nil`
 - `targetCalendarDays` on FinalGoal is optional and motivational only.
 - If set, the UI shows "X days remaining" as a reference. It does not block or warn when exceeded.
 
-### Archival
+### FinalGoal Completion / Archival
 
-- Archiving a FinalGoal archives all its incomplete MilestoneGoals.
-- Archiving the current active milestone causes the next incomplete milestone to become active.
+- Completing a FinalGoal and archiving a FinalGoal are the same state transition.
+- The user can complete/archive a FinalGoal at any time.
+- Completing/archiving sets `FinalGoal.archivedAt`.
+- Archived FinalGoals are removed from the active list and do not contribute milestones to the widget.
+- Completing/archiving a FinalGoal does not mutate its MilestoneGoals.
 
-### Completion
+### Milestone Completion
 
-- FinalGoal completion is manual: the user presses a "Complete" button.
-- Prerequisite: all MilestoneGoals under that FinalGoal must have `completedAt != nil`.
-- Setting `completedAt` on the FinalGoal removes it from the active list.
+- MilestoneGoals cannot be archived independently.
+- A MilestoneGoal completes when `completedDays >= targetCompletionDays`.
+- Completing a MilestoneGoal sets `MilestoneGoal.completedAt`.
+- The current active milestone is the first MilestoneGoal by `sortOrder` where `completedAt == nil`.
 
 ### Deletion
 
@@ -106,7 +108,7 @@ Computed: `isActive` = `archivedAt == nil && completedAt == nil`
 
 **Sidebar:** FinalGoal list
 - Each row shows: title, milestone progress (e.g., "2/5"), optional day countdown
-- Actions: create, delete, archive, reorder
+- Actions: create, delete, complete/archive, reorder
 
 **Detail pane (FinalGoal selected):**
 - FinalGoal title + description (editable)
@@ -115,7 +117,7 @@ Computed: `isActive` = `archivedAt == nil && completedAt == nil`
   - Current active milestone is highlighted; check-in button visible
   - Completed milestones show a checkmark
 - "Add Milestone" button at the bottom of the list
-- "Complete Final Goal" button appears when all milestones are done
+- "Complete Final Goal" button archives the FinalGoal and is available even with incomplete milestones
 
 ### Creation Flow
 
@@ -141,8 +143,8 @@ Computed: `isActive` = `archivedAt == nil && completedAt == nil`
 
 **Repositories:**
 - Delete `GoalRepository.swift`
-- Add `FinalGoalRepository.swift` — CRUD, manual completion, archival
-- Add `MilestoneGoalRepository.swift` — CRUD, check-in, undo, archival, milestone advancement logic
+- Add `FinalGoalRepository.swift` — CRUD, final-goal archival/end-state
+- Add `MilestoneGoalRepository.swift` — CRUD, check-in, undo, milestone advancement logic
 - Modify `GoalRepositoryError.swift` — expand error cases
 
 **Snapshots:**

@@ -25,8 +25,7 @@ Fields:
 | Target calendar days | Int? | Optional deadline from creation date. `nil` means no deadline. |
 | Start day | String (YYYY-MM-DD) | Set on creation. |
 | Sort order | Int | Manual ordering for display. |
-| Completed at | Date? | Set when all milestones are done. |
-| Archived at | Date? | `nil` when active. |
+| Archived at | Date? | `nil` when active. Set when the goal is completed, ended, or archived. |
 
 ### MilestoneGoal
 
@@ -42,20 +41,18 @@ Fields:
 | Sort order | Int | Determines sequence within the FinalGoal. |
 | Start day | String? (YYYY-MM-DD) | Set on first check-in. `nil` until then. |
 | Completed at | Date? | Auto-set when `completedDays >= targetCompletionDays`. |
-| Archived at | Date? | `nil` when active. |
 
 ### Current Active Milestone
 
-At any time, a FinalGoal has at most one **current active milestone**: the first `MilestoneGoal` where `isActive` is true, ordered by `sortOrder`. Only the current active milestone can receive check-ins. When it completes (or is archived), the next active milestone in sort order becomes current.
+At any time, a FinalGoal has at most one **current active milestone**: the first `MilestoneGoal` where `completedAt == nil`, ordered by `sortOrder`. Only the current active milestone can receive check-ins. When it completes, the next incomplete milestone in sort order becomes current.
 
 ## FinalGoal Lifecycle
 
 1. **Create.** User enters title, optional description, and optional calendar-day limit. The FinalGoal appears in the sidebar and is available to the Widget through its milestones.
 2. **Edit.** User can change title, description, and calendar-day limit.
-3. **Complete.** Available only when all milestones are done. Marks the FinalGoal as completed.
-4. **Archive.** Cascades to all incomplete milestones. Archived FinalGoals leave the Widget and move to the app's archived section.
-5. **Reorder.** User drags FinalGoals into a preferred order. The Widget follows this order.
-6. **Delete.** Removes the FinalGoal, all its milestones, and all completions.
+3. **Complete/archive.** Available at any time. Sets `archivedAt`, removes the FinalGoal from active tracking, and removes its milestones from the Widget. Milestones are not archived; they are either incomplete or complete.
+4. **Reorder.** User drags FinalGoals into a preferred order. The Widget follows this order.
+5. **Delete.** Removes the FinalGoal, all its milestones, and all completions.
 
 ## MilestoneGoal Lifecycle
 
@@ -64,8 +61,7 @@ At any time, a FinalGoal has at most one **current active milestone**: the first
 3. **Check in (complete today).** Mark daily effort on the current active milestone. Available from the app and the Widget. Sets `startDayKey` on first check-in.
 4. **Undo today.** Remove today's completion from the main app. If the milestone was auto-completed, undoing reopens it.
 5. **Auto-complete.** When `completedDays >= targetCompletionDays`, the milestone's `completedAt` is set and the next active milestone becomes current.
-6. **Archive.** If the current active milestone is archived, the next one becomes current.
-7. **Delete.** Removes the milestone and its completions.
+6. **Delete.** Removes the milestone and its completions.
 
 ## Widget Behavior
 
@@ -105,5 +101,5 @@ Empty state: when no active milestones exist, the Widget shows "Create a goal in
 - **Error states.** Repository errors surface as user-visible messages in the app. Widget errors are logged and result in empty data display rather than a crash.
 - **Long text.** Titles and descriptions may be long. The app list and Widget rows truncate gracefully without breaking layout.
 - **Many goals.** There is no hard cap on FinalGoal or MilestoneGoal count. The Widget shows the first N current milestones based on family size and sort order.
-- **Sequential milestone advancement.** Only the current active milestone accepts check-ins. Completing or archiving the current milestone automatically promotes the next one.
+- **Sequential milestone advancement.** Only the current active milestone accepts check-ins. Completing the current milestone automatically promotes the next one.
 - **Accessibility.** Interactive controls have VoiceOver labels. The app list is keyboard-navigable. Deeper accessibility hardening is planned for v1.x.

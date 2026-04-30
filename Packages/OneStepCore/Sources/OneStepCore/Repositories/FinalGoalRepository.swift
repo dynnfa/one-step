@@ -50,12 +50,6 @@ public struct FinalGoalRepository {
         let goal = try fetchFinalGoal(finalGoalID: finalGoalID)
         goal.archivedAt = archivedAt
         goal.updatedAt = Date()
-
-        let milestones = try fetchMilestones(for: finalGoalID)
-        for milestone in milestones where milestone.isActive {
-            milestone.archivedAt = archivedAt
-            milestone.updatedAt = Date()
-        }
         try save()
     }
 
@@ -90,18 +84,6 @@ public struct FinalGoalRepository {
             activeGoal.sortOrder = index
             activeGoal.updatedAt = Date()
         }
-        try save()
-    }
-
-    public func completeFinalGoal(finalGoalID: UUID, completedAt: Date) throws {
-        let goal = try fetchFinalGoal(finalGoalID: finalGoalID)
-        let milestones = try fetchMilestones(for: finalGoalID)
-        let incompleteMilestones = milestones.filter { $0.completedAt == nil && $0.archivedAt == nil }
-        guard incompleteMilestones.isEmpty else {
-            throw GoalRepositoryError.milestonesIncomplete
-        }
-        goal.completedAt = completedAt
-        goal.updatedAt = Date()
         try save()
     }
 
@@ -207,8 +189,7 @@ private extension FinalGoalRepository {
             currentMilestoneTitle: currentMilestone?.title,
             remainingCalendarDays: remainingCalendarDays,
             sortOrder: goal.sortOrder,
-            archivedAt: goal.archivedAt,
-            completedAt: goal.completedAt
+            archivedAt: goal.archivedAt
         )
     }
 

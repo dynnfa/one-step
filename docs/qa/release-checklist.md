@@ -13,9 +13,9 @@ Run every check before tagging an open-source release. Initial releases are sour
 - [ ] Create a FinalGoal with title, optional description, and optional calendar-day limit.
 - [ ] Edit the FinalGoal's title, description, and calendar-day limit.
 - [ ] Verify empty title is rejected.
-- [ ] Complete a FinalGoal (requires all milestones done).
-- [ ] Attempt to complete a FinalGoal with incomplete milestones — verify it is rejected.
-- [ ] Archive a FinalGoal. Verify it moves to the archived section and its incomplete milestones are also archived.
+- [ ] Complete a FinalGoal with no milestones and verify it leaves the active list.
+- [ ] Complete a FinalGoal with incomplete milestones and verify it leaves the active list.
+- [ ] Verify completing a FinalGoal does not mark its milestones complete.
 - [ ] Reorder active FinalGoals via drag. Verify new order persists.
 
 ## Manual App Checks — MilestoneGoal
@@ -28,7 +28,7 @@ Run every check before tagging an open-source release. Initial releases are sour
 - [ ] Verify only the current active milestone (first active in sort order) accepts check-ins.
 - [ ] Complete all days of the current milestone. Verify it auto-completes and the next milestone becomes current.
 - [ ] Undo the last completion of an auto-completed milestone. Verify it reopens and becomes current again.
-- [ ] Archive the current active milestone. Verify the next one becomes current.
+- [ ] Verify milestones have no archive action.
 - [ ] Edit a milestone's title and target completion days.
 
 ## Manual Widget Checks
@@ -40,7 +40,8 @@ Run every check before tagging an open-source release. Initial releases are sour
 - [ ] Each Widget row shows the milestone title and parent FinalGoal title.
 - [ ] Clicking an incomplete milestone in the Widget completes it without opening the app.
 - [ ] Clicking an already-completed milestone in the Widget does nothing (idempotent).
-- [ ] Clicking a stale Widget row for an archived milestone or FinalGoal does not create a completion.
+- [ ] Clicking a stale Widget row for a completed milestone or archived FinalGoal does not create a completion.
+- [ ] Verify Widget skips archived FinalGoals and shows the next active FinalGoal with a current milestone.
 
 ## Data Checks
 
@@ -48,7 +49,6 @@ Run every check before tagging an open-source release. Initial releases are sour
 - [ ] Upgrade install (when applicable): build over an existing store, verify existing data is readable.
 - [ ] Local store is readable by both the app and Widget after each operation.
 - [ ] Cascade delete: delete a FinalGoal and verify its milestones and completions are removed.
-- [ ] Cascade archive: archive a FinalGoal and verify incomplete milestones are also archived.
 
 ## Documentation Checks
 
@@ -56,7 +56,7 @@ Run every check before tagging an open-source release. Initial releases are sour
 - [ ] Roadmap matches shipped scope for the release version.
 - [ ] Privacy claims in `PRIVACY.md` are still true for the current codebase.
 - [ ] `docs/troubleshooting/widget-app-group.md` reflects the current Widget/App Group setup.
-- [ ] No unresolved `TODO`, `TBD`, or placeholder text in any documentation file.
+- [ ] No unresolved placeholder markers in any documentation file.
 
 ## Release Tag
 
