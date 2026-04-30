@@ -2,38 +2,41 @@ import Foundation
 import SwiftData
 
 @Model
-public final class Goal {
+public final class MilestoneGoal {
     @Attribute(.unique) public var id: UUID
     public var title: String
-    public var dailyAction: String
     public var targetCompletionDays: Int
-    public var startDayKey: String
+    public var finalGoalID: UUID
     public var sortOrder: Int
+    public var startDayKey: String?
+    public var completedAt: Date?
+    public var archivedAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
-    public var archivedAt: Date?
 
     public init(
         id: UUID = UUID(),
         title: String,
-        dailyAction: String,
         targetCompletionDays: Int,
-        startDayKey: String,
+        finalGoalID: UUID,
         sortOrder: Int,
+        startDayKey: String? = nil,
+        completedAt: Date? = nil,
+        archivedAt: Date? = nil,
         createdAt: Date = Date(),
-        updatedAt: Date = Date(),
-        archivedAt: Date? = nil
+        updatedAt: Date = Date()
     ) {
         self.id = id
         self.title = title
-        self.dailyAction = dailyAction
         self.targetCompletionDays = targetCompletionDays
-        self.startDayKey = startDayKey
+        self.finalGoalID = finalGoalID
         self.sortOrder = sortOrder
+        self.startDayKey = startDayKey
+        self.completedAt = completedAt
+        self.archivedAt = archivedAt
         self.createdAt = createdAt
         self.updatedAt = updatedAt
-        self.archivedAt = archivedAt
     }
 
-    public var isActive: Bool { archivedAt == nil }
+    public var isActive: Bool { archivedAt == nil && completedAt == nil }
 }
