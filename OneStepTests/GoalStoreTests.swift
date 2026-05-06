@@ -122,6 +122,20 @@ final class MilestoneGoalStoreTests: XCTestCase {
     }
 }
 
+final class DayCountInputValidatorTests: XCTestCase {
+    func testAcceptsTrimmedIntegerWithinRange() {
+        XCTAssertEqual(DayCountInputValidator.parse(" 365 ", range: 1...10_000), 365)
+    }
+
+    func testRejectsEmptyZeroNegativeTextAndOutOfRangeValues() {
+        XCTAssertNil(DayCountInputValidator.parse("", range: 1...10_000))
+        XCTAssertNil(DayCountInputValidator.parse("0", range: 1...10_000))
+        XCTAssertNil(DayCountInputValidator.parse("-1", range: 1...10_000))
+        XCTAssertNil(DayCountInputValidator.parse("abc", range: 1...10_000))
+        XCTAssertNil(DayCountInputValidator.parse("10001", range: 1...10_000))
+    }
+}
+
 @MainActor
 private struct MilestoneStoreFixture {
     let fgRepo: FinalGoalRepository
