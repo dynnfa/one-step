@@ -3,12 +3,12 @@ import WidgetKit
 
 struct OneStepWidgetEntry: TimelineEntry {
     let date: Date
-    let goals: [WidgetGoalSnapshot]
+    let milestones: [WidgetMilestoneSnapshot]
 }
 
 struct OneStepTimelineProvider: TimelineProvider {
     func placeholder(in context: Context) -> OneStepWidgetEntry {
-        OneStepWidgetEntry(date: Date(), goals: [])
+        OneStepWidgetEntry(date: Date(), milestones: [])
     }
 
     func getSnapshot(in context: Context, completion: @escaping (OneStepWidgetEntry) -> Void) {
@@ -30,12 +30,12 @@ struct OneStepTimelineProvider: TimelineProvider {
     @MainActor
     private func loadEntry(family: WidgetFamily) -> OneStepWidgetEntry {
         do {
-            let repository = try GoalRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier)
-            let goals = try repository.activeGoalsForWidget(limit: family.goalLimit, day: .today)
-            return OneStepWidgetEntry(date: Date(), goals: goals)
+            let repository = try MilestoneGoalRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier)
+            let milestones = try repository.activeMilestonesForWidget(limit: family.goalLimit, day: .today)
+            return OneStepWidgetEntry(date: Date(), milestones: milestones)
         } catch {
             OneStepLog.widget.error("Timeline load failed: \(error.localizedDescription, privacy: .public)")
-            return OneStepWidgetEntry(date: Date(), goals: [])
+            return OneStepWidgetEntry(date: Date(), milestones: [])
         }
     }
 }

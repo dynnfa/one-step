@@ -2,70 +2,124 @@ import XCTest
 @testable import OneStepCore
 
 final class DomainTypeTests: XCTestCase {
-    func testGoalTracksActiveArchiveState() {
-        let goal = Goal(
-            title: "Write",
-            dailyAction: "Write one paragraph",
-            targetCompletionDays: 30,
-            startDayKey: "2026-04-29",
+    func testFinalGoalActiveStateOnlyDependsOnArchivedAt() {
+        let goal = FinalGoal(
+            title: "Pass IELTS",
+            startDayKey: "2026-04-30",
             sortOrder: 0
         )
 
         XCTAssertTrue(goal.isActive)
 
         goal.archivedAt = Date()
-
         XCTAssertFalse(goal.isActive)
     }
 
-    func testDailyCompletionUniqueKeyUsesGoalAndDay() {
-        let goalID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-        let completion = DailyCompletion(goalID: goalID, dayKey: "2026-04-29")
+    func testMilestoneGoalActiveStateOnlyDependsOnCompletedAt() {
+        let milestone = MilestoneGoal(
+            title: "Finish vocabulary",
+            targetCompletionDays: 30,
+            finalGoalID: UUID(),
+            sortOrder: 0
+        )
+
+        XCTAssertTrue(milestone.isActive)
+
+        milestone.completedAt = Date()
+        XCTAssertFalse(milestone.isActive)
+    }
+
+    func testDailyCompletionUniqueKeyUsesMilestoneAndDay() {
+        let milestoneID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        let completion = DailyCompletion(goalID: milestoneID, dayKey: "2026-04-29")
 
         XCTAssertEqual(completion.uniqueKey, "00000000-0000-0000-0000-000000000001#2026-04-29")
         XCTAssertEqual(
-            DailyCompletion.makeUniqueKey(goalID: goalID, dayKey: "2026-04-29"),
+            DailyCompletion.makeUniqueKey(goalID: milestoneID, dayKey: "2026-04-29"),
             completion.uniqueKey
         )
     }
 
-    func testSnapshotsPreserveInputValues() throws {
+    func testFinalGoalSnapshotsPreserveValues() throws {
         let startDay = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
 
-        let createInput = CreateGoalInput(
-            title: "Write",
-            dailyAction: "Write one paragraph",
-            targetCompletionDays: 30,
+        let createInput = CreateFinalGoalInput(
+            title: "Pass IELTS",
+            goalDescription: "Score 7.0+",
+            targetCalendarDays: 180,
             startDay: startDay
         )
-        let updateInput = UpdateGoalInput(
-            title: "Read",
-            dailyAction: "Read five pages",
-            targetCompletionDays: 10
+        let updateInput = UpdateFinalGoalInput(
+            title: "Pass TOEFL",
+            goalDescription: "Score 100+",
+            targetCalendarDays: 200
         )
-        let recentActivity = RecentActivityDay(day: startDay, isCompleted: true)
-        let snapshot = GoalListSnapshot(
+        let snapshot = FinalGoalListSnapshot(
             id: UUID(),
             title: createInput.title,
-            dailyAction: createInput.dailyAction,
-            targetCompletionDays: createInput.targetCompletionDays,
-            completedDays: 1,
-            remainingDays: 29,
-            completionRate: 1.0 / 30.0,
-            isCompletedToday: true,
+            goalDescription: createInput.goalDescription,
+            targetCalendarDays: createInput.targetCalendarDays,
+            completedMilestoneCount: 1,
+            totalMilestoneCount: 3,
+            currentMilestoneID: UUID(),
+            currentMilestoneTitle: "Vocabulary",
+            remainingCalendarDays: 150,
             sortOrder: 0,
-            archivedAt: nil,
-            recentActivity: [recentActivity]
+            archivedAt: nil
         )
 
         XCTAssertEqual(createInput.startDay, startDay)
-        XCTAssertEqual(updateInput.dailyAction, "Read five pages")
-        XCTAssertEqual(recentActivity.id, "2026-04-29")
+        XCTAssertEqual(updateInput.title, "Pass TOEFL")
+        XCTAssertEqual(snapshot.completedMilestoneCount, 1)
+        XCTAssertEqual(snapshot.totalMilestoneCount, 3)
+    }
+
+    func testMilestoneSnapshotsPreserveValues() throws {
+        let parentID = UUID()
+        let milestoneID = UUID()
+        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        let recentActivity = RecentActivityDay(day: day, isCompleted: true)
+
+        let snapshot = MilestoneGoalSnapshot(
+            id: milestoneID,
+            title: "Vocabulary",
+            targetCompletionDays: 30,
+            finalGoalID: parentID,
+            sortOrder: 0,
+            isCurrent: true,
+            completedDays: 12,
+            remainingDays: 18,
+            completionRate: 0.4,
+            isCompletedToday: true,
+            startDayKey: "2026-04-17",
+            completedAt: nil,
+            recentActivity: [recentActivity]
+        )
+
+        XCTAssertTrue(snapshot.isCurrent)
+        XCTAssertEqual(snapshot.completionRate, 0.4)
         XCTAssertEqual(snapshot.recentActivity, [recentActivity])
     }
 
+    func testWidgetMilestoneSnapshotPreservesValues() {
+        let snapshot = WidgetMilestoneSnapshot(
+            id: UUID(),
+            title: "Vocabulary",
+            parentFinalGoalTitle: "Pass IELTS",
+            targetCompletionDays: 30,
+            completedDays: 12,
+            isCompletedToday: true
+        )
+
+        XCTAssertEqual(snapshot.parentFinalGoalTitle, "Pass IELTS")
+        XCTAssertEqual(snapshot.completedDays, 12)
+    }
+
     func testRepositoryErrorsExposeDescriptions() {
-        XCTAssertEqual(GoalRepositoryError.goalNotFound.errorDescription, "Goal not found.")
+        XCTAssertEqual(GoalRepositoryError.finalGoalNotFound.errorDescription, "Final goal not found.")
+        XCTAssertEqual(GoalRepositoryError.milestoneGoalNotFound.errorDescription, "Milestone goal not found.")
+        XCTAssertEqual(GoalRepositoryError.finalGoalNotActive.errorDescription, "Final goal is archived.")
+        XCTAssertEqual(GoalRepositoryError.notCurrentMilestone.errorDescription, "Only the current active milestone can receive check-ins.")
         XCTAssertEqual(GoalRepositoryError.saveFailed("disk").errorDescription, "Save failed: disk")
     }
 }
