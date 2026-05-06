@@ -10,7 +10,7 @@ public struct MilestoneGoalRepository {
     }
 
     public static func shared(appGroupIdentifier: String) throws -> MilestoneGoalRepository {
-        let container = try OneStepModelContainerFactory.makeShared(appGroupIdentifier: appGroupIdentifier)
+        let container = try OneStepModelContainerFactory.sharedContainer(appGroupIdentifier: appGroupIdentifier)
         return MilestoneGoalRepository(modelContext: ModelContext(container))
     }
 

@@ -4,6 +4,15 @@ import SwiftData
 public enum OneStepModelContainerFactory {
     public static let storeFileName = "OneStep.sqlite"
 
+    private static var sharedContainers: [String: ModelContainer] = [:]
+
+    public static func sharedContainer(appGroupIdentifier: String) throws -> ModelContainer {
+        if let existing = sharedContainers[appGroupIdentifier] { return existing }
+        let container = try makeShared(appGroupIdentifier: appGroupIdentifier)
+        sharedContainers[appGroupIdentifier] = container
+        return container
+    }
+
     public static func makeInMemory() throws -> ModelContainer {
         let schema = Schema([FinalGoal.self, MilestoneGoal.self, DailyCompletion.self])
         let configuration = ModelConfiguration("OneStepTests", schema: schema, isStoredInMemoryOnly: true)
