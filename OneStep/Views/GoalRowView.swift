@@ -27,6 +27,7 @@ struct MilestoneGoalRowView: View {
     let milestone: MilestoneGoalSnapshot
     let onCheckIn: () -> Void
     let onUndo: () -> Void
+    let onSetActive: (Bool) -> Void
     let onEdit: () -> Void
 
     var body: some View {
@@ -36,18 +37,22 @@ struct MilestoneGoalRowView: View {
                     .font(.title2)
             }
             .buttonStyle(.plain)
-            .disabled(!milestone.isCurrent || milestone.completedAt != nil)
+            .disabled(!milestone.isActive || milestone.completedAt != nil)
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
                     Text(milestone.title).font(.headline)
-                    if milestone.isCurrent {
-                        Text("current")
+                    if milestone.isActive {
+                        Text("active")
                             .font(.caption2)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(.tint.opacity(0.15))
                             .clipShape(Capsule())
+                    } else if milestone.completedAt == nil {
+                        Text("inactive")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                     }
                     if milestone.completedAt != nil {
                         Image(systemName: "checkmark.seal.fill")
@@ -69,6 +74,16 @@ struct MilestoneGoalRowView: View {
                 Text(milestone.completionRate, format: .percent.precision(.fractionLength(0)))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+
+            if milestone.completedAt == nil {
+                Button {
+                    onSetActive(!milestone.isActive)
+                } label: {
+                    Image(systemName: milestone.isActive ? "pause.circle" : "play.circle")
+                }
+                .buttonStyle(.plain)
+                .help(milestone.isActive ? "Deactivate milestone" : "Activate milestone")
             }
 
             Menu {

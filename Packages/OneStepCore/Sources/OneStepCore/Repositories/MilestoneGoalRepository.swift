@@ -35,7 +35,7 @@ public struct MilestoneGoalRepository {
 
     public func updateMilestoneGoal(milestoneGoalID: UUID, input: UpdateMilestoneGoalInput) throws {
         let milestone = try fetchMilestoneGoal(milestoneGoalID: milestoneGoalID)
-        guard milestone.completedAt == nil else { throw GoalRepositoryError.notCurrentMilestone }
+        guard milestone.completedAt == nil else { throw GoalRepositoryError.milestoneNotActive }
 
         let title = try validateTitle(input.title)
         try validateTargetCompletionDays(input.targetCompletionDays)
@@ -46,6 +46,21 @@ public struct MilestoneGoalRepository {
 
         milestone.title = title
         milestone.targetCompletionDays = input.targetCompletionDays
+        if currentCompletedDays >= input.targetCompletionDays {
+            milestone.completedAt = Date()
+            milestone.isActive = false
+        }
+        milestone.updatedAt = Date()
+        try save()
+    }
+
+    public func setMilestoneActive(milestoneGoalID: UUID, isActive: Bool) throws {
+        let milestone = try fetchMilestoneGoal(milestoneGoalID: milestoneGoalID)
+        let finalGoal = try fetchFinalGoal(finalGoalID: milestone.finalGoalID)
+        guard !isActive || finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
+        guard isActive == false || milestone.completedAt == nil else { throw GoalRepositoryError.milestoneNotActive }
+
+        milestone.isActive = isActive
         milestone.updatedAt = Date()
         try save()
     }
@@ -62,15 +77,10 @@ public struct MilestoneGoalRepository {
 
     public func completeToday(milestoneGoalID: UUID, day: LocalDay) throws {
         let milestone = try fetchMilestoneGoal(milestoneGoalID: milestoneGoalID)
-        guard milestone.completedAt == nil else { throw GoalRepositoryError.notCurrentMilestone }
+        guard milestone.completedAt == nil, milestone.isActive else { throw GoalRepositoryError.milestoneNotActive }
 
         let finalGoal = try fetchFinalGoal(finalGoalID: milestone.finalGoalID)
         guard finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
-
-        let currentActive = try currentActiveMilestone(for: finalGoal.id)
-        guard currentActive?.id == milestoneGoalID else {
-            throw GoalRepositoryError.notCurrentMilestone
-        }
 
         let uniqueKey = DailyCompletion.makeUniqueKey(goalID: milestoneGoalID, dayKey: day.rawValue)
         guard try fetchCompletion(uniqueKey: uniqueKey) == nil else { return }
@@ -84,6 +94,7 @@ public struct MilestoneGoalRepository {
         let newCompletedDays = try completedDays(for: milestoneGoalID)
         if newCompletedDays >= milestone.targetCompletionDays {
             milestone.completedAt = Date()
+            milestone.isActive = false
         }
 
         try save()
@@ -105,7 +116,6 @@ public struct MilestoneGoalRepository {
     }
 
     public func milestonesForFinalGoal(finalGoalID: UUID, day: LocalDay) throws -> [MilestoneGoalSnapshot] {
-        let currentActiveID = try currentActiveMilestone(for: finalGoalID)?.id
         let milestones = try fetchMilestones(for: finalGoalID)
 
         return milestones.map { milestone in
@@ -122,7 +132,7 @@ public struct MilestoneGoalRepository {
                 targetCompletionDays: milestone.targetCompletionDays,
                 finalGoalID: milestone.finalGoalID,
                 sortOrder: milestone.sortOrder,
-                isCurrent: milestone.id == currentActiveID,
+                isActive: milestone.isActive,
                 completedDays: completedDays,
                 remainingDays: remainingDays,
                 completionRate: completionRate,
@@ -143,16 +153,20 @@ public struct MilestoneGoalRepository {
         var snapshots: [WidgetMilestoneSnapshot] = []
         for finalGoal in activeFinalGoals {
             guard snapshots.count < boundedLimit else { break }
-            guard let current = try currentActiveMilestone(for: finalGoal.id) else { continue }
-            let completedDays = try completedDays(for: current.id)
-            snapshots.append(WidgetMilestoneSnapshot(
-                id: current.id,
-                title: current.title,
-                parentFinalGoalTitle: finalGoal.title,
-                targetCompletionDays: current.targetCompletionDays,
-                completedDays: completedDays,
-                isCompletedToday: try isCompleted(goalID: current.id, day: day)
-            ))
+            let activeMilestones = try fetchMilestones(for: finalGoal.id)
+                .filter { $0.isActive && $0.completedAt == nil }
+            for milestone in activeMilestones {
+                guard snapshots.count < boundedLimit else { break }
+                let completedDays = try completedDays(for: milestone.id)
+                snapshots.append(WidgetMilestoneSnapshot(
+                    id: milestone.id,
+                    title: milestone.title,
+                    parentFinalGoalTitle: finalGoal.title,
+                    targetCompletionDays: milestone.targetCompletionDays,
+                    completedDays: completedDays,
+                    isCompletedToday: try isCompleted(goalID: milestone.id, day: day)
+                ))
+            }
         }
         return snapshots
     }
@@ -193,11 +207,6 @@ private extension MilestoneGoalRepository {
             throw GoalRepositoryError.milestoneGoalNotFound
         }
         return milestone
-    }
-
-    func currentActiveMilestone(for finalGoalID: UUID) throws -> MilestoneGoal? {
-        let milestones = try fetchMilestones(for: finalGoalID)
-        return milestones.first(where: { $0.isActive })
     }
 
     func fetchCompletions(goalID: UUID) throws -> [DailyCompletion] {

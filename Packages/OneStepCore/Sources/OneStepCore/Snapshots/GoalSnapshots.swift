@@ -55,8 +55,7 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
     public let targetCalendarDays: Int?
     public let completedMilestoneCount: Int
     public let totalMilestoneCount: Int
-    public let currentMilestoneID: UUID?
-    public let currentMilestoneTitle: String?
+    public let activeMilestoneCount: Int
     public let remainingCalendarDays: Int?
     public let sortOrder: Int
     public let archivedAt: Date?
@@ -68,8 +67,7 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
         targetCalendarDays: Int?,
         completedMilestoneCount: Int,
         totalMilestoneCount: Int,
-        currentMilestoneID: UUID?,
-        currentMilestoneTitle: String?,
+        activeMilestoneCount: Int,
         remainingCalendarDays: Int?,
         sortOrder: Int,
         archivedAt: Date?
@@ -80,8 +78,7 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
         self.targetCalendarDays = targetCalendarDays
         self.completedMilestoneCount = completedMilestoneCount
         self.totalMilestoneCount = totalMilestoneCount
-        self.currentMilestoneID = currentMilestoneID
-        self.currentMilestoneTitle = currentMilestoneTitle
+        self.activeMilestoneCount = activeMilestoneCount
         self.remainingCalendarDays = remainingCalendarDays
         self.sortOrder = sortOrder
         self.archivedAt = archivedAt
@@ -94,7 +91,7 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
     public let targetCompletionDays: Int
     public let finalGoalID: UUID
     public let sortOrder: Int
-    public let isCurrent: Bool
+    public let isActive: Bool
     public let completedDays: Int
     public let remainingDays: Int
     public let completionRate: Double
@@ -109,7 +106,7 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
         targetCompletionDays: Int,
         finalGoalID: UUID,
         sortOrder: Int,
-        isCurrent: Bool,
+        isActive: Bool,
         completedDays: Int,
         remainingDays: Int,
         completionRate: Double,
@@ -123,7 +120,7 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
         self.targetCompletionDays = targetCompletionDays
         self.finalGoalID = finalGoalID
         self.sortOrder = sortOrder
-        self.isCurrent = isCurrent
+        self.isActive = isActive
         self.completedDays = completedDays
         self.remainingDays = remainingDays
         self.completionRate = completionRate

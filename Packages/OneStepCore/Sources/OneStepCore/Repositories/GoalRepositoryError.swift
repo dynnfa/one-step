@@ -8,7 +8,7 @@ public enum GoalRepositoryError: Error, Equatable, LocalizedError {
     case invalidTargetCalendarDays
     case invalidTargetCompletionDays
     case targetBelowCompletedCount
-    case notCurrentMilestone
+    case milestoneNotActive
     case storeUnavailable
     case saveFailed(String)
 
@@ -28,8 +28,8 @@ public enum GoalRepositoryError: Error, Equatable, LocalizedError {
             return "Target completion days must be greater than zero."
         case .targetBelowCompletedCount:
             return "Target completion days cannot be below completed days."
-        case .notCurrentMilestone:
-            return "Only the current active milestone can receive check-ins."
+        case .milestoneNotActive:
+            return "Milestone must be active before check-in."
         case .storeUnavailable:
             return "Shared store is unavailable."
         case .saveFailed(let message):
