@@ -10,7 +10,7 @@ public struct FinalGoalRepository {
     }
 
     public static func shared(appGroupIdentifier: String) throws -> FinalGoalRepository {
-        let container = try OneStepModelContainerFactory.makeShared(appGroupIdentifier: appGroupIdentifier)
+        let container = try OneStepModelContainerFactory.sharedContainer(appGroupIdentifier: appGroupIdentifier)
         return FinalGoalRepository(modelContext: ModelContext(container))
     }
 
