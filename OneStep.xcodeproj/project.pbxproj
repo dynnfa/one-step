@@ -20,15 +20,20 @@
 		A1000000000000000000000B /* CompleteGoalIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001C /* CompleteGoalIntent.swift */; };
 		A1000000000000000000000C /* GoalStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001D /* GoalStoreTests.swift */; };
 		A1000000000000000000000D /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B3 /* OneStepCore */; };
-		A1000000000000000000000E /* FinalGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* FinalGoalStore.swift */; };
-		A100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C2 /* MilestoneGoalStore.swift */; };
-		A100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C4 /* FinalGoalDetailView.swift */; };
+ttA1000000000000000000000E /* FinalGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* FinalGoalStore.swift */; };
+ttA100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C2 /* MilestoneGoalStore.swift */; };
+ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C4 /* FinalGoalDetailView.swift */; };
 		A1000000000000000000000F /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* EmptyStateView.swift */; };
 		A10000000000000000000010 /* GoalEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000020 /* GoalEditorView.swift */; };
 		A10000000000000000000024 /* RecentActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* RecentActivityView.swift */; };
 		A10000000000000000000025 /* GoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000028 /* GoalRowView.swift */; };
 		A10000000000000000000026 /* GoalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* GoalListView.swift */; };
 		A1000000000000000000002A /* WidgetGoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000002B /* WidgetGoalRowView.swift */; };
+		A100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C2 /* MilestoneGoalStore.swift */; };
+		A100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C4 /* FinalGoalDetailView.swift */; };
+		E2597E1B2FAB269E00518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
+		E2597E1C2FAB269E00518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
+		E2597E1D2FAB269E00518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +93,8 @@
 		A10000000000000000000028 /* GoalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalRowView.swift; sourceTree = "<group>"; };
 		A10000000000000000000029 /* GoalListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListView.swift; sourceTree = "<group>"; };
 		A1000000000000000000002B /* WidgetGoalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGoalRowView.swift; sourceTree = "<group>"; };
+		A100000000000000000000C2 /* MilestoneGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneGoalStore.swift; sourceTree = "<group>"; };
+		A100000000000000000000C4 /* FinalGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalDetailView.swift; sourceTree = "<group>"; };
 		E23586A12FA1FD1400E2888E /* one-step-design.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-design.md"; sourceTree = "<group>"; };
 		E23586A22FA1FD1400E2888E /* one-step-engineering-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-engineering-plan.md"; sourceTree = "<group>"; };
 		E23586A32FA1FD1400E2888E /* one-step-test-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-test-plan.md"; sourceTree = "<group>"; };
@@ -98,6 +105,7 @@
 		E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-04-main-app.md"; sourceTree = "<group>"; };
 		E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-05-widget.md"; sourceTree = "<group>"; };
 		E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-06-verification-docs.md"; sourceTree = "<group>"; };
+		E2597E1A2FAB269E00518077 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +139,7 @@
 		A10000000000000000000041 = {
 			isa = PBXGroup;
 			children = (
+				E2597E1A2FAB269E00518077 /* Media.xcassets */,
 				A10000000000000000000042 /* OneStep */,
 				A10000000000000000000045 /* OneStepWidget */,
 				A10000000000000000000047 /* OneStepTests */,
@@ -366,6 +375,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2597E1B2FAB269E00518077 /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,6 +383,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2597E1C2FAB269E00518077 /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,6 +391,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2597E1D2FAB269E00518077 /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -563,6 +575,9 @@
 		A10000000000000000000082 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_ENTITLEMENTS = OneStep/OneStep.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -586,6 +601,9 @@
 		A10000000000000000000083 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_ENTITLEMENTS = OneStep/OneStep.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
