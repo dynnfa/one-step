@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct FinalGoalEditorView: View {
+    private static let dayCountRange = 1...10_000
+
     enum Mode {
         case create
         case edit(title: String, goalDescription: String?, targetCalendarDays: Int?)
@@ -21,6 +23,7 @@ struct FinalGoalEditorView: View {
     @State private var goalDescription: String
     @State private var hasCalendarLimit: Bool
     @State private var targetCalendarDays: Int
+    @State private var isTargetCalendarDaysValid = true
 
     init(mode: Mode, onSave: @escaping (String, String?, Int?) -> Void) {
         self.mode = mode
@@ -41,6 +44,7 @@ struct FinalGoalEditorView: View {
 
     private var isValid: Bool {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && (!hasCalendarLimit || isTargetCalendarDaysValid)
     }
 
     var body: some View {
@@ -52,9 +56,13 @@ struct FinalGoalEditorView: View {
                 .lineLimit(2...4)
             Toggle("Set calendar-day limit", isOn: $hasCalendarLimit)
             if hasCalendarLimit {
-                Stepper(value: $targetCalendarDays, in: 1...10_000) {
-                    Text("Target: \(targetCalendarDays) calendar days")
-                }
+                DayCountStepperInput(
+                    title: "Target",
+                    unit: "calendar days",
+                    value: $targetCalendarDays,
+                    range: Self.dayCountRange,
+                    isValid: $isTargetCalendarDaysValid
+                )
             }
             HStack {
                 Spacer()
@@ -77,6 +85,8 @@ struct FinalGoalEditorView: View {
 }
 
 struct MilestoneGoalEditorView: View {
+    private static let dayCountRange = 1...10_000
+
     enum Mode {
         case create
         case edit(title: String, targetCompletionDays: Int)
@@ -95,6 +105,7 @@ struct MilestoneGoalEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var title: String
     @State private var targetCompletionDays: Int
+    @State private var isTargetCompletionDaysValid = true
 
     init(mode: Mode, onSave: @escaping (String, Int) -> Void) {
         self.mode = mode
@@ -110,16 +121,21 @@ struct MilestoneGoalEditorView: View {
     }
 
     private var isValid: Bool {
-        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && targetCompletionDays > 0
+        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && isTargetCompletionDaysValid
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(mode.title).font(.title2.bold())
             TextField("Finish vocabulary", text: $title).textFieldStyle(.roundedBorder)
-            Stepper(value: $targetCompletionDays, in: 1...10_000) {
-                Text("Target: \(targetCompletionDays) completed days")
-            }
+            DayCountStepperInput(
+                title: "Target",
+                unit: "completed days",
+                value: $targetCompletionDays,
+                range: Self.dayCountRange,
+                isValid: $isTargetCompletionDaysValid
+            )
             HStack {
                 Spacer()
                 Button("Cancel") { dismiss() }
@@ -130,5 +146,86 @@ struct MilestoneGoalEditorView: View {
         }
         .padding(24)
         .frame(width: 420)
+    }
+}
+
+struct DayCountInputValidator {
+    static func parse(_ text: String, range: ClosedRange<Int>) -> Int? {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let value = Int(trimmedText), range.contains(value) else {
+            return nil
+        }
+        return value
+    }
+}
+
+private struct DayCountStepperInput: View {
+    let title: String
+    let unit: String
+    @Binding var value: Int
+    let range: ClosedRange<Int>
+    @Binding var isValid: Bool
+
+    @State private var text: String
+
+    init(
+        title: String,
+        unit: String,
+        value: Binding<Int>,
+        range: ClosedRange<Int>,
+        isValid: Binding<Bool>
+    ) {
+        self.title = title
+        self.unit = unit
+        _value = value
+        self.range = range
+        _isValid = isValid
+        _text = State(initialValue: String(value.wrappedValue))
+    }
+
+    private var stepperValue: Binding<Int> {
+        Binding(
+            get: { value },
+            set: { newValue in
+                value = newValue
+                text = String(newValue)
+                isValid = true
+            }
+        )
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 10) {
+                Text(title)
+                Spacer()
+                TextField(title, text: $text)
+                    .textFieldStyle(.roundedBorder)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 86)
+                    .onChange(of: text) { _, newValue in
+                        updateValue(from: newValue)
+                    }
+                Text(unit)
+                    .foregroundStyle(.secondary)
+                Stepper("", value: stepperValue, in: range)
+                    .labelsHidden()
+                    .frame(width: 54)
+            }
+            if !isValid {
+                Text("Enter a number from \(range.lowerBound) to \(range.upperBound).")
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
+        }
+    }
+
+    private func updateValue(from text: String) {
+        guard let parsedValue = DayCountInputValidator.parse(text, range: range) else {
+            isValid = false
+            return
+        }
+        value = parsedValue
+        isValid = true
     }
 }
