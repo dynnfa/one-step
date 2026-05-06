@@ -10,6 +10,7 @@ struct FinalGoalDetailView: View {
     let onEditGoal: () -> Void
     let onCheckIn: (UUID) -> Void
     let onUndo: (UUID) -> Void
+    let onSetActive: (UUID, Bool) -> Void
     let onEditMilestone: (MilestoneGoalSnapshot) -> Void
 
     var body: some View {
@@ -90,6 +91,7 @@ struct FinalGoalDetailView: View {
                         milestone: milestone,
                         onCheckIn: { onCheckIn(milestone.id) },
                         onUndo: { onUndo(milestone.id) },
+                        onSetActive: { isActive in onSetActive(milestone.id, isActive) },
                         onEdit: { onEditMilestone(milestone) }
                     )
                 }

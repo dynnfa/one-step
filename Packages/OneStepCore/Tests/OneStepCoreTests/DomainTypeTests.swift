@@ -15,7 +15,7 @@ final class DomainTypeTests: XCTestCase {
         XCTAssertFalse(goal.isActive)
     }
 
-    func testMilestoneGoalActiveStateOnlyDependsOnCompletedAt() {
+    func testMilestoneGoalDefaultsInactiveAndCompletionIsIndependent() {
         let milestone = MilestoneGoal(
             title: "Finish vocabulary",
             targetCompletionDays: 30,
@@ -23,10 +23,13 @@ final class DomainTypeTests: XCTestCase {
             sortOrder: 0
         )
 
+        XCTAssertFalse(milestone.isActive)
+
+        milestone.isActive = true
         XCTAssertTrue(milestone.isActive)
 
         milestone.completedAt = Date()
-        XCTAssertFalse(milestone.isActive)
+        XCTAssertTrue(milestone.isActive)
     }
 
     func testDailyCompletionUniqueKeyUsesMilestoneAndDay() {
@@ -61,8 +64,7 @@ final class DomainTypeTests: XCTestCase {
             targetCalendarDays: createInput.targetCalendarDays,
             completedMilestoneCount: 1,
             totalMilestoneCount: 3,
-            currentMilestoneID: UUID(),
-            currentMilestoneTitle: "Vocabulary",
+            activeMilestoneCount: 2,
             remainingCalendarDays: 150,
             sortOrder: 0,
             archivedAt: nil
@@ -72,6 +74,7 @@ final class DomainTypeTests: XCTestCase {
         XCTAssertEqual(updateInput.title, "Pass TOEFL")
         XCTAssertEqual(snapshot.completedMilestoneCount, 1)
         XCTAssertEqual(snapshot.totalMilestoneCount, 3)
+        XCTAssertEqual(snapshot.activeMilestoneCount, 2)
     }
 
     func testMilestoneSnapshotsPreserveValues() throws {
@@ -86,7 +89,7 @@ final class DomainTypeTests: XCTestCase {
             targetCompletionDays: 30,
             finalGoalID: parentID,
             sortOrder: 0,
-            isCurrent: true,
+            isActive: true,
             completedDays: 12,
             remainingDays: 18,
             completionRate: 0.4,
@@ -96,7 +99,7 @@ final class DomainTypeTests: XCTestCase {
             recentActivity: [recentActivity]
         )
 
-        XCTAssertTrue(snapshot.isCurrent)
+        XCTAssertTrue(snapshot.isActive)
         XCTAssertEqual(snapshot.completionRate, 0.4)
         XCTAssertEqual(snapshot.recentActivity, [recentActivity])
     }
@@ -119,7 +122,7 @@ final class DomainTypeTests: XCTestCase {
         XCTAssertEqual(GoalRepositoryError.finalGoalNotFound.errorDescription, "Final goal not found.")
         XCTAssertEqual(GoalRepositoryError.milestoneGoalNotFound.errorDescription, "Milestone goal not found.")
         XCTAssertEqual(GoalRepositoryError.finalGoalNotActive.errorDescription, "Final goal is archived.")
-        XCTAssertEqual(GoalRepositoryError.notCurrentMilestone.errorDescription, "Only the current active milestone can receive check-ins.")
+        XCTAssertEqual(GoalRepositoryError.milestoneNotActive.errorDescription, "Milestone must be active before check-in.")
         XCTAssertEqual(GoalRepositoryError.saveFailed("disk").errorDescription, "Save failed: disk")
     }
 }

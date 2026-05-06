@@ -26,7 +26,7 @@ final class FinalGoalRepositoryTests: XCTestCase {
         XCTAssertEqual(snapshot.targetCalendarDays, 180)
         XCTAssertEqual(snapshot.completedMilestoneCount, 0)
         XCTAssertEqual(snapshot.totalMilestoneCount, 0)
-        XCTAssertNil(snapshot.currentMilestoneID)
+        XCTAssertEqual(snapshot.activeMilestoneCount, 0)
         XCTAssertNotNil(snapshot.remainingCalendarDays)
         XCTAssertEqual(snapshot.sortOrder, 0)
     }
@@ -166,7 +166,7 @@ final class FinalGoalRepositoryTests: XCTestCase {
         let snapshot = try XCTUnwrap(goals.first { $0.id == fgID })
         XCTAssertEqual(snapshot.completedMilestoneCount, 1)
         XCTAssertEqual(snapshot.totalMilestoneCount, 2)
-        XCTAssertEqual(snapshot.currentMilestoneID, milestones.first { $0.id != m1 }?.id)
+        XCTAssertEqual(snapshot.activeMilestoneCount, 0)
         XCTAssertNil(snapshot.archivedAt)
     }
 
