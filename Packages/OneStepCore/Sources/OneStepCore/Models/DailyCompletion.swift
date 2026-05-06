@@ -5,6 +5,7 @@ import SwiftData
 public final class DailyCompletion {
     @Attribute(.unique) public var uniqueKey: String
     public var id: UUID
+    // Stores MilestoneGoal.id (semantically changed from old Goal.id)
     public var goalID: UUID
     public var dayKey: String
     public var completedAt: Date

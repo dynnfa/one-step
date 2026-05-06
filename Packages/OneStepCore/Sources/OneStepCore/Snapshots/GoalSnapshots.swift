@@ -1,75 +1,143 @@
 import Foundation
 
-public struct CreateGoalInput: Equatable, Sendable {
+public struct CreateFinalGoalInput: Equatable, Sendable {
     public let title: String
-    public let dailyAction: String
-    public let targetCompletionDays: Int
+    public let goalDescription: String?
+    public let targetCalendarDays: Int?
     public let startDay: LocalDay
 
-    public init(title: String, dailyAction: String, targetCompletionDays: Int, startDay: LocalDay) {
+    public init(title: String, goalDescription: String? = nil, targetCalendarDays: Int? = nil, startDay: LocalDay) {
         self.title = title
-        self.dailyAction = dailyAction
-        self.targetCompletionDays = targetCompletionDays
+        self.goalDescription = goalDescription
+        self.targetCalendarDays = targetCalendarDays
         self.startDay = startDay
     }
 }
 
-public struct UpdateGoalInput: Equatable, Sendable {
+public struct UpdateFinalGoalInput: Equatable, Sendable {
     public let title: String
-    public let dailyAction: String
+    public let goalDescription: String?
+    public let targetCalendarDays: Int?
+
+    public init(title: String, goalDescription: String? = nil, targetCalendarDays: Int? = nil) {
+        self.title = title
+        self.goalDescription = goalDescription
+        self.targetCalendarDays = targetCalendarDays
+    }
+}
+
+public struct CreateMilestoneGoalInput: Equatable, Sendable {
+    public let title: String
+    public let targetCompletionDays: Int
+    public let finalGoalID: UUID
+
+    public init(title: String, targetCompletionDays: Int, finalGoalID: UUID) {
+        self.title = title
+        self.targetCompletionDays = targetCompletionDays
+        self.finalGoalID = finalGoalID
+    }
+}
+
+public struct UpdateMilestoneGoalInput: Equatable, Sendable {
+    public let title: String
     public let targetCompletionDays: Int
 
-    public init(title: String, dailyAction: String, targetCompletionDays: Int) {
+    public init(title: String, targetCompletionDays: Int) {
         self.title = title
-        self.dailyAction = dailyAction
         self.targetCompletionDays = targetCompletionDays
     }
 }
 
-public struct GoalListSnapshot: Identifiable, Equatable, Sendable {
+public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
     public let id: UUID
     public let title: String
-    public let dailyAction: String
+    public let goalDescription: String?
+    public let targetCalendarDays: Int?
+    public let completedMilestoneCount: Int
+    public let totalMilestoneCount: Int
+    public let currentMilestoneID: UUID?
+    public let currentMilestoneTitle: String?
+    public let remainingCalendarDays: Int?
+    public let sortOrder: Int
+    public let archivedAt: Date?
+
+    public init(
+        id: UUID,
+        title: String,
+        goalDescription: String?,
+        targetCalendarDays: Int?,
+        completedMilestoneCount: Int,
+        totalMilestoneCount: Int,
+        currentMilestoneID: UUID?,
+        currentMilestoneTitle: String?,
+        remainingCalendarDays: Int?,
+        sortOrder: Int,
+        archivedAt: Date?
+    ) {
+        self.id = id
+        self.title = title
+        self.goalDescription = goalDescription
+        self.targetCalendarDays = targetCalendarDays
+        self.completedMilestoneCount = completedMilestoneCount
+        self.totalMilestoneCount = totalMilestoneCount
+        self.currentMilestoneID = currentMilestoneID
+        self.currentMilestoneTitle = currentMilestoneTitle
+        self.remainingCalendarDays = remainingCalendarDays
+        self.sortOrder = sortOrder
+        self.archivedAt = archivedAt
+    }
+}
+
+public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
+    public let id: UUID
+    public let title: String
     public let targetCompletionDays: Int
+    public let finalGoalID: UUID
+    public let sortOrder: Int
+    public let isCurrent: Bool
     public let completedDays: Int
     public let remainingDays: Int
     public let completionRate: Double
     public let isCompletedToday: Bool
-    public let sortOrder: Int
-    public let archivedAt: Date?
+    public let startDayKey: String?
+    public let completedAt: Date?
     public let recentActivity: [RecentActivityDay]
 
     public init(
         id: UUID,
         title: String,
-        dailyAction: String,
         targetCompletionDays: Int,
+        finalGoalID: UUID,
+        sortOrder: Int,
+        isCurrent: Bool,
         completedDays: Int,
         remainingDays: Int,
         completionRate: Double,
         isCompletedToday: Bool,
-        sortOrder: Int,
-        archivedAt: Date?,
+        startDayKey: String?,
+        completedAt: Date?,
         recentActivity: [RecentActivityDay]
     ) {
         self.id = id
         self.title = title
-        self.dailyAction = dailyAction
         self.targetCompletionDays = targetCompletionDays
+        self.finalGoalID = finalGoalID
+        self.sortOrder = sortOrder
+        self.isCurrent = isCurrent
         self.completedDays = completedDays
         self.remainingDays = remainingDays
         self.completionRate = completionRate
         self.isCompletedToday = isCompletedToday
-        self.sortOrder = sortOrder
-        self.archivedAt = archivedAt
+        self.startDayKey = startDayKey
+        self.completedAt = completedAt
         self.recentActivity = recentActivity
     }
 }
 
-public struct WidgetGoalSnapshot: Identifiable, Equatable, Sendable {
+public struct WidgetMilestoneSnapshot: Identifiable, Equatable, Sendable {
     public let id: UUID
     public let title: String
-    public let dailyAction: String
+    public let parentFinalGoalTitle: String
     public let targetCompletionDays: Int
     public let completedDays: Int
     public let isCompletedToday: Bool
@@ -77,14 +145,14 @@ public struct WidgetGoalSnapshot: Identifiable, Equatable, Sendable {
     public init(
         id: UUID,
         title: String,
-        dailyAction: String,
+        parentFinalGoalTitle: String,
         targetCompletionDays: Int,
         completedDays: Int,
         isCompletedToday: Bool
     ) {
         self.id = id
         self.title = title
-        self.dailyAction = dailyAction
+        self.parentFinalGoalTitle = parentFinalGoalTitle
         self.targetCompletionDays = targetCompletionDays
         self.completedDays = completedDays
         self.isCompletedToday = isCompletedToday

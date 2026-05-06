@@ -10,7 +10,7 @@ struct OneStepWidget: Widget {
             OneStepWidgetView(entry: entry)
         }
         .configurationDisplayName("One Step")
-        .description("Complete today's long-term goals from the desktop.")
+        .description("Complete today's milestone from the desktop.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
@@ -30,15 +30,15 @@ struct OneStepWidgetView: View {
                     .foregroundStyle(.secondary)
             }
 
-            if entry.goals.isEmpty {
+            if entry.milestones.isEmpty {
                 Spacer(minLength: 0)
                 Text("Create a goal in the app.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer(minLength: 0)
             } else {
-                ForEach(entry.goals) { goal in
-                    WidgetGoalRowView(goal: goal, compact: family == .systemSmall)
+                ForEach(entry.milestones) { milestone in
+                    WidgetGoalRowView(milestone: milestone, compact: family == .systemSmall)
                 }
                 Spacer(minLength: 0)
             }
