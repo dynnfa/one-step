@@ -18,10 +18,12 @@ struct GoalListView: View {
     }
 
     var body: some View {
-        NavigationSplitView {
+        HStack(spacing: 0) {
             sidebar
-        } detail: {
+                .frame(width: 276)
+            Divider()
             detailPane
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .onAppear { finalGoalStore.refresh() }
         .onChange(of: finalGoalStore.selectedFinalGoalID) { _, newID in
@@ -75,30 +77,25 @@ struct GoalListView: View {
     // MARK: - Sidebar
 
     private var sidebar: some View {
-        List(selection: $finalGoalStore.selectedFinalGoalID) {
-            Section("Active") {
-                ForEach(activeGoals) { goal in
-                    FinalGoalRowView(goal: goal)
-                        .tag(goal.id)
-                }
-                .onMove(perform: finalGoalStore.move)
-            }
-            if !archivedGoals.isEmpty {
-                Section("Archived") {
-                    ForEach(archivedGoals) { goal in
-                        FinalGoalRowView(goal: goal)
-                            .tag(goal.id)
-                    }
-                }
-            }
+        GoalSidebarView(
+            activeGoals: activeGoals,
+            archivedGoals: archivedGoals,
+            selectedFinalGoalID: finalGoalStore.selectedFinalGoalID,
+            onAddGoal: { isShowingCreateGoal = true },
+            onSelectGoal: { finalGoalStore.select($0) },
+            onMoveActiveGoal: moveActiveGoal
+        )
+    }
+
+    private func moveActiveGoal(_ draggedGoalID: UUID, to destinationGoalID: UUID) -> Bool {
+        guard draggedGoalID != destinationGoalID,
+              let sourceIndex = activeGoals.firstIndex(where: { $0.id == draggedGoalID }),
+              let destinationIndex = activeGoals.firstIndex(where: { $0.id == destinationGoalID }) else {
+            return false
         }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { isShowingCreateGoal = true } label: {
-                    Label("Add Goal", systemImage: "plus")
-                }
-            }
-        }
+
+        finalGoalStore.move(from: IndexSet(integer: sourceIndex), to: destinationIndex)
+        return true
     }
 
     // MARK: - Detail
@@ -127,6 +124,118 @@ struct GoalListView: View {
                     description: Text("Choose a goal from the sidebar to view its milestones.")
                 )
             }
+        }
+    }
+}
+
+private struct GoalSidebarView: View {
+    let activeGoals: [FinalGoalListSnapshot]
+    let archivedGoals: [FinalGoalListSnapshot]
+    let selectedFinalGoalID: UUID?
+    let onAddGoal: () -> Void
+    let onSelectGoal: (UUID) -> Void
+    let onMoveActiveGoal: (UUID, UUID) -> Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            header
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 14) {
+                    GoalSidebarSection(title: "Active") {
+                        ForEach(activeGoals) { goal in
+                            GoalSidebarRowView(
+                                goal: goal,
+                                isSelected: selectedFinalGoalID == goal.id,
+                                onSelect: { onSelectGoal(goal.id) }
+                            )
+                            .draggable(goal.id.uuidString)
+                            .dropDestination(for: String.self) { items, _ in
+                                handleDrop(items, destinationGoalID: goal.id)
+                            }
+                        }
+                    }
+
+                    if !archivedGoals.isEmpty {
+                        GoalSidebarSection(title: "Archived") {
+                            ForEach(archivedGoals) { goal in
+                                GoalSidebarRowView(
+                                    goal: goal,
+                                    isSelected: selectedFinalGoalID == goal.id,
+                                    onSelect: { onSelectGoal(goal.id) }
+                                )
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 12)
+            }
+        }
+        .background(.bar)
+    }
+
+    private var header: some View {
+        HStack {
+            Text("Goals")
+                .font(.headline)
+            Spacer()
+            Button(action: onAddGoal) {
+                Image(systemName: "plus")
+            }
+            .buttonStyle(.borderless)
+            .help("Add Goal")
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+    }
+
+    private func handleDrop(_ items: [String], destinationGoalID: UUID) -> Bool {
+        guard let item = items.first,
+              let draggedGoalID = UUID(uuidString: item) else {
+            return false
+        }
+
+        return onMoveActiveGoal(draggedGoalID, destinationGoalID)
+    }
+}
+
+private struct GoalSidebarSection<Content: View>: View {
+    let title: String
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .padding(.horizontal, 8)
+
+            VStack(spacing: 2) {
+                content
+            }
+        }
+    }
+}
+
+private struct GoalSidebarRowView: View {
+    let goal: FinalGoalListSnapshot
+    let isSelected: Bool
+    let onSelect: () -> Void
+
+    var body: some View {
+        Button(action: onSelect) {
+            FinalGoalRowView(goal: goal)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 7)
+                .contentShape(Rectangle())
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.plain)
+        .background {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(isSelected ? Color.accentColor.opacity(0.18) : Color.clear)
         }
     }
 }

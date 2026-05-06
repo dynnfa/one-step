@@ -20,9 +20,7 @@
 		A1000000000000000000000B /* CompleteGoalIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001C /* CompleteGoalIntent.swift */; };
 		A1000000000000000000000C /* GoalStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001D /* GoalStoreTests.swift */; };
 		A1000000000000000000000D /* OneStepCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B3 /* OneStepCore */; };
-ttA1000000000000000000000E /* FinalGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* FinalGoalStore.swift */; };
-ttA100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C2 /* MilestoneGoalStore.swift */; };
-ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C4 /* FinalGoalDetailView.swift */; };
+		A1000000000000000000000E /* FinalGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* FinalGoalStore.swift */; };
 		A1000000000000000000000F /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* EmptyStateView.swift */; };
 		A10000000000000000000010 /* GoalEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000020 /* GoalEditorView.swift */; };
 		A10000000000000000000024 /* RecentActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* RecentActivityView.swift */; };
@@ -31,9 +29,7 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 		A1000000000000000000002A /* WidgetGoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000002B /* WidgetGoalRowView.swift */; };
 		A100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C2 /* MilestoneGoalStore.swift */; };
 		A100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C4 /* FinalGoalDetailView.swift */; };
-		E2597E1B2FAB269E00518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
-		E2597E1C2FAB269E00518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
-		E2597E1D2FAB269E00518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
+		E2597E1E2FAB441600518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,8 +78,6 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 		A1000000000000000000001C /* CompleteGoalIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteGoalIntent.swift; sourceTree = "<group>"; };
 		A1000000000000000000001D /* GoalStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalStoreTests.swift; sourceTree = "<group>"; };
 		A1000000000000000000001E /* FinalGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalStore.swift; sourceTree = "<group>"; };
-		A100000000000000000000C2 /* MilestoneGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneGoalStore.swift; sourceTree = "<group>"; };
-		A100000000000000000000C4 /* FinalGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalDetailView.swift; sourceTree = "<group>"; };
 		A1000000000000000000001F /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		A10000000000000000000020 /* GoalEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditorView.swift; sourceTree = "<group>"; };
 		A10000000000000000000021 /* OneStep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OneStep.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -375,7 +369,7 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E2597E1B2FAB269E00518077 /* Media.xcassets in Resources */,
+				E2597E1E2FAB441600518077 /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,7 +377,6 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E2597E1C2FAB269E00518077 /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,7 +384,6 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E2597E1D2FAB269E00518077 /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -487,6 +479,7 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -550,6 +543,7 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -584,8 +578,10 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 4FU949C7U7;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = OneStep/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = oneStep;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -610,8 +606,10 @@ ttA100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = P
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 4FU949C7U7;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = OneStep/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = oneStep;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
