@@ -8,10 +8,14 @@ struct FinalGoalDetailView: View {
     let onAddMilestone: () -> Void
     let onComplete: () -> Void
     let onEditGoal: () -> Void
+    let onDeleteGoal: () -> Void
     let onCheckIn: (UUID) -> Void
     let onUndo: (UUID) -> Void
     let onSetActive: (UUID, Bool) -> Void
     let onEditMilestone: (MilestoneGoalSnapshot) -> Void
+    let onDeleteMilestone: (MilestoneGoalSnapshot) -> Void
+
+    @State private var isConfirmingGoalDelete = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -27,6 +31,16 @@ struct FinalGoalDetailView: View {
             } else {
                 milestoneList
             }
+        }
+        .confirmationDialog(
+            "Delete Goal?",
+            isPresented: $isConfirmingGoalDelete,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Goal", role: .destructive, action: onDeleteGoal)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This permanently deletes the goal, its milestones, and their completion history.")
         }
     }
 
@@ -57,6 +71,9 @@ struct FinalGoalDetailView: View {
                 Divider()
                 Button("Complete Goal", action: onComplete)
                     .disabled(goal.archivedAt != nil)
+                Button("Delete Goal", role: .destructive) {
+                    isConfirmingGoalDelete = true
+                }
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
@@ -92,7 +109,8 @@ struct FinalGoalDetailView: View {
                         onCheckIn: { onCheckIn(milestone.id) },
                         onUndo: { onUndo(milestone.id) },
                         onSetActive: { isActive in onSetActive(milestone.id, isActive) },
-                        onEdit: { onEditMilestone(milestone) }
+                        onEdit: { onEditMilestone(milestone) },
+                        onDelete: { onDeleteMilestone(milestone) }
                     )
                 }
             }
