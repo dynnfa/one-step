@@ -8,6 +8,8 @@ import WidgetKit
 final class MilestoneGoalStore {
     private let repository: MilestoneGoalRepository
 
+    @ObservationIgnored var onMilestonesChanged: (() -> Void)?
+
     var milestones: [MilestoneGoalSnapshot] = []
     var errorMessage: String?
 
@@ -93,5 +95,6 @@ final class MilestoneGoalStore {
     private func refreshAndReloadWidget(finalGoalID: UUID) {
         refresh(finalGoalID: finalGoalID)
         WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")
+        onMilestonesChanged?()
     }
 }
