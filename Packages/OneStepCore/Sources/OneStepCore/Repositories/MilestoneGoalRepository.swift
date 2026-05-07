@@ -120,10 +120,6 @@ public struct MilestoneGoalRepository {
 
         return milestones.map { milestone in
             let completedDays = (try? completedDays(for: milestone.id)) ?? 0
-            let remainingDays = max(milestone.targetCompletionDays - completedDays, 0)
-            let completionRate = milestone.targetCompletionDays > 0
-                ? Double(completedDays) / Double(milestone.targetCompletionDays)
-                : 0
             let isCompletedToday = (try? isCompleted(goalID: milestone.id, day: day)) ?? false
 
             return MilestoneGoalSnapshot(
@@ -134,8 +130,6 @@ public struct MilestoneGoalRepository {
                 sortOrder: milestone.sortOrder,
                 isActive: milestone.isActive,
                 completedDays: completedDays,
-                remainingDays: remainingDays,
-                completionRate: completionRate,
                 isCompletedToday: isCompletedToday,
                 startDayKey: milestone.startDayKey,
                 completedAt: milestone.completedAt,

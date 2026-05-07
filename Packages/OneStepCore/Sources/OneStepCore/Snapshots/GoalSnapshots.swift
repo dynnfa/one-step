@@ -93,8 +93,6 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
     public let sortOrder: Int
     public let isActive: Bool
     public let completedDays: Int
-    public let remainingDays: Int
-    public let completionRate: Double
     public let isCompletedToday: Bool
     public let startDayKey: String?
     public let completedAt: Date?
@@ -108,8 +106,6 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
         sortOrder: Int,
         isActive: Bool,
         completedDays: Int,
-        remainingDays: Int,
-        completionRate: Double,
         isCompletedToday: Bool,
         startDayKey: String?,
         completedAt: Date?,
@@ -122,8 +118,6 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
         self.sortOrder = sortOrder
         self.isActive = isActive
         self.completedDays = completedDays
-        self.remainingDays = remainingDays
-        self.completionRate = completionRate
         self.isCompletedToday = isCompletedToday
         self.startDayKey = startDayKey
         self.completedAt = completedAt
