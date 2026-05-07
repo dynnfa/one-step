@@ -81,6 +81,15 @@ final class MilestoneGoalStore {
         }
     }
 
+    func deleteMilestone(milestoneGoalID: UUID, finalGoalID: UUID) {
+        do {
+            try repository.deleteMilestoneGoal(milestoneGoalID: milestoneGoalID)
+            refreshAndReloadWidget(finalGoalID: finalGoalID)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     private func refreshAndReloadWidget(finalGoalID: UUID) {
         refresh(finalGoalID: finalGoalID)
         WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")

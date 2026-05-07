@@ -68,6 +68,18 @@ final class FinalGoalStore {
         }
     }
 
+    func deleteFinalGoal(finalGoalID: UUID) {
+        do {
+            try repository.deleteFinalGoal(finalGoalID: finalGoalID)
+            if selectedFinalGoalID == finalGoalID {
+                selectedFinalGoalID = nil
+            }
+            refreshAndReloadWidget()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func move(from source: IndexSet, to destination: Int) {
         guard let sourceIndex = source.first else { return }
         let activeGoals = finalGoals.filter { $0.archivedAt == nil }

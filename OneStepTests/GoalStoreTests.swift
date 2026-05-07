@@ -56,6 +56,20 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertEqual(activeGoals.map(\.id), [secondID])
     }
 
+    func testDeleteFinalGoalRemovesItFromListAndClearsSelection() throws {
+        let fixture = try makeFixture()
+        fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(title: "Second", goalDescription: nil, targetCalendarDays: nil)
+        let firstID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "First" }?.id)
+
+        fixture.store.select(firstID)
+        fixture.store.deleteFinalGoal(finalGoalID: firstID)
+
+        XCTAssertEqual(fixture.store.finalGoals.map(\.title), ["Second"])
+        XCTAssertNil(fixture.store.selectedFinalGoalID)
+        XCTAssertNil(fixture.store.errorMessage)
+    }
+
     private func makeFixture() throws -> Fixture {
         let container = try OneStepModelContainerFactory.makeInMemory()
         let context = ModelContext(container)
@@ -119,6 +133,34 @@ final class MilestoneGoalStoreTests: XCTestCase {
         fixture.store.setMilestoneActive(milestoneGoalID: mID, finalGoalID: fgID, isActive: true)
 
         XCTAssertEqual(fixture.store.milestones.first?.isActive, true)
+    }
+
+    func testDeleteMilestoneRemovesItFromMilestones() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        let firstID = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
+        _ = try fixture.createMilestone(title: "Phase 2", targetDays: 10, finalGoalID: fgID)
+
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+        fixture.store.deleteMilestone(milestoneGoalID: firstID, finalGoalID: fgID)
+
+        XCTAssertEqual(fixture.store.milestones.map(\.title), ["Phase 2"])
+        XCTAssertNil(fixture.store.errorMessage)
+    }
+
+    func testDeletingMilestoneCanRefreshFinalGoalSnapshotCounts() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        let finalGoalStore = FinalGoalStore(repository: fixture.fgRepo)
+        let milestoneID = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
+
+        finalGoalStore.refresh()
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 1)
+
+        fixture.store.deleteMilestone(milestoneGoalID: milestoneID, finalGoalID: fgID)
+        finalGoalStore.refresh()
+
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 0)
     }
 
     private func makeFixture() throws -> MilestoneStoreFixture {
