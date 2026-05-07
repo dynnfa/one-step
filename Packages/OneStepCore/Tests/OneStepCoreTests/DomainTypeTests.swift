@@ -91,8 +91,6 @@ final class DomainTypeTests: XCTestCase {
             sortOrder: 0,
             isActive: true,
             completedDays: 12,
-            remainingDays: 18,
-            completionRate: 0.4,
             isCompletedToday: true,
             startDayKey: "2026-04-17",
             completedAt: nil,
@@ -100,7 +98,7 @@ final class DomainTypeTests: XCTestCase {
         )
 
         XCTAssertTrue(snapshot.isActive)
-        XCTAssertEqual(snapshot.completionRate, 0.4)
+        XCTAssertEqual(snapshot.completedDays, 12)
         XCTAssertEqual(snapshot.recentActivity, [recentActivity])
     }
 

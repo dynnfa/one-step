@@ -56,12 +56,17 @@ struct MilestoneGoalRowView: View {
                         Text("inactive")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(.quaternary)
+                            .clipShape(Capsule())
                     }
                     if milestone.completedAt != nil {
                         Image(systemName: "checkmark.seal.fill")
                             .foregroundStyle(.green)
                             .font(.caption)
                     }
+
                 }
                 RecentActivityView(activity: milestone.recentActivity)
             }
@@ -69,24 +74,35 @@ struct MilestoneGoalRowView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
+                if milestone.completedAt == nil {
+                    if milestone.isActive {
+                        Button { onSetActive(false) } label: {
+                            Text("Deactivate")
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .overlay(
+                                    Capsule().stroke(Color.secondary.opacity(0.4), lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                    } else {
+                        Button { onSetActive(true) } label: {
+                            Text("Activate")
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .overlay(
+                                    Capsule().stroke(Color.blue.opacity(0.5), lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.blue)
+                    }
+                }
                 Text("\(milestone.completedDays)/\(milestone.targetCompletionDays)")
                     .font(.headline.monospacedDigit())
-                Text("\(milestone.remainingDays) remaining")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(milestone.completionRate, format: .percent.precision(.fractionLength(0)))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            if milestone.completedAt == nil {
-                Button {
-                    onSetActive(!milestone.isActive)
-                } label: {
-                    Image(systemName: milestone.isActive ? "pause.circle" : "play.circle")
-                }
-                .buttonStyle(.plain)
-                .help(milestone.isActive ? "Deactivate milestone" : "Activate milestone")
             }
 
             Menu {
