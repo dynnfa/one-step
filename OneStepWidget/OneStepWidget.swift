@@ -19,6 +19,8 @@ struct OneStepWidgetView: View {
     @Environment(\.widgetFamily) private var family
     let entry: OneStepWidgetEntry
 
+    private static let rowSpacing: CGFloat = 6
+
     private var isSmall: Bool { family == .systemSmall }
 
     var body: some View {
@@ -32,8 +34,10 @@ struct OneStepWidgetView: View {
                     .foregroundStyle(.secondary)
                 Spacer(minLength: 0)
             } else if isSmall {
-                ForEach(Array(entry.milestones.prefix(2))) { milestone in
-                    WidgetGoalRowView(milestone: milestone, compact: true, narrow: false)
+                VStack(alignment: .leading, spacing: Self.rowSpacing) {
+                    ForEach(Array(entry.milestones.prefix(2))) { milestone in
+                        WidgetGoalRowView(milestone: milestone, compact: true, narrow: false)
+                    }
                 }
                 Spacer(minLength: 0)
             } else {
@@ -68,12 +72,12 @@ struct OneStepWidgetView: View {
         let rightHalf = Array(milestones[splitIndex...])
 
         return HStack(alignment: .top, spacing: 8) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Self.rowSpacing) {
                 ForEach(leftHalf) { milestone in
                     WidgetGoalRowView(milestone: milestone, compact: false, narrow: true)
                 }
             }
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Self.rowSpacing) {
                 ForEach(rightHalf) { milestone in
                     WidgetGoalRowView(milestone: milestone, compact: false, narrow: true)
                 }
