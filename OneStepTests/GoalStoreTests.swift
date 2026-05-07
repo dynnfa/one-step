@@ -148,6 +148,29 @@ final class MilestoneGoalStoreTests: XCTestCase {
         XCTAssertNil(fixture.store.errorMessage)
     }
 
+    func testMilestoneChangesCanRefreshFinalGoalSnapshotCounts() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        let finalGoalStore = FinalGoalStore(repository: fixture.fgRepo)
+
+        finalGoalStore.refresh()
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 0)
+
+        fixture.store.onMilestonesChanged = {
+            finalGoalStore.refresh()
+        }
+
+        fixture.store.createMilestone(title: "Phase 1", targetCompletionDays: 1, finalGoalID: fgID)
+        let milestoneID = try XCTUnwrap(fixture.store.milestones.first?.id)
+
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 1)
+
+        fixture.store.setMilestoneActive(milestoneGoalID: milestoneID, finalGoalID: fgID, isActive: true)
+        fixture.store.completeToday(milestoneGoalID: milestoneID, finalGoalID: fgID)
+
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.completedMilestoneCount, 1)
+    }
+
     func testDeletingMilestoneCanRefreshFinalGoalSnapshotCounts() throws {
         let fixture = try makeFixture()
         let fgID = try fixture.createFinalGoal()

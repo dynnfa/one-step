@@ -25,7 +25,12 @@ struct GoalListView: View {
             detailPane
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .onAppear { finalGoalStore.refresh() }
+        .onAppear {
+            milestoneStore.onMilestonesChanged = {
+                finalGoalStore.refresh()
+            }
+            finalGoalStore.refresh()
+        }
         .onChange(of: finalGoalStore.selectedFinalGoalID) { _, newID in
             if let newID {
                 milestoneStore.refresh(finalGoalID: newID)
@@ -134,7 +139,6 @@ struct GoalListView: View {
 
     private func deleteMilestone(_ milestone: MilestoneGoalSnapshot) {
         milestoneStore.deleteMilestone(milestoneGoalID: milestone.id, finalGoalID: milestone.finalGoalID)
-        finalGoalStore.refresh()
     }
 }
 
