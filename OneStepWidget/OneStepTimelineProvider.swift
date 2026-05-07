@@ -44,11 +44,11 @@ private extension WidgetFamily {
     var goalLimit: Int {
         switch self {
         case .systemSmall:
-            return 1
+            return 2
         case .systemMedium:
-            return 3
+            return 4
         case .systemLarge, .systemExtraLarge:
-            return 5
+            return 12
         default:
             return 3
         }
