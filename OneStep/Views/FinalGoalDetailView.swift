@@ -6,7 +6,7 @@ struct FinalGoalDetailView: View {
     let milestones: [MilestoneGoalSnapshot]
     let errorMessage: String?
     let onAddMilestone: () -> Void
-    let onComplete: () -> Void
+    let onToggleArchive: () -> Void
     let onEditGoal: () -> Void
     let onDeleteGoal: () -> Void
     let onCheckIn: (UUID) -> Void
@@ -44,6 +44,10 @@ struct FinalGoalDetailView: View {
         }
     }
 
+    private var actionPolicy: FinalGoalDetailActionPolicy {
+        FinalGoalDetailActionPolicy(goal: goal)
+    }
+
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
@@ -66,11 +70,16 @@ struct FinalGoalDetailView: View {
             }
             Spacer()
             Menu {
-                Button("Edit Goal", action: onEditGoal)
-                Button("Add Milestone", action: onAddMilestone)
-                Divider()
-                Button("Complete Goal", action: onComplete)
-                    .disabled(goal.archivedAt != nil)
+                if actionPolicy.canMutateGoal {
+                    Button("Edit Goal", action: onEditGoal)
+                }
+                if actionPolicy.canMutateMilestones {
+                    Button("Add Milestone", action: onAddMilestone)
+                }
+                if actionPolicy.canMutateGoal || actionPolicy.canMutateMilestones {
+                    Divider()
+                }
+                Button(actionPolicy.archiveButtonTitle, action: onToggleArchive)
                 Button("Delete Goal", role: .destructive) {
                     isConfirmingGoalDelete = true
                 }
@@ -93,8 +102,10 @@ struct FinalGoalDetailView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 300)
-            Button("Add First Milestone", action: onAddMilestone)
-                .buttonStyle(.borderedProminent)
+            if actionPolicy.canMutateMilestones {
+                Button("Add First Milestone", action: onAddMilestone)
+                    .buttonStyle(.borderedProminent)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
@@ -106,6 +117,7 @@ struct FinalGoalDetailView: View {
                 ForEach(milestones) { milestone in
                     MilestoneGoalRowView(
                         milestone: milestone,
+                        isReadOnly: !actionPolicy.canMutateMilestones,
                         onCheckIn: { onCheckIn(milestone.id) },
                         onUndo: { onUndo(milestone.id) },
                         onSetActive: { isActive in onSetActive(milestone.id, isActive) },
@@ -116,5 +128,21 @@ struct FinalGoalDetailView: View {
             }
         }
         .listStyle(.inset)
+    }
+}
+
+struct FinalGoalDetailActionPolicy {
+    let goal: FinalGoalListSnapshot
+
+    var canMutateGoal: Bool {
+        goal.archivedAt == nil
+    }
+
+    var canMutateMilestones: Bool {
+        goal.archivedAt == nil
+    }
+
+    var archiveButtonTitle: String {
+        goal.archivedAt == nil ? "Archive Goal" : "Reactivate Goal"
     }
 }

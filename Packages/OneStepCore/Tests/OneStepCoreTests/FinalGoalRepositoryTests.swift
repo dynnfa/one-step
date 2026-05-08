@@ -96,7 +96,7 @@ final class FinalGoalRepositoryTests: XCTestCase {
         let first = try fixture.createFinalGoal(title: "First", day: day)
         let archived = try fixture.createFinalGoal(title: "Archived", day: day)
         let third = try fixture.createFinalGoal(title: "Third", day: day)
-        try fixture.repository.archiveFinalGoal(finalGoalID: archived, archivedAt: Date())
+        try fixture.repository.setFinalGoalArchived(finalGoalID: archived, isArchived: true)
 
         try fixture.repository.moveActiveFinalGoal(finalGoalID: third, toIndex: 0)
 
@@ -105,33 +105,76 @@ final class FinalGoalRepositoryTests: XCTestCase {
         XCTAssertEqual(activeIDs, [third, first])
     }
 
-    // MARK: - Archive
+    // MARK: - Archive State
 
-    func testArchiveFinalGoalSetsOnlyFinalGoalArchivedAt() throws {
+    func testSetFinalGoalArchivedArchivesActiveGoal() throws {
+        let fixture = try makeFixture()
+        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        let fgID = try fixture.createFinalGoal(title: "Goal", day: day)
+
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: true)
+
+        let snapshot = try XCTUnwrap(try fixture.repository.finalGoalsForList().first { $0.id == fgID })
+        XCTAssertNotNil(snapshot.archivedAt)
+    }
+
+    func testSetFinalGoalArchivedReactivatesArchivedGoal() throws {
+        let fixture = try makeFixture()
+        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        let fgID = try fixture.createFinalGoal(title: "Goal", day: day)
+
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: true)
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: false)
+
+        let snapshot = try XCTUnwrap(try fixture.repository.finalGoalsForList().first { $0.id == fgID })
+        XCTAssertNil(snapshot.archivedAt)
+    }
+
+    func testSetFinalGoalArchivedIsIdempotent() throws {
+        let fixture = try makeFixture()
+        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        let fgID = try fixture.createFinalGoal(title: "Goal", day: day)
+
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: true)
+        var snapshot = try XCTUnwrap(try fixture.repository.finalGoalsForList().first { $0.id == fgID })
+        let firstArchivedAt = try XCTUnwrap(snapshot.archivedAt)
+
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: true)
+        snapshot = try XCTUnwrap(try fixture.repository.finalGoalsForList().first { $0.id == fgID })
+        XCTAssertEqual(snapshot.archivedAt, firstArchivedAt)
+
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: false)
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: false)
+        snapshot = try XCTUnwrap(try fixture.repository.finalGoalsForList().first { $0.id == fgID })
+        XCTAssertNil(snapshot.archivedAt)
+    }
+
+    func testSetFinalGoalArchivedPreservesMilestones() throws {
         let fixture = try makeFixture()
         let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
         let fgID = try fixture.createFinalGoal(title: "Goal", day: day)
         _ = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
 
-        try fixture.repository.archiveFinalGoal(finalGoalID: fgID, archivedAt: Date())
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: true)
 
-        let goal = try XCTUnwrap(try fixture.repository.finalGoalsForList().first { $0.id == fgID })
-        XCTAssertNotNil(goal.archivedAt)
         let milestones = try fixture.fetchMilestones(for: fgID)
         XCTAssertEqual(milestones.count, 1)
         XCTAssertNil(milestones[0].completedAt)
     }
 
-    func testArchiveFinalGoalAllowsIncompleteMilestones() throws {
+    func testCreateMilestoneRejectsArchivedFinalGoal() throws {
         let fixture = try makeFixture()
         let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
         let fgID = try fixture.createFinalGoal(title: "Goal", day: day)
-        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
+        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: true)
 
-        try fixture.repository.archiveFinalGoal(finalGoalID: fgID, archivedAt: Date())
-
-        let snapshot = try XCTUnwrap(try fixture.repository.finalGoalsForList().first { $0.id == fgID })
-        XCTAssertNotNil(snapshot.archivedAt)
+        XCTAssertThrowsError(try fixture.repository.createMilestoneGoal(CreateMilestoneGoalInput(
+            title: "Phase 1",
+            targetCompletionDays: 5,
+            finalGoalID: fgID
+        ))) { error in
+            XCTAssertEqual(error as? GoalRepositoryError, .finalGoalNotActive)
+        }
     }
 
     // MARK: - Delete

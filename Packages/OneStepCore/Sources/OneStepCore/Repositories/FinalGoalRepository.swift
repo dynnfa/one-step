@@ -46,9 +46,9 @@ public struct FinalGoalRepository {
         try save()
     }
 
-    public func archiveFinalGoal(finalGoalID: UUID, archivedAt: Date) throws {
+    public func setFinalGoalArchived(finalGoalID: UUID, isArchived: Bool) throws {
         let goal = try fetchFinalGoal(finalGoalID: finalGoalID)
-        goal.archivedAt = archivedAt
+        goal.archivedAt = isArchived ? (goal.archivedAt ?? Date()) : nil
         goal.updatedAt = Date()
         try save()
     }
@@ -94,9 +94,9 @@ public struct FinalGoalRepository {
     }
 
     public func createMilestoneGoal(_ input: CreateMilestoneGoalInput) throws -> UUID {
-        guard try fetchFinalGoalOrNil(finalGoalID: input.finalGoalID) != nil else {
-            throw GoalRepositoryError.finalGoalNotFound
-        }
+        let finalGoal = try fetchFinalGoal(finalGoalID: input.finalGoalID)
+        guard finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
+
         let title = try validateTitle(input.title)
         try validateTargetCompletionDays(input.targetCompletionDays)
 
