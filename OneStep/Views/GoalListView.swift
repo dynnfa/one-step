@@ -194,10 +194,6 @@ struct GoalListView: View {
 
 // MARK: - Sidebar
 
-private final class DragState {
-    var draggedGoalID: UUID?
-}
-
 private struct GoalSidebarView: View {
     let activeGoals: [FinalGoalListSnapshot]
     let archivedGoals: [FinalGoalListSnapshot]
@@ -207,7 +203,8 @@ private struct GoalSidebarView: View {
     let onMoveActiveGoal: (UUID, UUID, Bool) -> Bool
 
     @State private var dropHoverState: DropHoverState?
-    @State private var dragState = DragState()
+    @State private var draggedGoalID: UUID?
+    @State private var isSidebarDropTargeted = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -223,8 +220,9 @@ private struct GoalSidebarView: View {
                                 isDropTargetBelow: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == false,
                                 onSelect: { onSelectGoal(goal.id) }
                             )
+                            .opacity(draggedGoalID == goal.id ? 0 : 1)
                             .onDrag {
-                                dragState.draggedGoalID = goal.id
+                                draggedGoalID = goal.id
                                 return NSItemProvider(object: goal.id.uuidString as NSString)
                             }
                             .onDrop(
@@ -232,13 +230,22 @@ private struct GoalSidebarView: View {
                                 delegate: GoalRowDropDelegate(
                                     goalID: goal.id,
                                     onHoverUpdate: { newState in
+                                        guard draggedGoalID != nil else {
+                                            dropHoverState = nil
+                                            return
+                                        }
                                         dropHoverState = newState
                                     },
                                     onPerformDrop: { destinationGoalID, insertAbove in
                                         dropHoverState = nil
-                                        guard let draggedID = dragState.draggedGoalID else { return false }
-                                        dragState.draggedGoalID = nil
-                                        return onMoveActiveGoal(draggedID, destinationGoalID, insertAbove)
+                                        guard let draggedID = draggedGoalID else { return false }
+                                        draggedGoalID = nil
+                                        var result = false
+                                        withAnimation(.none) {
+                                            result = onMoveActiveGoal(draggedID, destinationGoalID, insertAbove)
+                                            dropHoverState = nil
+                                        }
+                                        return result
                                     }
                                 )
                             )
@@ -261,9 +268,33 @@ private struct GoalSidebarView: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 12)
+                .onDrop(of: [.text], isTargeted: sidebarDropTargetBinding) { _ in
+                    clearDragState()
+                    return false
+                }
             }
         }
         .background(.bar)
+        .onChange(of: activeGoals.map(\.id)) { _, _ in
+            clearDragState()
+        }
+    }
+
+    private var sidebarDropTargetBinding: Binding<Bool> {
+        Binding(
+            get: { isSidebarDropTargeted },
+            set: { isTargeted in
+                isSidebarDropTargeted = isTargeted
+                if !isTargeted {
+                    clearDragState()
+                }
+            }
+        )
+    }
+
+    private func clearDragState() {
+        draggedGoalID = nil
+        dropHoverState = nil
     }
 
     private var header: some View {

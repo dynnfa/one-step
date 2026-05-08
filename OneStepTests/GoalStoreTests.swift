@@ -59,6 +59,38 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertNil(fixture.store.finalGoals.first { $0.id == firstID }?.archivedAt)
     }
 
+    func testMoveReordersActiveGoalsLocallyAndPreservesArchivedGoals() throws {
+        let fixture = try makeFixture()
+        fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(title: "Archived", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(title: "Third", goalDescription: nil, targetCalendarDays: nil)
+        let firstID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "First" }?.id)
+        let archivedID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Archived" }?.id)
+        let thirdID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Third" }?.id)
+        fixture.store.toggleFinalGoalArchive(finalGoalID: archivedID)
+
+        fixture.store.move(from: IndexSet(integer: 1), to: 0)
+
+        let activeIDs = fixture.store.finalGoals.filter { $0.archivedAt == nil }.map(\.id)
+        XCTAssertEqual(activeIDs, [thirdID, firstID])
+        XCTAssertNotNil(fixture.store.finalGoals.first { $0.id == archivedID }?.archivedAt)
+        XCTAssertNil(fixture.store.errorMessage)
+    }
+
+    func testMoveClampsNegativeDestinationLocally() throws {
+        let fixture = try makeFixture()
+        fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(title: "Second", goalDescription: nil, targetCalendarDays: nil)
+        let firstID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "First" }?.id)
+        let secondID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Second" }?.id)
+
+        fixture.store.move(from: IndexSet(integer: 1), to: -10)
+
+        let activeIDs = fixture.store.finalGoals.filter { $0.archivedAt == nil }.map(\.id)
+        XCTAssertEqual(activeIDs, [secondID, firstID])
+        XCTAssertNil(fixture.store.errorMessage)
+    }
+
     func testFinalGoalDetailActionPolicyMakesArchivedGoalsReadOnly() {
         let activePolicy = FinalGoalDetailActionPolicy(goal: makeSnapshot(archivedAt: nil))
         XCTAssertTrue(activePolicy.canMutateGoal)
