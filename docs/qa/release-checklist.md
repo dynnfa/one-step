@@ -25,7 +25,7 @@ Run every check before tagging an open-source release. Initial releases are sour
 - [ ] Verify target completion days below the completed count is rejected.
 - [ ] Check in today on the current active milestone. Verify completed count increments.
 - [ ] Undo today. Verify completed count decrements.
-- [ ] Verify only the current active milestone (first active in sort order) accepts check-ins.
+- [ ] Verify only the current active milestone (first incomplete in sort order) accepts check-ins.
 - [ ] Complete all days of the current milestone. Verify it auto-completes and the next milestone becomes current.
 - [ ] Undo the last completion of an auto-completed milestone. Verify it reopens and becomes current again.
 - [ ] Verify milestones have no archive action.
@@ -33,9 +33,9 @@ Run every check before tagging an open-source release. Initial releases are sour
 
 ## Manual Widget Checks
 
-- [ ] Small Widget shows 1 milestone.
-- [ ] Medium Widget shows 3 milestones.
-- [ ] Large Widget shows 5 milestones.
+- [ ] Small Widget shows up to 2 milestones.
+- [ ] Medium Widget shows up to 4 milestones.
+- [ ] Large Widget shows up to 12 milestones.
 - [ ] Widget displays the current active milestone for each active FinalGoal, in sort order.
 - [ ] Each Widget row shows the milestone title and parent FinalGoal title.
 - [ ] Clicking an incomplete milestone in the Widget completes it without opening the app.

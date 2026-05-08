@@ -9,7 +9,7 @@ Included:
 - Create, edit, archive, and reorder long-term goals
 - Daily completion from the Widget via AppIntent
 - Undo today's completion from the main app
-- Small (1 goal), medium (3 goals), and large (5 goals) Widget families
+- Small (up to 2 milestones), medium (up to 4 milestones), and large (up to 12 milestones) Widget families
 - Manual sort order for active goals; Widget follows that order
 - Idempotent Widget taps — repeated clicks on a completed goal do nothing
 - Missed-day honesty: no backfill, no streak repair, no shame mechanics

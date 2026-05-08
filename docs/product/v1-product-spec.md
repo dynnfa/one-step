@@ -69,9 +69,9 @@ The Widget is the primary daily interface. It shows the **current active milesto
 
 | Widget family | Milestones shown |
 |---------------|-----------------|
-| Small | 1 |
-| Medium | 3 |
-| Large | 5 |
+| Small | Up to 2 |
+| Medium | Up to 4 |
+| Large | Up to 12 |
 
 Each visible milestone displays:
 
@@ -100,6 +100,6 @@ Empty state: when no active milestones exist, the Widget shows "Create a goal in
 - **Empty states.** First launch invites the user to create a FinalGoal. After the first FinalGoal is saved, the app briefly points toward adding the Widget.
 - **Error states.** Repository errors surface as user-visible messages in the app. Widget errors are logged and result in empty data display rather than a crash.
 - **Long text.** Titles and descriptions may be long. The app list and Widget rows truncate gracefully without breaking layout.
-- **Many goals.** There is no hard cap on FinalGoal or MilestoneGoal count. The Widget shows the first N current milestones based on family size and sort order.
+- **Many goals.** There is no hard cap on FinalGoal or MilestoneGoal count. The Widget shows the first N current milestones based on family size and final-goal sort order.
 - **Sequential milestone advancement.** Only the current active milestone accepts check-ins. Completing the current milestone automatically promotes the next one.
 - **Accessibility.** Interactive controls have VoiceOver labels. The app list is keyboard-navigable. Deeper accessibility hardening is planned for v1.x.

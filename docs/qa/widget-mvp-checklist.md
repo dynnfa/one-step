@@ -2,7 +2,7 @@
 
 ## Core Data
 
-- [ ] Create `Vocabulary / Study 30 minutes / 200 days`.
+- [ ] Create a `Vocabulary` FinalGoal with a `Study 30 minutes / 200 days` milestone.
 - [ ] Confirm completed count starts at `0`.
 - [ ] Complete today in the app.
 - [ ] Confirm completed count becomes `1`.
@@ -14,13 +14,13 @@
 ## Validation
 
 - [ ] Empty title is rejected.
-- [ ] Empty daily action is rejected.
+- [ ] Empty milestone title is rejected.
 - [ ] Target completion days `0` is rejected.
 - [ ] Target completion days below completed count is rejected.
 
 ## Ordering
 
-- [ ] Create 5 active goals.
+- [ ] Create 5 active goals, each with at least one incomplete milestone.
 - [ ] Reorder goals in the app.
 - [ ] Confirm Widget order follows app order after timeline reload.
 
@@ -35,10 +35,10 @@
 
 ## Widget Families
 
-- [ ] Small Widget shows 1 goal.
-- [ ] Medium Widget shows 3 goals.
-- [ ] Large Widget shows 5 goals.
-- [ ] Widget rows do not clip badly with long titles or daily actions.
+- [ ] Small Widget shows up to 2 milestones.
+- [ ] Medium Widget shows up to 4 milestones.
+- [ ] Large Widget shows up to 12 milestones.
+- [ ] Widget rows do not clip badly with long final-goal or milestone titles.
 - [ ] Completed Widget rows show the completed state.
 
 ## App Group and Logs
