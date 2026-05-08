@@ -103,3 +103,13 @@ final class FinalGoalStore {
         WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")
     }
 }
+
+/// Computes the target index for `FinalGoalStore.move(from:to:)` when reordering with above/below semantics.
+/// The `to` index follows Swift's remove-then-insert convention (index in the array after source removal).
+func computeGoalReorderIndex(source: Int, dest: Int, insertAbove: Bool) -> Int {
+    var insertionIndex = insertAbove ? dest : dest + 1
+    if source < insertionIndex {
+        insertionIndex -= 1
+    }
+    return max(insertionIndex, 0)
+}

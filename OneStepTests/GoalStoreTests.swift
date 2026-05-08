@@ -231,6 +231,101 @@ final class MilestoneGoalStoreTests: XCTestCase {
     }
 }
 
+final class GoalReorderIndexTests: XCTestCase {
+    // Tests computeGoalReorderIndex(source:dest:insertAbove:)
+    // which computes the target index for FinalGoalStore.move(from:to:)
+    // The "to" index follows Swift's Array remove-then-insert convention.
+
+    // MARK: - Insert Above
+
+    func testInsertAboveLowerIndex() {
+        // [A, B, C, D] — drag D(3) above B(1)
+        // Remove D → [A, B, C], insert at 1 → [A, D, B, C]
+        let result = computeGoalReorderIndex(source: 3, dest: 1, insertAbove: true)
+        XCTAssertEqual(result, 1)
+    }
+
+    func testInsertAboveUpperIndex() {
+        // [A, B, C, D] — drag A(0) above C(2)
+        // dest=2, source(0)<2 → insertionIndex=1
+        // Remove A → [B, C, D], insert at 1 → [B, A, C, D]
+        let result = computeGoalReorderIndex(source: 0, dest: 2, insertAbove: true)
+        XCTAssertEqual(result, 1)
+    }
+
+    func testInsertAboveSameIndex() {
+        // [A, B, C] — drag A(0) above A(0) — no-op but compute anyway
+        let result = computeGoalReorderIndex(source: 0, dest: 0, insertAbove: true)
+        XCTAssertEqual(result, 0)
+    }
+
+    func testInsertAboveFirstPosition() {
+        // [A, B, C] — drag C(2) above A(0)
+        // Remove C → [A, B], insert at 0 → [C, A, B]
+        let result = computeGoalReorderIndex(source: 2, dest: 0, insertAbove: true)
+        XCTAssertEqual(result, 0)
+    }
+
+    // MARK: - Insert Below
+
+    func testInsertBelowLowerIndex() {
+        // [A, B, C, D] — drag A(0) below B(1)
+        // Remove A → [B, C, D], insert at 2 → [B, C, A, D]
+        // Wait — "below B" means after B. After removing A (index 0 < 2), shift: 2-1=1
+        // Result: [B, A, C, D]
+        let result = computeGoalReorderIndex(source: 0, dest: 1, insertAbove: false)
+        XCTAssertEqual(result, 1)
+    }
+
+    func testInsertBelowUpperIndex() {
+        // [A, B, C, D] — drag D(3) below A(0)
+        // Remove D → [A, B, C], insert at 1 → [A, D, B, C]
+        let result = computeGoalReorderIndex(source: 3, dest: 0, insertAbove: false)
+        XCTAssertEqual(result, 1)
+    }
+
+    func testInsertBelowLastPosition() {
+        // [A, B, C] — drag A(0) below C(2)
+        // Remove A → [B, C], insert at 3, adjust: source(0) < 3 → 2
+        // → [B, C, A]
+        let result = computeGoalReorderIndex(source: 0, dest: 2, insertAbove: false)
+        XCTAssertEqual(result, 2)
+    }
+
+    func testInsertBelowAdjacentForward() {
+        // [A, B, C] — drag A(0) below B(1)
+        // Remove A → [B, C], dest+1=2, source(0)<2 → 1
+        // → [B, A, C]
+        let result = computeGoalReorderIndex(source: 0, dest: 1, insertAbove: false)
+        XCTAssertEqual(result, 1)
+    }
+
+    func testInsertBelowAdjacentBackward() {
+        // [A, B, C] — drag C(2) below A(0)
+        // dest+1=1, source(2) > 1 → no adjustment → 1
+        // → [A, C, B]
+        let result = computeGoalReorderIndex(source: 2, dest: 0, insertAbove: false)
+        XCTAssertEqual(result, 1)
+    }
+
+    // MARK: - Edge cases
+
+    func testTwoItemsInsertAbove() {
+        // [A, B] — drag B(1) above A(0)
+        // Remove B → [A], insert at 0 → [B, A]
+        let result = computeGoalReorderIndex(source: 1, dest: 0, insertAbove: true)
+        XCTAssertEqual(result, 0)
+    }
+
+    func testTwoItemsInsertBelow() {
+        // [A, B] — drag A(0) below B(1)
+        // dest+1=2, source(0)<2 → 1
+        // → [B, A]
+        let result = computeGoalReorderIndex(source: 0, dest: 1, insertAbove: false)
+        XCTAssertEqual(result, 1)
+    }
+}
+
 final class DayCountInputValidatorTests: XCTestCase {
     func testAcceptsTrimmedIntegerWithinRange() {
         XCTAssertEqual(DayCountInputValidator.parse(" 365 ", range: 1...10_000), 365)
