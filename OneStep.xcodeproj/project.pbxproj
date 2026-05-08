@@ -89,9 +89,6 @@
 		A1000000000000000000002B /* WidgetGoalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGoalRowView.swift; sourceTree = "<group>"; };
 		A100000000000000000000C2 /* MilestoneGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneGoalStore.swift; sourceTree = "<group>"; };
 		A100000000000000000000C4 /* FinalGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalDetailView.swift; sourceTree = "<group>"; };
-		E23586A12FA1FD1400E2888E /* one-step-design.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-design.md"; sourceTree = "<group>"; };
-		E23586A22FA1FD1400E2888E /* one-step-engineering-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-engineering-plan.md"; sourceTree = "<group>"; };
-		E23586A32FA1FD1400E2888E /* one-step-test-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "one-step-test-plan.md"; sourceTree = "<group>"; };
 		E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp.md"; sourceTree = "<group>"; };
 		E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-01-scaffold.md"; sourceTree = "<group>"; };
 		E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-02-core-data.md"; sourceTree = "<group>"; };
@@ -211,16 +208,6 @@
 			path = OneStepTests;
 			sourceTree = "<group>";
 		};
-		E23586A42FA1FD1400E2888E /* plans */ = {
-			isa = PBXGroup;
-			children = (
-				E23586A12FA1FD1400E2888E /* one-step-design.md */,
-				E23586A22FA1FD1400E2888E /* one-step-engineering-plan.md */,
-				E23586A32FA1FD1400E2888E /* one-step-test-plan.md */,
-			);
-			path = plans;
-			sourceTree = "<group>";
-		};
 		E23586AC2FA1FD1400E2888E /* plans */ = {
 			isa = PBXGroup;
 			children = (
@@ -246,7 +233,6 @@
 		E23586AE2FA1FD1400E2888E /* docs */ = {
 			isa = PBXGroup;
 			children = (
-				E23586A42FA1FD1400E2888E /* plans */,
 				E23586AD2FA1FD1400E2888E /* superpowers */,
 			);
 			path = docs;
