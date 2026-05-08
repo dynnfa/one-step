@@ -29,7 +29,7 @@ public enum GoalRepositoryError: Error, Equatable, LocalizedError {
         case .targetBelowCompletedCount:
             return "Target completion days cannot be below completed days."
         case .milestoneNotActive:
-            return "Milestone must be active before check-in."
+            return "Milestone is not current or is already complete."
         case .storeUnavailable:
             return "Shared store is unavailable."
         case .saveFailed(let message):

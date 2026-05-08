@@ -93,24 +93,6 @@ public struct FinalGoalRepository {
         }
     }
 
-    public func createMilestoneGoal(_ input: CreateMilestoneGoalInput) throws -> UUID {
-        let finalGoal = try fetchFinalGoal(finalGoalID: input.finalGoalID)
-        guard finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
-
-        let title = try validateTitle(input.title)
-        try validateTargetCompletionDays(input.targetCompletionDays)
-
-        let sortOrder = try nextMilestoneSortOrder(for: input.finalGoalID)
-        let milestone = MilestoneGoal(
-            title: title,
-            targetCompletionDays: input.targetCompletionDays,
-            finalGoalID: input.finalGoalID,
-            sortOrder: sortOrder
-        )
-        modelContext.insert(milestone)
-        try save()
-        return milestone.id
-    }
 }
 
 @MainActor
@@ -168,7 +150,7 @@ private extension FinalGoalRepository {
         let milestones = try fetchMilestones(for: goal.id)
         let totalMilestoneCount = milestones.count
         let completedMilestoneCount = milestones.filter { $0.completedAt != nil }.count
-        let activeMilestoneCount = milestones.filter { $0.isActive && $0.completedAt == nil }.count
+        let activeMilestoneCount = goal.isActive && milestones.contains { $0.completedAt == nil } ? 1 : 0
 
         let remainingCalendarDays: Int? = goal.targetCalendarDays.map { limit in
             let startString = goal.startDayKey
@@ -200,10 +182,6 @@ private extension FinalGoalRepository {
 
     func validateTargetCalendarDays(_ days: Int) throws {
         guard days > 0 else { throw GoalRepositoryError.invalidTargetCalendarDays }
-    }
-
-    func validateTargetCompletionDays(_ days: Int) throws {
-        guard days > 0 else { throw GoalRepositoryError.invalidTargetCompletionDays }
     }
 
     func save() throws {

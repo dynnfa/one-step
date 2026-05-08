@@ -15,7 +15,7 @@ final class DomainTypeTests: XCTestCase {
         XCTAssertFalse(goal.isActive)
     }
 
-    func testMilestoneGoalDefaultsInactiveAndCompletionIsIndependent() {
+    func testMilestoneGoalCompletionStateIsStoredWithoutActivationState() {
         let milestone = MilestoneGoal(
             title: "Finish vocabulary",
             targetCompletionDays: 30,
@@ -23,13 +23,9 @@ final class DomainTypeTests: XCTestCase {
             sortOrder: 0
         )
 
-        XCTAssertFalse(milestone.isActive)
-
-        milestone.isActive = true
-        XCTAssertTrue(milestone.isActive)
-
+        XCTAssertNil(milestone.completedAt)
         milestone.completedAt = Date()
-        XCTAssertTrue(milestone.isActive)
+        XCTAssertNotNil(milestone.completedAt)
     }
 
     func testDailyCompletionUniqueKeyUsesMilestoneAndDay() {
@@ -120,7 +116,7 @@ final class DomainTypeTests: XCTestCase {
         XCTAssertEqual(GoalRepositoryError.finalGoalNotFound.errorDescription, "Final goal not found.")
         XCTAssertEqual(GoalRepositoryError.milestoneGoalNotFound.errorDescription, "Milestone goal not found.")
         XCTAssertEqual(GoalRepositoryError.finalGoalNotActive.errorDescription, "Final goal is archived.")
-        XCTAssertEqual(GoalRepositoryError.milestoneNotActive.errorDescription, "Milestone must be active before check-in.")
+        XCTAssertEqual(GoalRepositoryError.milestoneNotActive.errorDescription, "Milestone is not current or is already complete.")
         XCTAssertEqual(GoalRepositoryError.saveFailed("disk").errorDescription, "Save failed: disk")
     }
 }

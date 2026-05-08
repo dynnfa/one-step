@@ -162,21 +162,6 @@ final class FinalGoalRepositoryTests: XCTestCase {
         XCTAssertNil(milestones[0].completedAt)
     }
 
-    func testCreateMilestoneRejectsArchivedFinalGoal() throws {
-        let fixture = try makeFixture()
-        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
-        let fgID = try fixture.createFinalGoal(title: "Goal", day: day)
-        try fixture.repository.setFinalGoalArchived(finalGoalID: fgID, isArchived: true)
-
-        XCTAssertThrowsError(try fixture.repository.createMilestoneGoal(CreateMilestoneGoalInput(
-            title: "Phase 1",
-            targetCompletionDays: 5,
-            finalGoalID: fgID
-        ))) { error in
-            XCTAssertEqual(error as? GoalRepositoryError, .finalGoalNotActive)
-        }
-    }
-
     // MARK: - Delete
 
     func testDeleteFinalGoalCascadeDeletesMilestones() throws {
@@ -209,7 +194,7 @@ final class FinalGoalRepositoryTests: XCTestCase {
         let snapshot = try XCTUnwrap(goals.first { $0.id == fgID })
         XCTAssertEqual(snapshot.completedMilestoneCount, 1)
         XCTAssertEqual(snapshot.totalMilestoneCount, 2)
-        XCTAssertEqual(snapshot.activeMilestoneCount, 0)
+        XCTAssertEqual(snapshot.activeMilestoneCount, 1)
         XCTAssertNil(snapshot.archivedAt)
     }
 
@@ -235,7 +220,7 @@ private struct FinalGoalRepositoryFixture {
     }
 
     func createMilestone(title: String, targetDays: Int, finalGoalID: UUID) throws -> UUID {
-        try repository.createMilestoneGoal(CreateMilestoneGoalInput(
+        try MilestoneGoalRepository(modelContext: modelContext).createMilestoneGoal(CreateMilestoneGoalInput(
             title: title,
             targetCompletionDays: targetDays,
             finalGoalID: finalGoalID

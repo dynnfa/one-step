@@ -11,7 +11,6 @@ struct FinalGoalDetailView: View {
     let onDeleteGoal: () -> Void
     let onCheckIn: (UUID) -> Void
     let onUndo: (UUID) -> Void
-    let onSetActive: (UUID, Bool) -> Void
     let onEditMilestone: (MilestoneGoalSnapshot) -> Void
     let onDeleteMilestone: (MilestoneGoalSnapshot) -> Void
 
@@ -120,7 +119,6 @@ struct FinalGoalDetailView: View {
                         isReadOnly: !actionPolicy.canMutateMilestones,
                         onCheckIn: { onCheckIn(milestone.id) },
                         onUndo: { onUndo(milestone.id) },
-                        onSetActive: { isActive in onSetActive(milestone.id, isActive) },
                         onEdit: { onEditMilestone(milestone) },
                         onDelete: { onDeleteMilestone(milestone) }
                     )

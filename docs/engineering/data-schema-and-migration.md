@@ -33,13 +33,12 @@ Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Mode
 | `targetCompletionDays` | Int | Must be > 0. Represents intended completed days, not calendar duration. |
 | `finalGoalID` | UUID | Foreign key to `FinalGoal.id`. |
 | `sortOrder` | Int | Determines milestone sequence within a FinalGoal. |
-| `isActive` | Bool | User-controlled activation flag. Defaults to `false`. Active, incomplete milestones can receive check-ins and appear in the Widget. |
 | `startDayKey` | String? | YYYY-MM-DD format. Set on first check-in. `nil` until then. |
 | `completedAt` | Date? | `nil` while in progress. Auto-set when `completedDays >= targetCompletionDays`. |
 | `createdAt` | Date | Set once on creation. |
 | `updatedAt` | Date | Updated on every mutation. |
 
-`MilestoneGoal` stores one ordered phase under a final goal. Activation is separate from completion: `isActive` says whether the milestone is currently available for check-in, while `completedAt` records whether the target count has been reached.
+`MilestoneGoal` stores one ordered phase under a final goal. The current milestone is derived by repository logic: the first incomplete milestone by `sortOrder` under an active `FinalGoal`.
 
 ### DailyCompletion
 
@@ -62,10 +61,10 @@ Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Mode
 ## Data Invariants
 
 1. **One completion per milestone per local day.** Enforced by the unique `uniqueKey` on `DailyCompletion`. Duplicate same-day writes are repository-level no-ops.
-2. **Only active, incomplete milestones can receive check-ins.** `MilestoneGoalRepository.completeToday` rejects inactive or completed milestones.
+2. **Only the current incomplete milestone can receive check-ins.** `MilestoneGoalRepository.completeToday` rejects completed milestones and non-current milestones.
 3. **Check-in requires an active parent FinalGoal.** `completeToday` rejects if the parent FinalGoal is archived.
-4. **Multiple milestones may be active at once.** Widget snapshots include active, incomplete milestones from active FinalGoals, ordered by FinalGoal order then milestone order, up to the Widget family limit.
-5. **Milestone auto-completes when target is reached.** `completedAt` is set automatically and `isActive` is set to `false` when `completedDays >= targetCompletionDays`.
+4. **Each active FinalGoal contributes at most one Widget milestone.** Widget snapshots include the first incomplete milestone from each active FinalGoal, ordered by FinalGoal order, up to the Widget family limit.
+5. **Milestone auto-completes when target is reached.** `completedAt` is set automatically when `completedDays >= targetCompletionDays`.
 6. **FinalGoal completion is archival.** Completing/ending a FinalGoal sets `archivedAt`; it does not mutate its milestones and does not require all milestones to be complete.
 7. **Delete cascades.** Deleting a FinalGoal removes all its milestones and their completions. Deleting a MilestoneGoal removes its completions.
 8. **Progress uses completion count, not elapsed days.** Progress = `completedDays / targetCompletionDays`.
@@ -88,12 +87,6 @@ Schema changes may be made deliberately. SwiftData's lightweight migration handl
 ### Current Schema Version
 
 The schema has no explicit version number yet. One will be assigned before the v1.0 public release tag.
-
-### Pre-v1.0 Destructive Reset: Milestone Activation
-
-The milestone activation change adds `MilestoneGoal.isActive` and intentionally clears existing app data once. Before opening the shared SwiftData store, `OneStepModelContainerFactory.makeShared(appGroupIdentifier:)` checks the app-group `UserDefaults` marker `didResetForMilestoneActivationV1`. If absent, it deletes `OneStep.sqlite`, `OneStep.sqlite-wal`, and `OneStep.sqlite-shm`, then sets the marker.
-
-This reset removes all existing `FinalGoal`, `MilestoneGoal`, and `DailyCompletion` rows. New milestones default to inactive and must be explicitly activated from the app before they can be checked in or shown in the Widget.
 
 ## PR Checklist for Schema Changes
 

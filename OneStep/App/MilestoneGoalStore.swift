@@ -56,15 +56,6 @@ final class MilestoneGoalStore {
         }
     }
 
-    func setMilestoneActive(milestoneGoalID: UUID, finalGoalID: UUID, isActive: Bool) {
-        do {
-            try repository.setMilestoneActive(milestoneGoalID: milestoneGoalID, isActive: isActive)
-            refreshAndReloadWidget(finalGoalID: finalGoalID)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
     func completeToday(milestoneGoalID: UUID, finalGoalID: UUID) {
         do {
             try repository.completeToday(milestoneGoalID: milestoneGoalID, day: .today)

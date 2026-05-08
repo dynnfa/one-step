@@ -62,25 +62,25 @@ The app and Widget share a SwiftData `ModelContainer` stored in the App Group co
 
 ## Active Milestones
 
-Each active `FinalGoal` may have multiple active incomplete milestones. `MilestoneGoal.isActive` is stored independently from `completedAt`, and only milestones where `isActive == true` and `completedAt == nil` can accept check-ins. When a milestone reaches its target, the repository sets `completedAt` and forces `isActive = false`; it does not automatically activate another milestone.
+Each active `FinalGoal` has at most one current milestone. The current milestone is derived, not stored: `MilestoneGoalRepository` selects the first milestone by `sortOrder` where `completedAt == nil`. When that milestone reaches its target, the repository sets `completedAt`; the next incomplete milestone becomes current automatically.
 
 ## Widget Tap Flow
 
 ```text
 Widget tap
-    → CompleteGoalIntent.perform()
+        → CompleteGoalIntent.perform()
         → MilestoneGoalRepository.completeToday(milestoneGoalID, LocalDay.today)
-            → validates milestone is active, incomplete, and parent FinalGoal is active
+            → validates milestone is current, incomplete, and parent FinalGoal is active
             → SwiftData store in App Group container
                 → WidgetCenter.shared.reloadTimelines(ofKind:)
                     → Widget shows completed state
 ```
 
-`CompleteGoalIntent` catches repository errors and logs them via `OneStepLog.appIntent`. Stale taps for missing, archived-parent, inactive, or completed milestones are logged and no-oped without crashing.
+`CompleteGoalIntent` catches repository errors and logs them via `OneStepLog.appIntent`. Stale taps for missing, archived-parent, non-current, or completed milestones are logged and no-oped without crashing.
 
 ## Timeline Provider
 
-`OneStepTimelineProvider` loads milestones on a 15-minute refresh cycle. Each refresh calls `MilestoneGoalRepository.activeMilestonesForWidget(limit:day:)` with a limit determined by the Widget family. The method returns active incomplete milestones from active final goals, ordered by final goal order and then milestone order until the widget-family limit is reached.
+`OneStepTimelineProvider` loads milestones on a 15-minute refresh cycle. Each refresh calls `MilestoneGoalRepository.activeMilestonesForWidget(limit:day:)` with a limit determined by the Widget family. The method returns the current incomplete milestone from each active final goal, ordered by final goal order until the widget-family limit is reached.
 
 ## Logging
 

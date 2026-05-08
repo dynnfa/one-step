@@ -164,7 +164,7 @@ final class MilestoneGoalStoreTests: XCTestCase {
         fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
 
         XCTAssertEqual(fixture.store.milestones.map(\.title), ["Phase 1"])
-        XCTAssertFalse(fixture.store.milestones.first?.isActive ?? true)
+        XCTAssertTrue(fixture.store.milestones.first?.isActive ?? false)
     }
 
     func testCreateAndCheckInRefreshesState() throws {
@@ -175,7 +175,6 @@ final class MilestoneGoalStoreTests: XCTestCase {
         fixture.store.createMilestone(title: "Phase 1", targetCompletionDays: 5, finalGoalID: fgID)
         let mID = try XCTUnwrap(fixture.store.milestones.first?.id)
 
-        fixture.store.setMilestoneActive(milestoneGoalID: mID, finalGoalID: fgID, isActive: true)
         XCTAssertTrue(fixture.store.milestones.first?.isActive ?? false)
 
         fixture.store.completeToday(milestoneGoalID: mID, finalGoalID: fgID)
@@ -186,15 +185,15 @@ final class MilestoneGoalStoreTests: XCTestCase {
         XCTAssertEqual(fixture.store.milestones.first?.completedDays, 0)
     }
 
-    func testSetMilestoneActiveRefreshesState() throws {
+    func testOnlyFirstIncompleteMilestoneIsActive() throws {
         let fixture = try makeFixture()
         let fgID = try fixture.createFinalGoal()
-        let mID = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
+        _ = try fixture.createMilestone(title: "Phase 2", targetDays: 5, finalGoalID: fgID)
 
         fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
-        fixture.store.setMilestoneActive(milestoneGoalID: mID, finalGoalID: fgID, isActive: true)
 
-        XCTAssertEqual(fixture.store.milestones.first?.isActive, true)
+        XCTAssertEqual(fixture.store.milestones.map(\.isActive), [true, false])
     }
 
     func testDeleteMilestoneRemovesItFromMilestones() throws {
@@ -227,7 +226,6 @@ final class MilestoneGoalStoreTests: XCTestCase {
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 1)
 
-        fixture.store.setMilestoneActive(milestoneGoalID: milestoneID, finalGoalID: fgID, isActive: true)
         fixture.store.completeToday(milestoneGoalID: milestoneID, finalGoalID: fgID)
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.completedMilestoneCount, 1)

@@ -28,7 +28,7 @@ struct CompleteGoalIntent: AppIntent {
         } catch GoalRepositoryError.milestoneGoalNotFound {
             OneStepLog.appIntent.error("Stale widget tap ignored because milestone was missing: \(goalID)")
         } catch GoalRepositoryError.milestoneNotActive {
-            OneStepLog.appIntent.error("Stale widget tap ignored because milestone was not active: \(goalID)")
+            OneStepLog.appIntent.error("Stale widget tap ignored because milestone was not current or was complete: \(goalID)")
         } catch {
             OneStepLog.appIntent.error("CompleteGoalIntent failed: \(error.localizedDescription)")
         }
