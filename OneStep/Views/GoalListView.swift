@@ -1,5 +1,54 @@
 import OneStepCore
 import SwiftUI
+import UniformTypeIdentifiers
+
+// MARK: - Drop Indicator Types
+
+private struct DropHoverState: Equatable {
+    let goalID: UUID
+    let isAbove: Bool
+}
+
+private struct GoalRowDropDelegate: DropDelegate {
+    let goalID: UUID
+    let onHoverUpdate: (DropHoverState?) -> Void
+    let onPerformDrop: (_ destinationGoalID: UUID, _ insertAbove: Bool) -> Bool
+
+    func validateDrop(info: DropInfo) -> Bool {
+        true
+    }
+
+    func dropEntered(info: DropInfo) {
+        onHoverUpdate(DropHoverState(goalID: goalID, isAbove: true))
+    }
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        let isAbove = info.location.y < 22
+        onHoverUpdate(DropHoverState(goalID: goalID, isAbove: isAbove))
+        return DropProposal(operation: .move)
+    }
+
+    func dropExited(info: DropInfo) {
+        onHoverUpdate(nil)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        let isAbove = info.location.y < 22
+        onHoverUpdate(nil)
+        return onPerformDrop(goalID, isAbove)
+    }
+}
+
+private struct DropIndicatorLine: View {
+    var body: some View {
+        Capsule()
+            .fill(Color.accentColor)
+            .frame(height: 3)
+            .padding(.horizontal, 6)
+    }
+}
+
+// MARK: - GoalListView
 
 struct GoalListView: View {
     @Bindable var finalGoalStore: FinalGoalStore
@@ -92,14 +141,15 @@ struct GoalListView: View {
         )
     }
 
-    private func moveActiveGoal(_ draggedGoalID: UUID, to destinationGoalID: UUID) -> Bool {
+    private func moveActiveGoal(_ draggedGoalID: UUID, to destinationGoalID: UUID, insertAbove: Bool) -> Bool {
         guard draggedGoalID != destinationGoalID,
               let sourceIndex = activeGoals.firstIndex(where: { $0.id == draggedGoalID }),
-              let destinationIndex = activeGoals.firstIndex(where: { $0.id == destinationGoalID }) else {
+              let destIndex = activeGoals.firstIndex(where: { $0.id == destinationGoalID }) else {
             return false
         }
 
-        finalGoalStore.move(from: IndexSet(integer: sourceIndex), to: destinationIndex)
+        let targetIndex = computeGoalReorderIndex(source: sourceIndex, dest: destIndex, insertAbove: insertAbove)
+        finalGoalStore.move(from: IndexSet(integer: sourceIndex), to: targetIndex)
         return true
     }
 
@@ -142,13 +192,22 @@ struct GoalListView: View {
     }
 }
 
+// MARK: - Sidebar
+
+private final class DragState {
+    var draggedGoalID: UUID?
+}
+
 private struct GoalSidebarView: View {
     let activeGoals: [FinalGoalListSnapshot]
     let archivedGoals: [FinalGoalListSnapshot]
     let selectedFinalGoalID: UUID?
     let onAddGoal: () -> Void
     let onSelectGoal: (UUID) -> Void
-    let onMoveActiveGoal: (UUID, UUID) -> Bool
+    let onMoveActiveGoal: (UUID, UUID, Bool) -> Bool
+
+    @State private var dropHoverState: DropHoverState?
+    @State private var dragState = DragState()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -160,12 +219,29 @@ private struct GoalSidebarView: View {
                             GoalSidebarRowView(
                                 goal: goal,
                                 isSelected: selectedFinalGoalID == goal.id,
+                                isDropTargetAbove: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == true,
+                                isDropTargetBelow: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == false,
                                 onSelect: { onSelectGoal(goal.id) }
                             )
-                            .draggable(goal.id.uuidString)
-                            .dropDestination(for: String.self) { items, _ in
-                                handleDrop(items, destinationGoalID: goal.id)
+                            .onDrag {
+                                dragState.draggedGoalID = goal.id
+                                return NSItemProvider(object: goal.id.uuidString as NSString)
                             }
+                            .onDrop(
+                                of: [.text],
+                                delegate: GoalRowDropDelegate(
+                                    goalID: goal.id,
+                                    onHoverUpdate: { newState in
+                                        dropHoverState = newState
+                                    },
+                                    onPerformDrop: { destinationGoalID, insertAbove in
+                                        dropHoverState = nil
+                                        guard let draggedID = dragState.draggedGoalID else { return false }
+                                        dragState.draggedGoalID = nil
+                                        return onMoveActiveGoal(draggedID, destinationGoalID, insertAbove)
+                                    }
+                                )
+                            )
                         }
                     }
 
@@ -175,6 +251,8 @@ private struct GoalSidebarView: View {
                                 GoalSidebarRowView(
                                     goal: goal,
                                     isSelected: selectedFinalGoalID == goal.id,
+                                    isDropTargetAbove: false,
+                                    isDropTargetBelow: false,
                                     onSelect: { onSelectGoal(goal.id) }
                                 )
                             }
@@ -202,16 +280,9 @@ private struct GoalSidebarView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
     }
-
-    private func handleDrop(_ items: [String], destinationGoalID: UUID) -> Bool {
-        guard let item = items.first,
-              let draggedGoalID = UUID(uuidString: item) else {
-            return false
-        }
-
-        return onMoveActiveGoal(draggedGoalID, destinationGoalID)
-    }
 }
+
+// MARK: - Sidebar Components
 
 private struct GoalSidebarSection<Content: View>: View {
     let title: String
@@ -236,6 +307,8 @@ private struct GoalSidebarSection<Content: View>: View {
 private struct GoalSidebarRowView: View {
     let goal: FinalGoalListSnapshot
     let isSelected: Bool
+    let isDropTargetAbove: Bool
+    let isDropTargetBelow: Bool
     let onSelect: () -> Void
 
     var body: some View {
@@ -250,6 +323,18 @@ private struct GoalSidebarRowView: View {
         .background {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isSelected ? Color.accentColor.opacity(0.18) : Color.clear)
+        }
+        .overlay(alignment: .top) {
+            if isDropTargetAbove {
+                DropIndicatorLine()
+                    .offset(y: -1)
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if isDropTargetBelow {
+                DropIndicatorLine()
+                    .offset(y: 1)
+            }
         }
     }
 }
