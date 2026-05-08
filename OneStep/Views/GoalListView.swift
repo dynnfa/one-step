@@ -169,9 +169,6 @@ struct GoalListView: View {
                     onDeleteGoal: { finalGoalStore.deleteFinalGoal(finalGoalID: goal.id) },
                     onCheckIn: { msID in milestoneStore.completeToday(milestoneGoalID: msID, finalGoalID: goal.id) },
                     onUndo: { msID in milestoneStore.uncompleteToday(milestoneGoalID: msID, finalGoalID: goal.id) },
-                    onSetActive: { msID, isActive in
-                        milestoneStore.setMilestoneActive(milestoneGoalID: msID, finalGoalID: goal.id, isActive: isActive)
-                    },
                     onEditMilestone: { ms in editingMilestone = ms },
                     onDeleteMilestone: deleteMilestone
                 )
