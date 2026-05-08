@@ -41,19 +41,34 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertEqual(fixture.store.errorMessage, GoalRepositoryError.invalidTitle.localizedDescription)
     }
 
-    func testCompleteFinalGoalArchivesItAndRefreshesListState() throws {
+    func testToggleFinalGoalArchiveUpdatesListState() throws {
         let fixture = try makeFixture()
         fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
         fixture.store.createFinalGoal(title: "Second", goalDescription: nil, targetCalendarDays: nil)
         let firstID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "First" }?.id)
         let secondID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Second" }?.id)
 
-        fixture.store.completeFinalGoal(finalGoalID: firstID)
+        fixture.store.toggleFinalGoalArchive(finalGoalID: firstID)
         XCTAssertNotNil(fixture.store.finalGoals.first { $0.id == firstID }?.archivedAt)
 
         fixture.store.move(from: IndexSet(integer: 1), to: 0)
         let activeGoals = fixture.store.finalGoals.filter { $0.archivedAt == nil }
         XCTAssertEqual(activeGoals.map(\.id), [secondID])
+
+        fixture.store.toggleFinalGoalArchive(finalGoalID: firstID)
+        XCTAssertNil(fixture.store.finalGoals.first { $0.id == firstID }?.archivedAt)
+    }
+
+    func testFinalGoalDetailActionPolicyMakesArchivedGoalsReadOnly() {
+        let activePolicy = FinalGoalDetailActionPolicy(goal: makeSnapshot(archivedAt: nil))
+        XCTAssertTrue(activePolicy.canMutateGoal)
+        XCTAssertTrue(activePolicy.canMutateMilestones)
+        XCTAssertEqual(activePolicy.archiveButtonTitle, "Archive Goal")
+
+        let archivedPolicy = FinalGoalDetailActionPolicy(goal: makeSnapshot(archivedAt: Date()))
+        XCTAssertFalse(archivedPolicy.canMutateGoal)
+        XCTAssertFalse(archivedPolicy.canMutateMilestones)
+        XCTAssertEqual(archivedPolicy.archiveButtonTitle, "Reactivate Goal")
     }
 
     func testDeleteFinalGoalRemovesItFromListAndClearsSelection() throws {
@@ -80,6 +95,21 @@ final class FinalGoalStoreTests: XCTestCase {
             finalGoalRepo: fgRepo,
             store: FinalGoalStore(repository: fgRepo),
             day: day
+        )
+    }
+
+    private func makeSnapshot(archivedAt: Date?) -> FinalGoalListSnapshot {
+        FinalGoalListSnapshot(
+            id: UUID(),
+            title: "Goal",
+            goalDescription: nil,
+            targetCalendarDays: nil,
+            completedMilestoneCount: 0,
+            totalMilestoneCount: 0,
+            activeMilestoneCount: 0,
+            remainingCalendarDays: nil,
+            sortOrder: 0,
+            archivedAt: archivedAt
         )
     }
 }

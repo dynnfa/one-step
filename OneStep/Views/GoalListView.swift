@@ -114,7 +114,7 @@ struct GoalListView: View {
                     milestones: milestoneStore.milestones,
                     errorMessage: milestoneStore.errorMessage ?? finalGoalStore.errorMessage,
                     onAddMilestone: { isAddingMilestone = true },
-                    onComplete: { finalGoalStore.completeFinalGoal(finalGoalID: goal.id) },
+                    onToggleArchive: { finalGoalStore.toggleFinalGoalArchive(finalGoalID: goal.id) },
                     onEditGoal: { editingFinalGoal = goal },
                     onDeleteGoal: { finalGoalStore.deleteFinalGoal(finalGoalID: goal.id) },
                     onCheckIn: { msID in milestoneStore.completeToday(milestoneGoalID: msID, finalGoalID: goal.id) },

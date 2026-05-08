@@ -59,9 +59,10 @@ final class FinalGoalStore {
         }
     }
 
-    func completeFinalGoal(finalGoalID: UUID) {
+    func toggleFinalGoalArchive(finalGoalID: UUID) {
         do {
-            try repository.archiveFinalGoal(finalGoalID: finalGoalID, archivedAt: Date())
+            let shouldArchive = finalGoals.first { $0.id == finalGoalID }?.archivedAt == nil
+            try repository.setFinalGoalArchived(finalGoalID: finalGoalID, isArchived: shouldArchive)
             refreshAndReloadWidget()
         } catch {
             errorMessage = error.localizedDescription

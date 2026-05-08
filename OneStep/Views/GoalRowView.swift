@@ -25,6 +25,7 @@ struct FinalGoalRowView: View {
 
 struct MilestoneGoalRowView: View {
     let milestone: MilestoneGoalSnapshot
+    let isReadOnly: Bool
     let onCheckIn: () -> Void
     let onUndo: () -> Void
     let onSetActive: (Bool) -> Void
@@ -40,7 +41,7 @@ struct MilestoneGoalRowView: View {
                     .font(.title2)
             }
             .buttonStyle(.plain)
-            .disabled(!milestone.isActive || milestone.completedAt != nil)
+            .disabled(isReadOnly || !milestone.isActive || milestone.completedAt != nil)
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
@@ -74,7 +75,7 @@ struct MilestoneGoalRowView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                if milestone.completedAt == nil {
+                if !isReadOnly && milestone.completedAt == nil {
                     if milestone.isActive {
                         Button { onSetActive(false) } label: {
                             Text("Deactivate")
@@ -105,16 +106,18 @@ struct MilestoneGoalRowView: View {
                     .font(.headline.monospacedDigit())
             }
 
-            Menu {
-                Button("Edit", action: onEdit)
-                Button("Delete", role: .destructive) {
-                    isConfirmingDelete = true
+            if !isReadOnly {
+                Menu {
+                    Button("Edit", action: onEdit)
+                    Button("Delete", role: .destructive) {
+                        isConfirmingDelete = true
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
                 }
-            } label: {
-                Image(systemName: "ellipsis.circle")
+                .menuStyle(.button)
+                .frame(width: 32)
             }
-            .menuStyle(.button)
-            .frame(width: 32)
         }
         .padding(.vertical, 10)
         .confirmationDialog(

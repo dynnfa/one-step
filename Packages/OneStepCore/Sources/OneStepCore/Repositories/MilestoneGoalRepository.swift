@@ -101,16 +101,18 @@ public struct MilestoneGoalRepository {
     }
 
     public func uncompleteToday(milestoneGoalID: UUID, day: LocalDay) throws {
+        let milestone = try fetchMilestoneGoal(milestoneGoalID: milestoneGoalID)
+        let finalGoal = try fetchFinalGoal(finalGoalID: milestone.finalGoalID)
+        guard finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
+
         let uniqueKey = DailyCompletion.makeUniqueKey(goalID: milestoneGoalID, dayKey: day.rawValue)
         if let completion = try fetchCompletion(uniqueKey: uniqueKey) {
             modelContext.delete(completion)
-            if let milestone = try? fetchMilestoneGoal(milestoneGoalID: milestoneGoalID) {
-                let remaining = try completedDays(for: milestoneGoalID) - 1
-                if remaining < milestone.targetCompletionDays {
-                    milestone.completedAt = nil
-                }
-                milestone.updatedAt = Date()
+            let remaining = try completedDays(for: milestoneGoalID) - 1
+            if remaining < milestone.targetCompletionDays {
+                milestone.completedAt = nil
             }
+            milestone.updatedAt = Date()
             try save()
         }
     }

@@ -1,12 +1,30 @@
 # One Step
 
-One Step is a local-first macOS app for confirming daily progress on long-term goals from a desktop Widget.
+Daily planning, one tap at a time.
+
+One Step is a local-first macOS app for tracking long-term goals through desktop Widgets. Set your goals, break them into milestones, and check off today's progress without ever opening the app.
+
+## How It Works
+
+1. **Set a goal.** Create a final goal and break it into sequential milestones.
+2. **Check in daily.** Tap the milestone directly in the Widget. Done.
+3. **Stay honest.** Missed days stay missed. No streak repair, no guilt mechanics, no social feed.
+
+## Widget Sizes
+
+| Size | Visible Milestones | Layout |
+|------|--------------|--------|
+| Small | 1–2 | Single column |
+| Medium | 4 | Two-column grid |
+| Large | 12 | Two-column grid |
+
+Each row shows the active milestone, its parent goal, and today's completion state. Widgets refresh every 15 minutes.
 
 ## Requirements
 
-- macOS 14 or newer
-- Xcode 15 or newer
-- Swift 5.9 or newer
+- macOS 14+
+- Xcode 15+
+- Swift 5.9+
 
 ## Build
 
@@ -15,32 +33,29 @@ swift test --package-path Packages/OneStepCore
 xcodebuild -project OneStep.xcodeproj -scheme OneStep -destination 'platform=macOS' build
 ```
 
-## Local Widget Check
+## Verify the Widget
 
-1. Open `OneStep.xcodeproj`.
-2. Run the `OneStep` app scheme.
-3. Create at least 5 goals.
-4. Add the One Step Widget in small, medium, and large sizes.
-5. Click an incomplete goal in the Widget.
-6. Confirm the goal becomes completed today without opening the app.
+1. Run the `OneStep` scheme.
+2. Create at least 5 goals with milestones.
+3. Add One Step Widget in small, medium, and large sizes.
+4. Tap an incomplete milestone in the Widget.
+5. Confirm it marks as completed — no app launch required.
 
-## Product Boundaries
+## What One Step Is Not
 
-One Step is not a general task manager, streak repair tool, notes app, reminder system, or social habit tracker. Missed days remain missed. The Widget is the primary daily workflow.
+Not a task manager. Not a streak app. Not a notes tool. Not a social habit tracker. One thing only: show up, tap, move on.
 
 ## Data
 
-The current app stores local data with SwiftData in the app group container `group.dev.dynnfa.OneStep`. Import/export is a possible v1.x improvement; iCloud sync is a possible v2 direction.
+All data lives locally in SwiftData inside the app group container `group.dev.dynnfa.OneStep`. No accounts, no analytics, no telemetry. Import/export is planned for v1.x; iCloud sync is a possible v2 direction.
 
 ## Documentation
 
-- [Roadmap](ROADMAP.md) — development scope and out-of-scope boundaries
-- [Contributing](CONTRIBUTING.md) — build, test, and PR expectations
-- [Privacy](PRIVACY.md) — local-first privacy promise
-- [V1 Product Spec](docs/product/v1-product-spec.md) — current source of truth for product behavior
-- [Architecture](docs/engineering/architecture.md) — app, Widget, core, and data boundaries
-- [Data Schema and Migration](docs/engineering/data-schema-and-migration.md) — schema, invariants, migration policy
-- [Release Checklist](docs/qa/release-checklist.md) — open-source release gate
-- [Widget/App Group Troubleshooting](docs/troubleshooting/widget-app-group.md) — common Widget empty-data causes and fixes
-
-The `docs/plans/` directory contains historical MVP planning context and is not the current source of truth.
+- [Roadmap](ROADMAP.md)
+- [Contributing](CONTRIBUTING.md)
+- [Privacy](PRIVACY.md)
+- [V1 Product Spec](docs/product/v1-product-spec.md)
+- [Architecture](docs/engineering/architecture.md)
+- [Data Schema & Migration](docs/engineering/data-schema-and-migration.md)
+- [Release Checklist](docs/qa/release-checklist.md)
+- [Widget Troubleshooting](docs/troubleshooting/widget-app-group.md)
