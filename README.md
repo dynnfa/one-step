@@ -14,9 +14,9 @@ One Step is a local-first macOS app for tracking long-term goals through desktop
 
 | Size | Visible Milestones | Layout |
 |------|--------------|--------|
-| Small | 1–2 | Single column |
-| Medium | 4 | Two-column grid |
-| Large | 12 | Two-column grid |
+| Small | Up to 2 | Single column |
+| Medium | Up to 4 | Two-column grid |
+| Large | Up to 12 | Two-column grid |
 
 Each row shows the active milestone, its parent goal, and today's completion state. Widgets refresh every 15 minutes.
 

@@ -44,7 +44,7 @@ Computed: `isActive` = `archivedAt == nil`
 | `createdAt` | `Date` | | Set once |
 | `updatedAt` | `Date` | | Updated on every mutation |
 
-Computed: `isActive` = `completedAt == nil`
+`MilestoneGoal` does not store active state. Repository snapshots derive the current active milestone as the first incomplete milestone by `sortOrder` under an active `FinalGoal`.
 
 ### DailyCompletion (unchanged)
 
@@ -61,9 +61,9 @@ Computed: `isActive` = `completedAt == nil`
 ### Milestone Advancement
 
 - Each FinalGoal has an ordered set of MilestoneGoals (by `sortOrder`).
-- The **current active milestone** is the one with the smallest `sortOrder` that is `isActive`.
+- The **current active milestone** is the incomplete milestone with the smallest `sortOrder`.
 - Only the current active milestone can receive check-ins.
-- When `completedDays >= targetCompletionDays` for a milestone, `completedAt` is auto-set and the next milestone becomes active.
+- When `completedDays >= targetCompletionDays` for a milestone, `completedAt` is auto-set and the next incomplete milestone becomes current.
 
 ### Check-in Rules
 
@@ -126,7 +126,8 @@ Computed: `isActive` = `completedAt == nil`
 
 ### Widget
 
-- Shows all current active milestones across all active FinalGoals (one per FinalGoal).
+- Shows current active milestones across active FinalGoals (one per FinalGoal), capped by Widget family.
+- Widget family caps: small up to 2 milestones, medium up to 4, large up to 12.
 - Each row can optionally show the parent FinalGoal title in smaller text for context.
 - Tap-to-complete targets the MilestoneGoal (same `CompleteGoalIntent` pattern).
 - After check-in, widget reloads timelines.
