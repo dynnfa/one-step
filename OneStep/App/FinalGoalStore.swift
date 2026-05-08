@@ -88,7 +88,8 @@ final class FinalGoalStore {
 
         do {
             try repository.moveActiveFinalGoal(finalGoalID: activeGoals[sourceIndex].id, toIndex: destination)
-            refreshAndReloadWidget()
+            reorderLocally(activeGoals: activeGoals, source: sourceIndex, destination: destination)
+            WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -96,6 +97,26 @@ final class FinalGoalStore {
 
     func select(_ id: UUID?) {
         selectedFinalGoalID = id
+    }
+
+    private func reorderLocally(activeGoals: [FinalGoalListSnapshot], source: Int, destination: Int) {
+        var reordered = activeGoals
+        guard reordered.indices.contains(source) else { return }
+        let moved = reordered.remove(at: source)
+        let target = min(max(destination, 0), reordered.count)
+        reordered.insert(moved, at: target)
+
+        var result: [FinalGoalListSnapshot] = []
+        var idx = 0
+        for goal in finalGoals {
+            if goal.archivedAt == nil {
+                result.append(reordered[idx])
+                idx += 1
+            } else {
+                result.append(goal)
+            }
+        }
+        finalGoals = result
     }
 
     private func refreshAndReloadWidget() {
