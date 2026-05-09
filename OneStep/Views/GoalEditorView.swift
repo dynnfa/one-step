@@ -50,7 +50,7 @@ struct FinalGoalEditorView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(mode.title).font(.title2.bold())
-            TextField("Pass IELTS", text: $title).textFieldStyle(.roundedBorder)
+            TextField("What do you want to achieve?", text: $title).textFieldStyle(.roundedBorder)
             TextField("Description (optional)", text: $goalDescription, axis: .vertical)
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(2...4)
@@ -128,7 +128,7 @@ struct MilestoneGoalEditorView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(mode.title).font(.title2.bold())
-            TextField("Finish vocabulary", text: $title).textFieldStyle(.roundedBorder)
+            TextField("Milestone title", text: $title).textFieldStyle(.roundedBorder)
             DayCountStepperInput(
                 title: "Target",
                 unit: "completed days",
