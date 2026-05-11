@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build OneStepCore
+        run: swift build --package-path Packages/OneStepCore
+
+      - name: Test OneStepCore
+        run: swift test --package-path Packages/OneStepCore
+
+      - name: Build OneStep
+        run: |
+          xcodebuild build \
+            -project OneStep.xcodeproj \
+            -scheme OneStep \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Build OneStepWidget
+        run: |
+          xcodebuild build \
+            -project OneStep.xcodeproj \
+            -scheme OneStepWidget \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Test OneStep
+        run: |
+          xcodebuild test \
+            -project OneStep.xcodeproj \
+            -scheme OneStep \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
