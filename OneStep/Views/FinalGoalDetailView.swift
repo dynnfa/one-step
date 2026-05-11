@@ -13,6 +13,8 @@ struct FinalGoalDetailView: View {
     let onUndo: (UUID) -> Void
     let onEditMilestone: (MilestoneGoalSnapshot) -> Void
     let onDeleteMilestone: (MilestoneGoalSnapshot) -> Void
+    let onSetActive: (UUID, Bool) -> Void
+    let onRecentActivityDayLimitChange: (Int) -> Void
 
     @State private var isConfirmingGoalDelete = false
 
@@ -120,7 +122,9 @@ struct FinalGoalDetailView: View {
                         onCheckIn: { onCheckIn(milestone.id) },
                         onUndo: { onUndo(milestone.id) },
                         onEdit: { onEditMilestone(milestone) },
-                        onDelete: { onDeleteMilestone(milestone) }
+                        onDelete: { onDeleteMilestone(milestone) },
+                        onSetActive: { isActive in onSetActive(milestone.id, isActive) },
+                        onRecentActivityDayLimitChange: onRecentActivityDayLimitChange
                     )
                 }
             }

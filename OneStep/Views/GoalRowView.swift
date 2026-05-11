@@ -30,6 +30,8 @@ struct MilestoneGoalRowView: View {
     let onUndo: () -> Void
     let onEdit: () -> Void
     let onDelete: () -> Void
+    let onSetActive: (Bool) -> Void
+    let onRecentActivityDayLimitChange: (Int) -> Void
 
     @State private var isConfirmingDelete = false
 
@@ -44,36 +46,55 @@ struct MilestoneGoalRowView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    Text(milestone.title).font(.headline)
+                    Text(milestone.title)
+                        .font(.headline)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .layoutPriority(0)
                     if milestone.isActive {
-                        Text("current")
+                        Text("active")
                             .font(.caption2)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(.tint.opacity(0.15))
                             .clipShape(Capsule())
+                            .fixedSize()
                     } else if milestone.completedAt == nil {
-                        Text("up next")
+                        Text("inactive")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(.quaternary)
                             .clipShape(Capsule())
+                            .fixedSize()
                     }
                     if milestone.completedAt != nil {
                         Image(systemName: "checkmark.seal.fill")
                             .foregroundStyle(.green)
                             .font(.caption)
+                            .fixedSize()
                     }
 
                 }
-                RecentActivityView(activity: milestone.recentActivity)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                RecentActivityView(
+                    activity: milestone.recentActivity,
+                    targetCompletionDays: milestone.targetCompletionDays,
+                    onRequiredDayCountChange: onRecentActivityDayLimitChange
+                )
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer()
+            VStack(alignment: .trailing, spacing: 6) {
+                if !isReadOnly && milestone.completedAt == nil {
+                    CapsuleToggleButton(
+                        title: milestone.isActive ? "Deactivate" : "Activate",
+                        strokeColor: milestone.isActive ? Color.secondary.opacity(0.4) : .blue.opacity(0.5),
+                        textColor: milestone.isActive ? .secondary : .blue
+                    ) { onSetActive(!milestone.isActive) }
+                }
 
-            VStack(alignment: .trailing, spacing: 4) {
                 Text("\(milestone.completedDays)/\(milestone.targetCompletionDays)")
                     .font(.headline.monospacedDigit())
             }
@@ -102,5 +123,24 @@ struct MilestoneGoalRowView: View {
         } message: {
             Text("This permanently deletes the milestone and its completion history.")
         }
+    }
+}
+
+private struct CapsuleToggleButton: View {
+    let title: String
+    let strokeColor: Color
+    let textColor: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .overlay(Capsule().stroke(strokeColor, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(textColor)
     }
 }
