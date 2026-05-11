@@ -183,7 +183,11 @@ final class FinalGoalRepositoryTests: XCTestCase {
         let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
         let fgID = try fixture.createFinalGoal(title: "Goal", day: day)
         let m1 = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
-        _ = try fixture.createMilestone(title: "Phase 2", targetDays: 10, finalGoalID: fgID)
+        let m2 = try fixture.createMilestone(title: "Phase 2", targetDays: 10, finalGoalID: fgID)
+
+        // Activate second milestone (first will be completed)
+        let milestoneRepo = MilestoneGoalRepository(modelContext: fixture.modelContext)
+        try milestoneRepo.setMilestoneActive(milestoneGoalID: m2, isActive: true)
 
         // Complete first milestone
         let milestones = try fixture.fetchMilestones(for: fgID)

@@ -30,8 +30,11 @@ struct MilestoneGoalRowView: View {
     let onUndo: () -> Void
     let onEdit: () -> Void
     let onDelete: () -> Void
+    let onSetActive: (Bool) -> Void
+    let onRecentActivityDayLimitChange: (Int) -> Void
 
     @State private var isConfirmingDelete = false
+    @State private var titleRowWidth: CGFloat?
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
@@ -43,17 +46,25 @@ struct MilestoneGoalRowView: View {
             .disabled(isReadOnly || !milestone.isActive || milestone.completedAt != nil)
 
             VStack(alignment: .leading, spacing: 6) {
+                let tagWidth: CGFloat = milestone.isActive ? 50
+                    : (milestone.completedAt == nil ? 58 : 20)
+                let titleMaxWidth = titleRowWidth.map { max(0, ($0 - tagWidth) * 0.8) } ?? .infinity
+
                 HStack(spacing: 6) {
-                    Text(milestone.title).font(.headline)
+                    Text(milestone.title)
+                        .font(.headline)
+                        .frame(maxWidth: titleMaxWidth, alignment: .leading)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                     if milestone.isActive {
-                        Text("current")
+                        Text("active")
                             .font(.caption2)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(.tint.opacity(0.15))
                             .clipShape(Capsule())
                     } else if milestone.completedAt == nil {
-                        Text("up next")
+                        Text("inactive")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 6)
@@ -68,12 +79,39 @@ struct MilestoneGoalRowView: View {
                     }
 
                 }
-                RecentActivityView(activity: milestone.recentActivity)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    GeometryReader { geo in
+                        let width = geo.size.width
+                        Color.clear.preference(
+                            key: TitleRowWidthKey.self,
+                            value: width.isFinite ? width : nil
+                        )
+                    }
+                )
+                .onPreferenceChange(TitleRowWidthKey.self) { width in
+                    if let width, width.isFinite {
+                        titleRowWidth = width
+                    }
+                }
+                RecentActivityView(
+                    activity: milestone.recentActivity,
+                    targetCompletionDays: milestone.targetCompletionDays,
+                    onRequiredDayCountChange: onRecentActivityDayLimitChange
+                )
+                    .frame(maxWidth: titleRowWidth, alignment: .leading)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer()
+            VStack(alignment: .trailing, spacing: 6) {
+                if !isReadOnly && milestone.completedAt == nil {
+                    CapsuleToggleButton(
+                        title: milestone.isActive ? "Deactivate" : "Activate",
+                        strokeColor: milestone.isActive ? Color.secondary.opacity(0.4) : .blue.opacity(0.5),
+                        textColor: milestone.isActive ? .secondary : .blue
+                    ) { onSetActive(!milestone.isActive) }
+                }
 
-            VStack(alignment: .trailing, spacing: 4) {
                 Text("\(milestone.completedDays)/\(milestone.targetCompletionDays)")
                     .font(.headline.monospacedDigit())
             }
@@ -102,5 +140,31 @@ struct MilestoneGoalRowView: View {
         } message: {
             Text("This permanently deletes the milestone and its completion history.")
         }
+    }
+}
+
+private struct TitleRowWidthKey: PreferenceKey {
+    static let defaultValue: CGFloat? = nil
+    static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
+        value = nextValue()
+    }
+}
+
+private struct CapsuleToggleButton: View {
+    let title: String
+    let strokeColor: Color
+    let textColor: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .overlay(Capsule().stroke(strokeColor, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(textColor)
     }
 }

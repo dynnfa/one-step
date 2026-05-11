@@ -170,7 +170,11 @@ struct GoalListView: View {
                     onCheckIn: { msID in milestoneStore.completeToday(milestoneGoalID: msID, finalGoalID: goal.id) },
                     onUndo: { msID in milestoneStore.uncompleteToday(milestoneGoalID: msID, finalGoalID: goal.id) },
                     onEditMilestone: { ms in editingMilestone = ms },
-                    onDeleteMilestone: deleteMilestone
+                    onDeleteMilestone: deleteMilestone,
+                    onSetActive: { msID, isActive in milestoneStore.setMilestoneActive(milestoneGoalID: msID, finalGoalID: goal.id, isActive: isActive) },
+                    onRecentActivityDayLimitChange: { dayLimit in
+                        milestoneStore.ensureRecentActivityDayLimit(dayLimit, finalGoalID: goal.id)
+                    }
                 )
             } else if finalGoalStore.finalGoals.isEmpty {
                 EmptyStateView { isShowingCreateGoal = true }
