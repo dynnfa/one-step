@@ -34,7 +34,6 @@ struct MilestoneGoalRowView: View {
     let onRecentActivityDayLimitChange: (Int) -> Void
 
     @State private var isConfirmingDelete = false
-    @State private var titleRowWidth: CGFloat?
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
@@ -46,16 +45,12 @@ struct MilestoneGoalRowView: View {
             .disabled(isReadOnly || !milestone.isActive || milestone.completedAt != nil)
 
             VStack(alignment: .leading, spacing: 6) {
-                let tagWidth: CGFloat = milestone.isActive ? 50
-                    : (milestone.completedAt == nil ? 58 : 20)
-                let titleMaxWidth = titleRowWidth.map { max(0, ($0 - tagWidth) * 0.8) } ?? .infinity
-
                 HStack(spacing: 6) {
                     Text(milestone.title)
                         .font(.headline)
-                        .frame(maxWidth: titleMaxWidth, alignment: .leading)
                         .lineLimit(1)
                         .truncationMode(.tail)
+                        .layoutPriority(0)
                     if milestone.isActive {
                         Text("active")
                             .font(.caption2)
@@ -63,6 +58,7 @@ struct MilestoneGoalRowView: View {
                             .padding(.vertical, 2)
                             .background(.tint.opacity(0.15))
                             .clipShape(Capsule())
+                            .fixedSize()
                     } else if milestone.completedAt == nil {
                         Text("inactive")
                             .font(.caption2)
@@ -71,35 +67,22 @@ struct MilestoneGoalRowView: View {
                             .padding(.vertical, 2)
                             .background(.quaternary)
                             .clipShape(Capsule())
+                            .fixedSize()
                     }
                     if milestone.completedAt != nil {
                         Image(systemName: "checkmark.seal.fill")
                             .foregroundStyle(.green)
                             .font(.caption)
+                            .fixedSize()
                     }
 
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    GeometryReader { geo in
-                        let width = geo.size.width
-                        Color.clear.preference(
-                            key: TitleRowWidthKey.self,
-                            value: width.isFinite ? width : nil
-                        )
-                    }
-                )
-                .onPreferenceChange(TitleRowWidthKey.self) { width in
-                    if let width, width.isFinite {
-                        titleRowWidth = width
-                    }
-                }
                 RecentActivityView(
                     activity: milestone.recentActivity,
                     targetCompletionDays: milestone.targetCompletionDays,
                     onRequiredDayCountChange: onRecentActivityDayLimitChange
                 )
-                    .frame(maxWidth: titleRowWidth, alignment: .leading)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -140,13 +123,6 @@ struct MilestoneGoalRowView: View {
         } message: {
             Text("This permanently deletes the milestone and its completion history.")
         }
-    }
-}
-
-private struct TitleRowWidthKey: PreferenceKey {
-    static let defaultValue: CGFloat? = nil
-    static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
-        value = nextValue()
     }
 }
 

@@ -404,6 +404,27 @@ final class MilestoneGoalRepositoryTests: XCTestCase {
         XCTAssertEqual(milestones.first?.recentActivity.count, 7)
     }
 
+    func testFetchCompletionsCanBeLimitedToDayRange() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        let milestoneID = try fixture.createMilestone(title: "Phase 1", targetDays: 90, finalGoalID: fgID)
+        let otherMilestoneID = try fixture.createMilestone(title: "Phase 2", targetDays: 90, finalGoalID: fgID)
+
+        fixture.modelContext.insert(DailyCompletion(goalID: milestoneID, dayKey: "2026-03-01"))
+        fixture.modelContext.insert(DailyCompletion(goalID: milestoneID, dayKey: "2026-03-20"))
+        fixture.modelContext.insert(DailyCompletion(goalID: milestoneID, dayKey: "2026-04-29"))
+        fixture.modelContext.insert(DailyCompletion(goalID: otherMilestoneID, dayKey: "2026-03-20"))
+        try fixture.modelContext.save()
+
+        let completions = try fixture.repository.fetchCompletions(
+            goalID: milestoneID,
+            fromDayKey: "2026-03-20",
+            throughDayKey: "2026-04-29"
+        )
+
+        XCTAssertEqual(completions.map(\.dayKey), ["2026-03-20", "2026-04-29"])
+    }
+
     // MARK: - Helpers
 
     private func makeFixture() throws -> MilestoneGoalRepositoryFixture {
