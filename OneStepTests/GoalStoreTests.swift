@@ -117,6 +117,69 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertNil(fixture.store.errorMessage)
     }
 
+    func testDataPortStoreExportsBackupFileData() throws {
+        let fixture = try makeFixture()
+        fixture.store.createFinalGoal(title: "Pass IELTS", goalDescription: "Score 7.0+", targetCalendarDays: 180)
+        let dataPortStore = DataPortStore(repository: OneStepBackupRepository(modelContext: fixture.modelContext))
+
+        let file = dataPortStore.makeExportFile()
+
+        XCTAssertNotNil(file)
+        XCTAssertEqual(dataPortStore.statusMessage, "Export is ready.")
+        let data = try XCTUnwrap(file?.data)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let document = try decoder.decode(OneStepBackupDocument.self, from: data)
+        XCTAssertEqual(document.finalGoals.map(\.title), ["Pass IELTS"])
+    }
+
+    func testDataPortStoreImportsBackupDataAndReportsSuccess() throws {
+        let fixture = try makeFixture()
+        let finalGoalID = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
+        let document = OneStepBackupDocument(
+            exportedAt: Date(timeIntervalSince1970: 1_777_000_000),
+            finalGoals: [
+                .init(
+                    id: finalGoalID,
+                    title: "Imported",
+                    goalDescription: nil,
+                    targetCalendarDays: nil,
+                    startDayKey: "2026-04-29",
+                    sortOrder: 0,
+                    archivedAt: nil,
+                    createdAt: Date(timeIntervalSince1970: 1_777_000_000),
+                    updatedAt: Date(timeIntervalSince1970: 1_777_000_000)
+                )
+            ],
+            milestones: [],
+            dailyCompletions: []
+        )
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(document)
+        let dataPortStore = DataPortStore(repository: OneStepBackupRepository(modelContext: fixture.modelContext))
+
+        dataPortStore.importData(data)
+
+        fixture.store.refresh()
+        XCTAssertEqual(fixture.store.finalGoals.map(\.title), ["Imported"])
+        XCTAssertEqual(dataPortStore.statusMessage, "Import complete.")
+        XCTAssertNil(dataPortStore.errorMessage)
+    }
+
+    func testOneStepBackupFileReadsAndWritesData() throws {
+        let input = Data("{}".utf8)
+        let file = OneStepBackupFile(data: input)
+
+        let written = file.makeFileWrapper()
+        let read = try OneStepBackupFile(fileWrapper: written)
+
+        XCTAssertEqual(read.data, input)
+        XCTAssertTrue(OneStepBackupFile.readableContentTypes.contains(.oneStepBackup))
+        XCTAssertTrue(OneStepBackupFile.readableContentTypes.contains(.json))
+        XCTAssertEqual(OneStepBackupFile.writableContentTypes, [.oneStepBackup])
+    }
+
     private func makeFixture() throws -> Fixture {
         let container = try OneStepModelContainerFactory.makeInMemory()
         let context = ModelContext(container)
