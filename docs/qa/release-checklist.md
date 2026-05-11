@@ -50,6 +50,17 @@ Run every check before tagging an open-source release. Initial releases are sour
 - [ ] Local store is readable by both the app and Widget after each operation.
 - [ ] Cascade delete: delete a FinalGoal and verify its milestones and completions are removed.
 
+## Data Import and Export
+
+- [ ] Create one active goal with two milestones and at least one completion.
+- [ ] Archive a second goal.
+- [ ] Export data from the Goals sidebar menu.
+- [ ] Delete or change local data.
+- [ ] Import the exported `.onestepbackup` file and confirm the app asks before replacing data.
+- [ ] Confirm active goals, archived goals, milestone active state, and completion history are restored.
+- [ ] Confirm the widget updates after import.
+- [ ] Try importing invalid JSON and confirm the app shows a readable error without changing existing data.
+
 ## Documentation Checks
 
 - [ ] README build commands run without errors.
