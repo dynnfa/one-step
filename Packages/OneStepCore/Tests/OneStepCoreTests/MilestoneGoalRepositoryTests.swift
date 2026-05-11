@@ -66,6 +66,18 @@ final class MilestoneGoalRepositoryTests: XCTestCase {
         XCTAssertEqual(milestones.map(\.isActive), [false, false])
     }
 
+    func testBackfillLegacyActiveMilestonesActivatesFirstIncompleteMilestone() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 5, finalGoalID: fgID)
+        _ = try fixture.createMilestone(title: "Phase 2", targetDays: 5, finalGoalID: fgID)
+
+        try fixture.repository.backfillLegacyActiveMilestonesIfNeeded()
+
+        let milestones = try fixture.repository.milestonesForFinalGoal(finalGoalID: fgID, day: fixture.day)
+        XCTAssertEqual(milestones.map(\.isActive), [true, false])
+    }
+
     // MARK: - Check-in
 
     func testCompleteTodayRejectsInactiveMilestone() throws {
@@ -103,6 +115,7 @@ final class MilestoneGoalRepositoryTests: XCTestCase {
 
         let milestones = try fixture.repository.milestonesForFinalGoal(finalGoalID: fgID, day: fixture.day)
         XCTAssertNotNil(milestones[0].completedAt)
+        XCTAssertEqual(milestones[0].isActive, false)
         XCTAssertEqual(milestones[1].isActive, false)
     }
 

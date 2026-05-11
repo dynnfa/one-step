@@ -88,6 +88,10 @@ Schema changes may be made deliberately. SwiftData's lightweight migration handl
 
 The schema has no explicit version number yet. One will be assigned before the v1.0 public release tag.
 
+### Pre-v1 Compatibility Notes
+
+- 0.0.4 adds `MilestoneGoal.isActive` as explicit state. On first app launch after the update, the app backfills active goals that have milestones but no active incomplete milestone by marking the first incomplete milestone active.
+
 ## PR Checklist for Schema Changes
 
 - [ ] Document the change in this file.

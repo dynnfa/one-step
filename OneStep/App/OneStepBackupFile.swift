@@ -2,7 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 extension UTType {
-    static let oneStepBackup = UTType(exportedAs: "com.onestep.backup", conformingTo: .json)
+    static let oneStepBackup = UTType("com.onestep.backup") ?? UTType(exportedAs: "com.onestep.backup", conformingTo: .json)
 }
 
 struct OneStepBackupFile: FileDocument, Equatable {

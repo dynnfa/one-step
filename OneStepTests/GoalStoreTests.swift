@@ -1,4 +1,5 @@
 import SwiftData
+import UniformTypeIdentifiers
 import XCTest
 import OneStepCore
 @testable import OneStep
@@ -178,12 +179,13 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertTrue(OneStepBackupFile.readableContentTypes.contains(.oneStepBackup))
         XCTAssertTrue(OneStepBackupFile.readableContentTypes.contains(.json))
         XCTAssertEqual(OneStepBackupFile.writableContentTypes, [.oneStepBackup])
+        XCTAssertEqual(UTType.oneStepBackup.preferredFilenameExtension?.lowercased(), "onestepbackup")
     }
 
     func testDataPortStoreDefaultExportFilenameUsesCurrentDay() {
         let date = Date(timeIntervalSince1970: 1_777_000_000)
 
-        XCTAssertEqual(DataPortStore.defaultExportFilename(now: date), "OneStep-Backup-2026-04-24")
+        XCTAssertEqual(DataPortStore.defaultExportFilename(now: date), "OneStep-Backup-2026-04-24.oneStepBackup")
     }
 
     private func makeFixture() throws -> Fixture {
