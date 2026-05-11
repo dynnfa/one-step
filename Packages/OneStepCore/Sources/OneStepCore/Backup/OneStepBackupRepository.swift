@@ -68,9 +68,10 @@ public struct OneStepBackupRepository {
     public func importDocument(_ document: OneStepBackupDocument) throws {
         try validate(document)
 
-        do {
-            try deleteExistingRows()
+        let snapshot = try snapshotExistingData()
+        try deleteExistingRows()
 
+        do {
             for record in document.finalGoals {
                 modelContext.insert(FinalGoal(
                     id: record.id,
@@ -111,7 +112,7 @@ public struct OneStepBackupRepository {
 
             try save()
         } catch {
-            modelContext.rollback()
+            restoreFromSnapshot(snapshot)
             throw error
         }
     }
@@ -171,6 +172,55 @@ private extension OneStepBackupRepository {
         }
         for finalGoal in try modelContext.fetch(FetchDescriptor<FinalGoal>()) {
             modelContext.delete(finalGoal)
+        }
+    }
+
+    func snapshotExistingData() throws -> OneStepBackupDocument {
+        try exportDocument()
+    }
+
+    func restoreFromSnapshot(_ snapshot: OneStepBackupDocument) {
+        let completions = (try? modelContext.fetch(FetchDescriptor<DailyCompletion>())) ?? []
+        for completion in completions { modelContext.delete(completion) }
+        let milestones = (try? modelContext.fetch(FetchDescriptor<MilestoneGoal>())) ?? []
+        for milestone in milestones { modelContext.delete(milestone) }
+        let goals = (try? modelContext.fetch(FetchDescriptor<FinalGoal>())) ?? []
+        for finalGoal in goals { modelContext.delete(finalGoal) }
+
+        for record in snapshot.finalGoals {
+            modelContext.insert(FinalGoal(
+                id: record.id,
+                title: record.title,
+                goalDescription: record.goalDescription,
+                targetCalendarDays: record.targetCalendarDays,
+                startDayKey: record.startDayKey,
+                sortOrder: record.sortOrder,
+                archivedAt: record.archivedAt,
+                createdAt: record.createdAt,
+                updatedAt: record.updatedAt
+            ))
+        }
+        for record in snapshot.milestones {
+            modelContext.insert(MilestoneGoal(
+                id: record.id,
+                title: record.title,
+                targetCompletionDays: record.targetCompletionDays,
+                finalGoalID: record.finalGoalID,
+                sortOrder: record.sortOrder,
+                isActive: record.isActive,
+                startDayKey: record.startDayKey,
+                completedAt: record.completedAt,
+                createdAt: record.createdAt,
+                updatedAt: record.updatedAt
+            ))
+        }
+        for record in snapshot.dailyCompletions {
+            modelContext.insert(DailyCompletion(
+                id: record.id,
+                goalID: record.goalID,
+                dayKey: record.dayKey,
+                completedAt: record.completedAt
+            ))
         }
     }
 
