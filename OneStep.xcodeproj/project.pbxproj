@@ -23,6 +23,8 @@
 		A1000000000000000000000E /* FinalGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* FinalGoalStore.swift */; };
 		A1000000000000000000000F /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* EmptyStateView.swift */; };
 		A10000000000000000000010 /* GoalEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000020 /* GoalEditorView.swift */; };
+		A100000000000000000000D0 /* DataPortStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D2 /* DataPortStore.swift */; };
+		A100000000000000000000D1 /* OneStepBackupFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D3 /* OneStepBackupFile.swift */; };
 		A10000000000000000000024 /* RecentActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* RecentActivityView.swift */; };
 		A10000000000000000000025 /* GoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000028 /* GoalRowView.swift */; };
 		A10000000000000000000026 /* GoalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* GoalListView.swift */; };
@@ -89,14 +91,9 @@
 		A1000000000000000000002B /* WidgetGoalRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGoalRowView.swift; sourceTree = "<group>"; };
 		A100000000000000000000C2 /* MilestoneGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneGoalStore.swift; sourceTree = "<group>"; };
 		A100000000000000000000C4 /* FinalGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalDetailView.swift; sourceTree = "<group>"; };
+		A100000000000000000000D2 /* DataPortStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPortStore.swift; sourceTree = "<group>"; };
+		A100000000000000000000D3 /* OneStepBackupFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepBackupFile.swift; sourceTree = "<group>"; };
 		E22B711C2FAF32A900D253D3 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
-		E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp.md"; sourceTree = "<group>"; };
-		E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-01-scaffold.md"; sourceTree = "<group>"; };
-		E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-02-core-data.md"; sourceTree = "<group>"; };
-		E23586A82FA1FD1400E2888E /* 2026-04-29-one-step-mvp-03-app-group-widget-spike.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-03-app-group-widget-spike.md"; sourceTree = "<group>"; };
-		E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-04-main-app.md"; sourceTree = "<group>"; };
-		E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-05-widget.md"; sourceTree = "<group>"; };
-		E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-06-verification-docs.md"; sourceTree = "<group>"; };
 		E2597E1A2FAB269E00518077 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -137,7 +134,6 @@
 				A10000000000000000000047 /* OneStepTests */,
 				A10000000000000000000046 /* Products */,
 				E22B711D2FAF32A900D253D3 /* scripts */,
-				E23586AE2FA1FD1400E2888E /* docs */,
 			);
 			sourceTree = "<group>";
 		};
@@ -156,8 +152,10 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000011 /* AppConstants.swift */,
+				A100000000000000000000D2 /* DataPortStore.swift */,
 				A1000000000000000000001E /* FinalGoalStore.swift */,
 				A100000000000000000000C2 /* MilestoneGoalStore.swift */,
+				A100000000000000000000D3 /* OneStepBackupFile.swift */,
 				A10000000000000000000012 /* OneStepApp.swift */,
 			);
 			path = App;
@@ -216,36 +214,6 @@
 				E22B711C2FAF32A900D253D3 /* release.sh */,
 			);
 			path = scripts;
-			sourceTree = "<group>";
-		};
-		E23586AC2FA1FD1400E2888E /* plans */ = {
-			isa = PBXGroup;
-			children = (
-				E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */,
-				E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */,
-				E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */,
-				E23586A82FA1FD1400E2888E /* 2026-04-29-one-step-mvp-03-app-group-widget-spike.md */,
-				E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */,
-				E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */,
-				E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */,
-			);
-			path = plans;
-			sourceTree = "<group>";
-		};
-		E23586AD2FA1FD1400E2888E /* superpowers */ = {
-			isa = PBXGroup;
-			children = (
-				E23586AC2FA1FD1400E2888E /* plans */,
-			);
-			path = superpowers;
-			sourceTree = "<group>";
-		};
-		E23586AE2FA1FD1400E2888E /* docs */ = {
-			isa = PBXGroup;
-			children = (
-				E23586AD2FA1FD1400E2888E /* superpowers */,
-			);
-			path = docs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -393,6 +361,8 @@
 				A10000000000000000000001 /* AppConstants.swift in Sources */,
 				A1000000000000000000000E /* FinalGoalStore.swift in Sources */,
 				A100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */,
+				A100000000000000000000D0 /* DataPortStore.swift in Sources */,
+				A100000000000000000000D1 /* OneStepBackupFile.swift in Sources */,
 				A100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */,
 				A10000000000000000000002 /* OneStepApp.swift in Sources */,
 				A10000000000000000000003 /* ContentView.swift in Sources */,
@@ -496,7 +466,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -556,7 +526,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -587,7 +557,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -617,7 +587,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -643,7 +613,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep.OneStepWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -670,7 +640,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep.OneStepWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

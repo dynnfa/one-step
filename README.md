@@ -20,6 +20,14 @@ One Step is a local-first macOS app for tracking long-term goals through desktop
 
 Each row shows the active milestone, its parent goal, and today's completion state. Widgets refresh every 15 minutes.
 
+## Data Backup
+
+One Step can export all local data from the Goals sidebar menu:
+
+- Choose **Export Data...** to save a `.onestepbackup` JSON file containing goals, milestones, archived state, and completion history.
+- Choose **Import Data...** to restore a backup. Import replaces all current local data after confirmation.
+- Keep exported backup files somewhere private because they contain your goal names, notes, and completion history.
+
 ## Requirements
 
 - macOS 14+
@@ -47,7 +55,7 @@ Not a task manager. Not a streak app. Not a notes tool. Not a social habit track
 
 ## Data
 
-All data lives locally in SwiftData inside the app group container `group.dev.dynnfa.OneStep`. No accounts, no analytics, no telemetry. Import/export is planned for v1.x; iCloud sync is a possible v2 direction.
+All data lives locally in SwiftData inside the app group container `group.dev.dynnfa.OneStep`. No accounts, no analytics, no telemetry. Import/export uses local JSON backup files; iCloud sync is a possible v2 direction.
 
 ## Documentation
 

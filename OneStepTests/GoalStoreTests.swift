@@ -1,4 +1,5 @@
 import SwiftData
+import UniformTypeIdentifiers
 import XCTest
 import OneStepCore
 @testable import OneStep
@@ -117,6 +118,76 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertNil(fixture.store.errorMessage)
     }
 
+    func testDataPortStoreExportsBackupFileData() throws {
+        let fixture = try makeFixture()
+        fixture.store.createFinalGoal(title: "Pass IELTS", goalDescription: "Score 7.0+", targetCalendarDays: 180)
+        let dataPortStore = DataPortStore(repository: OneStepBackupRepository(modelContext: fixture.modelContext))
+
+        let file = dataPortStore.makeExportFile()
+
+        XCTAssertNotNil(file)
+        XCTAssertEqual(dataPortStore.statusMessage, "Export is ready.")
+        let data = try XCTUnwrap(file?.data)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let document = try decoder.decode(OneStepBackupDocument.self, from: data)
+        XCTAssertEqual(document.finalGoals.map(\.title), ["Pass IELTS"])
+    }
+
+    func testDataPortStoreImportsBackupDataAndReportsSuccess() throws {
+        let fixture = try makeFixture()
+        let finalGoalID = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
+        let document = OneStepBackupDocument(
+            exportedAt: Date(timeIntervalSince1970: 1_777_000_000),
+            finalGoals: [
+                .init(
+                    id: finalGoalID,
+                    title: "Imported",
+                    goalDescription: nil,
+                    targetCalendarDays: nil,
+                    startDayKey: "2026-04-29",
+                    sortOrder: 0,
+                    archivedAt: nil,
+                    createdAt: Date(timeIntervalSince1970: 1_777_000_000),
+                    updatedAt: Date(timeIntervalSince1970: 1_777_000_000)
+                )
+            ],
+            milestones: [],
+            dailyCompletions: []
+        )
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(document)
+        let dataPortStore = DataPortStore(repository: OneStepBackupRepository(modelContext: fixture.modelContext))
+
+        dataPortStore.importData(data)
+
+        fixture.store.refresh()
+        XCTAssertEqual(fixture.store.finalGoals.map(\.title), ["Imported"])
+        XCTAssertEqual(dataPortStore.statusMessage, "Import complete.")
+        XCTAssertNil(dataPortStore.errorMessage)
+    }
+
+    func testOneStepBackupFileReadsAndWritesData() throws {
+        let input = Data("{}".utf8)
+        let file = OneStepBackupFile(data: input)
+
+        let written = file.makeFileWrapper()
+        let read = try OneStepBackupFile(fileWrapper: written)
+
+        XCTAssertEqual(read.data, input)
+        XCTAssertTrue(OneStepBackupFile.readableContentTypes.contains(.oneStepBackup))
+        XCTAssertTrue(OneStepBackupFile.readableContentTypes.contains(.json))
+        XCTAssertEqual(OneStepBackupFile.writableContentTypes, [.oneStepBackup])
+        XCTAssertEqual(UTType.oneStepBackup.preferredFilenameExtension?.lowercased(), "onestepbackup")
+    }
+
+    func testDataPortStoreDefaultExportFilenameUsesCurrentDay() {
+        let date = Date(timeIntervalSince1970: 1_777_000_000)
+
+        XCTAssertEqual(DataPortStore.defaultExportFilename(now: date), "OneStep-Backup-2026-04-24.oneStepBackup")
+    }
+
     private func makeFixture() throws -> Fixture {
         let container = try OneStepModelContainerFactory.makeInMemory()
         let context = ModelContext(container)
@@ -164,7 +235,7 @@ final class MilestoneGoalStoreTests: XCTestCase {
         fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
 
         XCTAssertEqual(fixture.store.milestones.map(\.title), ["Phase 1"])
-        XCTAssertTrue(fixture.store.milestones.first?.isActive ?? false)
+        XCTAssertFalse(fixture.store.milestones.first?.isActive ?? true)
     }
 
     func testCreateAndCheckInRefreshesState() throws {
@@ -175,8 +246,9 @@ final class MilestoneGoalStoreTests: XCTestCase {
         fixture.store.createMilestone(title: "Phase 1", targetCompletionDays: 5, finalGoalID: fgID)
         let mID = try XCTUnwrap(fixture.store.milestones.first?.id)
 
-        XCTAssertTrue(fixture.store.milestones.first?.isActive ?? false)
+        XCTAssertFalse(fixture.store.milestones.first?.isActive ?? true)
 
+        fixture.store.setMilestoneActive(milestoneGoalID: mID, finalGoalID: fgID, isActive: true)
         fixture.store.completeToday(milestoneGoalID: mID, finalGoalID: fgID)
         XCTAssertEqual(fixture.store.milestones.first?.completedDays, 1)
         XCTAssertTrue(fixture.store.milestones.first?.isCompletedToday ?? false)
@@ -193,7 +265,7 @@ final class MilestoneGoalStoreTests: XCTestCase {
 
         fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
 
-        XCTAssertEqual(fixture.store.milestones.map(\.isActive), [true, false])
+        XCTAssertEqual(fixture.store.milestones.map(\.isActive), [false, false])
     }
 
     func testDeleteMilestoneRemovesItFromMilestones() throws {
@@ -226,6 +298,7 @@ final class MilestoneGoalStoreTests: XCTestCase {
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 1)
 
+        fixture.store.setMilestoneActive(milestoneGoalID: milestoneID, finalGoalID: fgID, isActive: true)
         fixture.store.completeToday(milestoneGoalID: milestoneID, finalGoalID: fgID)
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.completedMilestoneCount, 1)
@@ -244,6 +317,50 @@ final class MilestoneGoalStoreTests: XCTestCase {
         finalGoalStore.refresh()
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 0)
+    }
+
+    func testEnsuringLargerRecentActivityDayLimitRefreshesMilestones() async throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 60, finalGoalID: fgID)
+
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+        XCTAssertEqual(fixture.store.milestones.first?.recentActivity.count, 30)
+
+        fixture.store.ensureRecentActivityDayLimit(44, finalGoalID: fgID, day: fixture.day)
+        await Task.yield()
+
+        XCTAssertEqual(fixture.store.milestones.first?.recentActivity.count, 44)
+    }
+
+    func testRecentActivityDayLimitGrowthCoalescesBeforeRefreshing() async throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 90, finalGoalID: fgID)
+
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+
+        fixture.store.ensureRecentActivityDayLimit(44, finalGoalID: fgID, day: fixture.day)
+        fixture.store.ensureRecentActivityDayLimit(60, finalGoalID: fgID, day: fixture.day)
+
+        XCTAssertEqual(fixture.store.milestones.first?.recentActivity.count, 30)
+
+        await Task.yield()
+
+        XCTAssertEqual(fixture.store.milestones.first?.recentActivity.count, 60)
+    }
+
+    func testEnsuringSmallerRecentActivityDayLimitDoesNotShrinkLoadedActivity() async throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 60, finalGoalID: fgID)
+
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+        fixture.store.ensureRecentActivityDayLimit(44, finalGoalID: fgID, day: fixture.day)
+        await Task.yield()
+        fixture.store.ensureRecentActivityDayLimit(10, finalGoalID: fgID, day: fixture.day)
+
+        XCTAssertEqual(fixture.store.milestones.first?.recentActivity.count, 44)
     }
 
     private func makeFixture() throws -> MilestoneStoreFixture {
@@ -367,6 +484,34 @@ final class DayCountInputValidatorTests: XCTestCase {
         XCTAssertNil(DayCountInputValidator.parse("-1", range: 1...10_000))
         XCTAssertNil(DayCountInputValidator.parse("abc", range: 1...10_000))
         XCTAssertNil(DayCountInputValidator.parse("10001", range: 1...10_000))
+    }
+}
+
+final class VisibleActivityDayCountTests: XCTestCase {
+    func testUsesFallbackForMissingAndNonFiniteWidths() {
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: nil, activityCount: 60, targetCompletionDays: 60), 30)
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: .infinity, activityCount: 60, targetCompletionDays: 60), 30)
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: .nan, activityCount: 60, targetCompletionDays: 60), 30)
+    }
+
+    func testFiniteWidthsShowAtLeastOneExistingDay() {
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: 0, activityCount: 60, targetCompletionDays: 60), 1)
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: 7, activityCount: 60, targetCompletionDays: 60), 1)
+    }
+
+    func testFiniteWidthsUseCellWidthAndSpacingCapacity() {
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: 8, activityCount: 60, targetCompletionDays: 60), 1)
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: 19, activityCount: 60, targetCompletionDays: 60), 2)
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: 327, activityCount: 60, targetCompletionDays: 60), 30)
+    }
+
+    func testVisibleDaysAreCappedByActivityAndTargetCounts() {
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: 327, activityCount: 7, targetCompletionDays: 30), 7)
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: 327, activityCount: 60, targetCompletionDays: 7), 7)
+    }
+
+    func testEmptyActivityShowsNoDays() {
+        XCTAssertEqual(RecentActivityLayout.computeVisibleDayCount(availableWidth: 327, activityCount: 0, targetCompletionDays: 30), 0)
     }
 }
 

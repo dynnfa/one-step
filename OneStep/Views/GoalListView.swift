@@ -53,7 +53,10 @@ private struct DropIndicatorLine: View {
 struct GoalListView: View {
     @Bindable var finalGoalStore: FinalGoalStore
     @Bindable var milestoneStore: MilestoneGoalStore
+    @Bindable var dataPortStore: DataPortStore
     @Binding var isShowingCreateGoal: Bool
+    let onImportData: () -> Void
+    let onExportData: () -> Void
     @State private var editingFinalGoal: FinalGoalListSnapshot?
     @State private var editingMilestone: MilestoneGoalSnapshot?
     @State private var isAddingMilestone = false
@@ -135,7 +138,11 @@ struct GoalListView: View {
             activeGoals: activeGoals,
             archivedGoals: archivedGoals,
             selectedFinalGoalID: finalGoalStore.selectedFinalGoalID,
+            statusMessage: dataPortStore.statusMessage,
+            errorMessage: dataPortStore.errorMessage,
             onAddGoal: { isShowingCreateGoal = true },
+            onImportData: onImportData,
+            onExportData: onExportData,
             onSelectGoal: { finalGoalStore.select($0) },
             onMoveActiveGoal: moveActiveGoal
         )
@@ -170,7 +177,11 @@ struct GoalListView: View {
                     onCheckIn: { msID in milestoneStore.completeToday(milestoneGoalID: msID, finalGoalID: goal.id) },
                     onUndo: { msID in milestoneStore.uncompleteToday(milestoneGoalID: msID, finalGoalID: goal.id) },
                     onEditMilestone: { ms in editingMilestone = ms },
-                    onDeleteMilestone: deleteMilestone
+                    onDeleteMilestone: deleteMilestone,
+                    onSetActive: { msID, isActive in milestoneStore.setMilestoneActive(milestoneGoalID: msID, finalGoalID: goal.id, isActive: isActive) },
+                    onRecentActivityDayLimitChange: { dayLimit in
+                        milestoneStore.ensureRecentActivityDayLimit(dayLimit, finalGoalID: goal.id)
+                    }
                 )
             } else if finalGoalStore.finalGoals.isEmpty {
                 EmptyStateView { isShowingCreateGoal = true }
@@ -195,7 +206,11 @@ private struct GoalSidebarView: View {
     let activeGoals: [FinalGoalListSnapshot]
     let archivedGoals: [FinalGoalListSnapshot]
     let selectedFinalGoalID: UUID?
+    let statusMessage: String?
+    let errorMessage: String?
     let onAddGoal: () -> Void
+    let onImportData: () -> Void
+    let onExportData: () -> Void
     let onSelectGoal: (UUID) -> Void
     let onMoveActiveGoal: (UUID, UUID, Bool) -> Bool
 
@@ -206,6 +221,19 @@ private struct GoalSidebarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 8)
+            } else if let statusMessage {
+                Text(statusMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 8)
+            }
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 14) {
                     GoalSidebarSection(title: "Active") {
@@ -299,6 +327,19 @@ private struct GoalSidebarView: View {
             Text("Goals")
                 .font(.headline)
             Spacer()
+            Menu {
+                Button(action: onImportData) {
+                    Label("Import Data...", systemImage: "square.and.arrow.down")
+                }
+                Button(action: onExportData) {
+                    Label("Export Data...", systemImage: "square.and.arrow.up")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+            }
+            .menuStyle(.button)
+            .help("Import or Export Data")
+
             Button(action: onAddGoal) {
                 Image(systemName: "plus")
             }
