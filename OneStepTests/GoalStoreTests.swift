@@ -180,6 +180,12 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertEqual(OneStepBackupFile.writableContentTypes, [.oneStepBackup])
     }
 
+    func testDataPortStoreDefaultExportFilenameUsesCurrentDay() {
+        let date = Date(timeIntervalSince1970: 1_777_000_000)
+
+        XCTAssertEqual(DataPortStore.defaultExportFilename(now: date), "OneStep-Backup-2026-04-24")
+    }
+
     private func makeFixture() throws -> Fixture {
         let container = try OneStepModelContainerFactory.makeInMemory()
         let context = ModelContext(container)
