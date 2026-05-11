@@ -8,6 +8,7 @@ import WidgetKit
 final class MilestoneGoalStore {
     private let repository: MilestoneGoalRepository
     private var recentActivityDayLimit = 30
+    private var pendingRecentActivityRefreshTask: Task<Void, Never>?
 
     @ObservationIgnored var onMilestonesChanged: (() -> Void)?
 
@@ -39,7 +40,12 @@ final class MilestoneGoalStore {
     func ensureRecentActivityDayLimit(_ dayLimit: Int, finalGoalID: UUID, day: LocalDay = .today) {
         guard dayLimit > recentActivityDayLimit else { return }
         recentActivityDayLimit = dayLimit
-        refresh(finalGoalID: finalGoalID, day: day)
+        pendingRecentActivityRefreshTask?.cancel()
+        pendingRecentActivityRefreshTask = Task { @MainActor [weak self] in
+            guard let self, !Task.isCancelled else { return }
+            refresh(finalGoalID: finalGoalID, day: day)
+            pendingRecentActivityRefreshTask = nil
+        }
     }
 
     func createMilestone(title: String, targetCompletionDays: Int, finalGoalID: UUID) {
@@ -104,6 +110,8 @@ final class MilestoneGoalStore {
     }
 
     private func refreshAndReloadWidget(finalGoalID: UUID) {
+        pendingRecentActivityRefreshTask?.cancel()
+        pendingRecentActivityRefreshTask = nil
         refresh(finalGoalID: finalGoalID)
         WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")
         onMilestonesChanged?()

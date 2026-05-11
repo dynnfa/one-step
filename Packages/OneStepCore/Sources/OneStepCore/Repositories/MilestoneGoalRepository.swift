@@ -108,8 +108,10 @@ public struct MilestoneGoalRepository {
     public func setMilestoneActive(milestoneGoalID: UUID, isActive: Bool) throws {
         let milestone = try fetchMilestoneGoal(milestoneGoalID: milestoneGoalID)
         let finalGoal = try fetchFinalGoal(finalGoalID: milestone.finalGoalID)
-        guard !isActive || finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
-        guard !isActive || milestone.completedAt == nil else { throw GoalRepositoryError.milestoneNotActive }
+        if isActive {
+            guard finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
+            guard milestone.completedAt == nil else { throw GoalRepositoryError.milestoneNotActive }
+        }
 
         milestone.isActive = isActive
         milestone.updatedAt = Date()
@@ -169,6 +171,25 @@ public struct MilestoneGoalRepository {
             }
         }
         return snapshots
+    }
+}
+
+@MainActor
+extension MilestoneGoalRepository {
+    func fetchCompletions(
+        goalID: UUID,
+        fromDayKey: String,
+        throughDayKey: String
+    ) throws -> [DailyCompletion] {
+        let descriptor = FetchDescriptor<DailyCompletion>(
+            predicate: #Predicate {
+                $0.goalID == goalID &&
+                    $0.dayKey >= fromDayKey &&
+                    $0.dayKey <= throughDayKey
+            },
+            sortBy: [SortDescriptor(\DailyCompletion.dayKey)]
+        )
+        return try modelContext.fetch(descriptor)
     }
 }
 
@@ -237,8 +258,13 @@ private extension MilestoneGoalRepository {
     }
 
     func recentActivity(goalID: UUID, endingOn day: LocalDay, dayCount: Int) throws -> [RecentActivityDay] {
-        let completedDayKeys = Set(try fetchCompletions(goalID: goalID).map(\.dayKey))
         let days = recentDays(endingOn: day, count: dayCount)
+        guard let firstDay = days.first, let lastDay = days.last else { return [] }
+        let completedDayKeys = Set(try fetchCompletions(
+            goalID: goalID,
+            fromDayKey: firstDay.rawValue,
+            throughDayKey: lastDay.rawValue
+        ).map(\.dayKey))
         return days.map { activityDay in
             RecentActivityDay(day: activityDay, isCompleted: completedDayKeys.contains(activityDay.rawValue))
         }

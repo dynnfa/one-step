@@ -10,7 +10,7 @@ struct RecentActivityView: View {
     @State private var lastEmittedDayLimit: Int?
 
     private var visibleDayCount: Int {
-        computeVisibleRecentActivityDayCount(
+        RecentActivityLayout.computeVisibleDayCount(
             availableWidth: availableWidth,
             activityCount: activity.count,
             targetCompletionDays: targetCompletionDays
@@ -36,8 +36,10 @@ struct RecentActivityView: View {
             }
         )
         .onPreferenceChange(RecentActivityWidthKey.self) { width in
-            availableWidth = width
-            let newLimit = computeRequiredRecentActivityDayLimit(
+            if availableWidth != width {
+                availableWidth = width
+            }
+            let newLimit = RecentActivityLayout.computeRequiredDayLimit(
                 availableWidth: width,
                 targetCompletionDays: targetCompletionDays
             )
@@ -53,36 +55,36 @@ enum RecentActivityLayout {
     static let blockHeight: CGFloat = 18
     static let spacing: CGFloat = 3
     static let fallbackDayCount = 30
-}
 
-func computeVisibleRecentActivityDayCount(
-    availableWidth: CGFloat?,
-    activityCount: Int,
-    targetCompletionDays: Int,
-    fallback: Int = RecentActivityLayout.fallbackDayCount
-) -> Int {
-    guard activityCount > 0, targetCompletionDays > 0 else { return 0 }
-    let requestedDayCount = computeRequiredRecentActivityDayLimit(
-        availableWidth: availableWidth,
-        targetCompletionDays: targetCompletionDays,
-        fallback: fallback
-    )
-    return min(activityCount, requestedDayCount)
-}
-
-func computeRequiredRecentActivityDayLimit(
-    availableWidth: CGFloat?,
-    targetCompletionDays: Int,
-    fallback: Int = RecentActivityLayout.fallbackDayCount
-) -> Int {
-    guard targetCompletionDays > 0 else { return 0 }
-    guard let availableWidth, availableWidth.isFinite else {
-        return min(fallback, targetCompletionDays)
+    static func computeVisibleDayCount(
+        availableWidth: CGFloat?,
+        activityCount: Int,
+        targetCompletionDays: Int,
+        fallback: Int = fallbackDayCount
+    ) -> Int {
+        guard activityCount > 0, targetCompletionDays > 0 else { return 0 }
+        let requestedDayCount = computeRequiredDayLimit(
+            availableWidth: availableWidth,
+            targetCompletionDays: targetCompletionDays,
+            fallback: fallback
+        )
+        return min(activityCount, requestedDayCount)
     }
 
-    let slotWidth = RecentActivityLayout.blockWidth + RecentActivityLayout.spacing
-    let capacity = Int((availableWidth + RecentActivityLayout.spacing) / slotWidth)
-    return min(max(1, capacity), targetCompletionDays)
+    static func computeRequiredDayLimit(
+        availableWidth: CGFloat?,
+        targetCompletionDays: Int,
+        fallback: Int = fallbackDayCount
+    ) -> Int {
+        guard targetCompletionDays > 0 else { return 0 }
+        guard let availableWidth, availableWidth.isFinite else {
+            return min(fallback, targetCompletionDays)
+        }
+
+        let slotWidth = blockWidth + spacing
+        let capacity = Int((availableWidth + spacing) / slotWidth)
+        return min(max(1, capacity), targetCompletionDays)
+    }
 }
 
 private struct RecentActivityWidthKey: PreferenceKey {
