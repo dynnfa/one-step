@@ -164,7 +164,7 @@ final class MilestoneGoalStoreTests: XCTestCase {
         fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
 
         XCTAssertEqual(fixture.store.milestones.map(\.title), ["Phase 1"])
-        XCTAssertTrue(fixture.store.milestones.first?.isActive ?? false)
+        XCTAssertFalse(fixture.store.milestones.first?.isActive ?? true)
     }
 
     func testCreateAndCheckInRefreshesState() throws {
@@ -175,8 +175,9 @@ final class MilestoneGoalStoreTests: XCTestCase {
         fixture.store.createMilestone(title: "Phase 1", targetCompletionDays: 5, finalGoalID: fgID)
         let mID = try XCTUnwrap(fixture.store.milestones.first?.id)
 
-        XCTAssertTrue(fixture.store.milestones.first?.isActive ?? false)
+        XCTAssertFalse(fixture.store.milestones.first?.isActive ?? true)
 
+        fixture.store.setMilestoneActive(milestoneGoalID: mID, finalGoalID: fgID, isActive: true)
         fixture.store.completeToday(milestoneGoalID: mID, finalGoalID: fgID)
         XCTAssertEqual(fixture.store.milestones.first?.completedDays, 1)
         XCTAssertTrue(fixture.store.milestones.first?.isCompletedToday ?? false)
@@ -193,7 +194,7 @@ final class MilestoneGoalStoreTests: XCTestCase {
 
         fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
 
-        XCTAssertEqual(fixture.store.milestones.map(\.isActive), [true, false])
+        XCTAssertEqual(fixture.store.milestones.map(\.isActive), [false, false])
     }
 
     func testDeleteMilestoneRemovesItFromMilestones() throws {
@@ -226,6 +227,7 @@ final class MilestoneGoalStoreTests: XCTestCase {
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 1)
 
+        fixture.store.setMilestoneActive(milestoneGoalID: milestoneID, finalGoalID: fgID, isActive: true)
         fixture.store.completeToday(milestoneGoalID: milestoneID, finalGoalID: fgID)
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.completedMilestoneCount, 1)
@@ -244,6 +246,31 @@ final class MilestoneGoalStoreTests: XCTestCase {
         finalGoalStore.refresh()
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 0)
+    }
+
+    func testEnsuringLargerRecentActivityDayLimitRefreshesMilestones() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 60, finalGoalID: fgID)
+
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+        XCTAssertEqual(fixture.store.milestones.first?.recentActivity.count, 30)
+
+        fixture.store.ensureRecentActivityDayLimit(44, finalGoalID: fgID, day: fixture.day)
+
+        XCTAssertEqual(fixture.store.milestones.first?.recentActivity.count, 44)
+    }
+
+    func testEnsuringSmallerRecentActivityDayLimitDoesNotShrinkLoadedActivity() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 60, finalGoalID: fgID)
+
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+        fixture.store.ensureRecentActivityDayLimit(44, finalGoalID: fgID, day: fixture.day)
+        fixture.store.ensureRecentActivityDayLimit(10, finalGoalID: fgID, day: fixture.day)
+
+        XCTAssertEqual(fixture.store.milestones.first?.recentActivity.count, 44)
     }
 
     private func makeFixture() throws -> MilestoneStoreFixture {
@@ -367,6 +394,34 @@ final class DayCountInputValidatorTests: XCTestCase {
         XCTAssertNil(DayCountInputValidator.parse("-1", range: 1...10_000))
         XCTAssertNil(DayCountInputValidator.parse("abc", range: 1...10_000))
         XCTAssertNil(DayCountInputValidator.parse("10001", range: 1...10_000))
+    }
+}
+
+final class VisibleActivityDayCountTests: XCTestCase {
+    func testUsesFallbackForMissingAndNonFiniteWidths() {
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: nil, activityCount: 60, targetCompletionDays: 60), 30)
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: .infinity, activityCount: 60, targetCompletionDays: 60), 30)
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: .nan, activityCount: 60, targetCompletionDays: 60), 30)
+    }
+
+    func testFiniteWidthsShowAtLeastOneExistingDay() {
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: 0, activityCount: 60, targetCompletionDays: 60), 1)
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: 7, activityCount: 60, targetCompletionDays: 60), 1)
+    }
+
+    func testFiniteWidthsUseCellWidthAndSpacingCapacity() {
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: 8, activityCount: 60, targetCompletionDays: 60), 1)
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: 19, activityCount: 60, targetCompletionDays: 60), 2)
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: 327, activityCount: 60, targetCompletionDays: 60), 30)
+    }
+
+    func testVisibleDaysAreCappedByActivityAndTargetCounts() {
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: 327, activityCount: 7, targetCompletionDays: 30), 7)
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: 327, activityCount: 60, targetCompletionDays: 7), 7)
+    }
+
+    func testEmptyActivityShowsNoDays() {
+        XCTAssertEqual(computeVisibleRecentActivityDayCount(availableWidth: 327, activityCount: 0, targetCompletionDays: 30), 0)
     }
 }
 

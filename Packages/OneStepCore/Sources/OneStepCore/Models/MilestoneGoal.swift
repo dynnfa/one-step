@@ -8,6 +8,7 @@ public final class MilestoneGoal {
     public var targetCompletionDays: Int
     public var finalGoalID: UUID
     public var sortOrder: Int
+    public var isActive: Bool
     public var startDayKey: String?
     public var completedAt: Date?
     public var createdAt: Date
@@ -19,6 +20,7 @@ public final class MilestoneGoal {
         targetCompletionDays: Int,
         finalGoalID: UUID,
         sortOrder: Int,
+        isActive: Bool = false,
         startDayKey: String? = nil,
         completedAt: Date? = nil,
         createdAt: Date = Date(),
@@ -29,6 +31,7 @@ public final class MilestoneGoal {
         self.targetCompletionDays = targetCompletionDays
         self.finalGoalID = finalGoalID
         self.sortOrder = sortOrder
+        self.isActive = isActive
         self.startDayKey = startDayKey
         self.completedAt = completedAt
         self.createdAt = createdAt

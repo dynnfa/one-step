@@ -150,7 +150,7 @@ private extension FinalGoalRepository {
         let milestones = try fetchMilestones(for: goal.id)
         let totalMilestoneCount = milestones.count
         let completedMilestoneCount = milestones.filter { $0.completedAt != nil }.count
-        let activeMilestoneCount = goal.isActive && milestones.contains { $0.completedAt == nil } ? 1 : 0
+        let activeMilestoneCount = milestones.filter { $0.isActive }.count
 
         let remainingCalendarDays: Int? = goal.targetCalendarDays.map { limit in
             let startString = goal.startDayKey

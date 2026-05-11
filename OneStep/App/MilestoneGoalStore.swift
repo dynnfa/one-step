@@ -7,6 +7,7 @@ import WidgetKit
 @Observable
 final class MilestoneGoalStore {
     private let repository: MilestoneGoalRepository
+    private var recentActivityDayLimit = 30
 
     @ObservationIgnored var onMilestonesChanged: (() -> Void)?
 
@@ -23,12 +24,22 @@ final class MilestoneGoalStore {
 
     func refresh(finalGoalID: UUID, day: LocalDay = .today) {
         do {
-            milestones = try repository.milestonesForFinalGoal(finalGoalID: finalGoalID, day: day)
+            milestones = try repository.milestonesForFinalGoal(
+                finalGoalID: finalGoalID,
+                day: day,
+                recentActivityDayLimit: recentActivityDayLimit
+            )
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
             OneStepLog.repository.error("Milestone refresh failed: \(error.localizedDescription)")
         }
+    }
+
+    func ensureRecentActivityDayLimit(_ dayLimit: Int, finalGoalID: UUID, day: LocalDay = .today) {
+        guard dayLimit > recentActivityDayLimit else { return }
+        recentActivityDayLimit = dayLimit
+        refresh(finalGoalID: finalGoalID, day: day)
     }
 
     func createMilestone(title: String, targetCompletionDays: Int, finalGoalID: UUID) {
@@ -77,6 +88,15 @@ final class MilestoneGoalStore {
     func deleteMilestone(milestoneGoalID: UUID, finalGoalID: UUID) {
         do {
             try repository.deleteMilestoneGoal(milestoneGoalID: milestoneGoalID)
+            refreshAndReloadWidget(finalGoalID: finalGoalID)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func setMilestoneActive(milestoneGoalID: UUID, finalGoalID: UUID, isActive: Bool) {
+        do {
+            try repository.setMilestoneActive(milestoneGoalID: milestoneGoalID, isActive: isActive)
             refreshAndReloadWidget(finalGoalID: finalGoalID)
         } catch {
             errorMessage = error.localizedDescription
