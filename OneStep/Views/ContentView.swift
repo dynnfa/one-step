@@ -1,3 +1,5 @@
+import OneStepCore
+import SwiftData
 import SwiftUI
 
 struct ContentView: View {
@@ -38,14 +40,22 @@ struct ContentView: View {
         .task {
             guard finalGoalStore == nil else { return }
             do {
-                let fgStore = try FinalGoalStore.live()
+                let container = try OneStepModelContainerFactory.sharedContainer(
+                    appGroupIdentifier: AppConstants.appGroupIdentifier
+                )
+                let modelContext = ModelContext(container)
+
+                let milestoneRepository = MilestoneGoalRepository(modelContext: modelContext)
+                try backfillLegacyActiveMilestonesIfNeeded(repository: milestoneRepository)
+
+                let fgStore = FinalGoalStore(repository: FinalGoalRepository(modelContext: modelContext))
                 fgStore.refresh()
                 finalGoalStore = fgStore
 
-                let msStore = try MilestoneGoalStore.live()
+                let msStore = MilestoneGoalStore(repository: milestoneRepository)
                 milestoneStore = msStore
 
-                dataPortStore = try DataPortStore.live()
+                dataPortStore = DataPortStore(repository: OneStepBackupRepository(modelContext: modelContext))
             } catch {
                 startupError = error.localizedDescription
             }
@@ -126,6 +136,14 @@ struct ContentView: View {
             Text("Your first goal is ready. Add the One Step Widget to check in from the desktop.")
         }
         .frame(minWidth: 860, minHeight: 560)
+    }
+
+    private func backfillLegacyActiveMilestonesIfNeeded(repository: MilestoneGoalRepository) throws {
+        let defaults = UserDefaults(suiteName: AppConstants.appGroupIdentifier) ?? .standard
+        let key = "didBackfillLegacyActiveMilestonesForExplicitState"
+        guard !defaults.bool(forKey: key) else { return }
+        try repository.backfillLegacyActiveMilestonesIfNeeded()
+        defaults.set(true, forKey: key)
     }
 }
 

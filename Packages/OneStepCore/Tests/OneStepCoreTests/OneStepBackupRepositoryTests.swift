@@ -26,6 +26,74 @@ final class OneStepBackupRepositoryTests: XCTestCase {
     func testImportDocumentReplacesExistingDataAndPreservesFields() throws {
         let fixture = try makeFixture()
         _ = try fixture.createFinalGoal(title: "Existing")
+        let document = makeImportDocument()
+
+        try fixture.backupRepository.importDocument(document)
+
+        let goals = try fixture.fetchFinalGoals()
+        let milestones = try fixture.fetchMilestones()
+        let completions = try fixture.fetchCompletions()
+        XCTAssertEqual(goals.map(\.id), [document.finalGoals[0].id])
+        XCTAssertEqual(goals.first?.title, "Imported Goal")
+        XCTAssertEqual(goals.first?.goalDescription, "Restored")
+        XCTAssertEqual(goals.first?.targetCalendarDays, 90)
+        XCTAssertEqual(goals.first?.startDayKey, "2026-04-01")
+        XCTAssertEqual(goals.first?.sortOrder, 7)
+        XCTAssertEqual(goals.first?.archivedAt, Date(timeIntervalSince1970: 1_777_000_120))
+        XCTAssertEqual(goals.first?.createdAt, Date(timeIntervalSince1970: 1_777_000_000))
+        XCTAssertEqual(goals.first?.updatedAt, Date(timeIntervalSince1970: 1_777_000_060))
+        XCTAssertEqual(milestones.map(\.id), [document.milestones[0].id])
+        XCTAssertEqual(milestones.first?.title, "Imported Milestone")
+        XCTAssertEqual(milestones.first?.targetCompletionDays, 12)
+        XCTAssertEqual(milestones.first?.finalGoalID, document.finalGoals[0].id)
+        XCTAssertEqual(milestones.first?.sortOrder, 3)
+        XCTAssertEqual(milestones.first?.isActive, false)
+        XCTAssertEqual(milestones.first?.startDayKey, "2026-04-02")
+        XCTAssertEqual(milestones.first?.completedAt, Date(timeIntervalSince1970: 1_777_000_180))
+        XCTAssertEqual(completions.map(\.id), [document.dailyCompletions[0].id])
+        XCTAssertEqual(completions.first?.uniqueKey, DailyCompletion.makeUniqueKey(goalID: document.milestones[0].id, dayKey: "2026-04-03"))
+    }
+
+    func testImportDocumentSavesReplacementOnce() throws {
+        let fixture = try makeFixture()
+        _ = try fixture.createFinalGoal(title: "Existing")
+        let document = makeImportDocument()
+        var saveCount = 0
+        let backupRepository = OneStepBackupRepository(modelContext: fixture.modelContext) { context in
+            saveCount += 1
+            try context.save()
+        }
+
+        try backupRepository.importDocument(document)
+
+        XCTAssertEqual(saveCount, 1)
+        XCTAssertEqual(try fixture.fetchFinalGoals().map(\.title), ["Imported Goal"])
+    }
+
+    func testImportDocumentRollsBackWhenSaveFails() throws {
+        let fixture = try makeFixture()
+        _ = try fixture.createFinalGoal(title: "Existing")
+        let document = makeImportDocument()
+        let backupRepository = OneStepBackupRepository(modelContext: fixture.modelContext) { _ in
+            throw NSError(domain: "OneStepBackupRepositoryTests", code: 1)
+        }
+
+        XCTAssertThrowsError(try backupRepository.importDocument(document))
+        XCTAssertEqual(try fixture.fetchFinalGoals().map(\.title), ["Existing"])
+    }
+
+    func testImportRejectsUnsupportedSchemaVersionAndKeepsExistingData() throws {
+        let fixture = try makeFixture()
+        _ = try fixture.createFinalGoal(title: "Existing")
+        let document = makeImportDocument(schemaVersion: 99)
+
+        XCTAssertThrowsError(try fixture.backupRepository.importDocument(document)) { error in
+            XCTAssertEqual(error as? OneStepBackupError, .unsupportedSchemaVersion(99))
+        }
+        XCTAssertEqual(try fixture.fetchFinalGoals().map(\.title), ["Existing"])
+    }
+
+    private func makeImportDocument(schemaVersion: Int = OneStepBackupDocument.currentSchemaVersion) -> OneStepBackupDocument {
         let finalGoalID = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
         let milestoneID = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
         let completionID = UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
@@ -33,7 +101,8 @@ final class OneStepBackupRepositoryTests: XCTestCase {
         let updatedAt = Date(timeIntervalSince1970: 1_777_000_060)
         let archivedAt = Date(timeIntervalSince1970: 1_777_000_120)
         let completedAt = Date(timeIntervalSince1970: 1_777_000_180)
-        let document = OneStepBackupDocument(
+        return OneStepBackupDocument(
+            schemaVersion: schemaVersion,
             exportedAt: Date(timeIntervalSince1970: 1_777_000_240),
             finalGoals: [
                 .init(
@@ -66,31 +135,6 @@ final class OneStepBackupRepositoryTests: XCTestCase {
                 .init(id: completionID, goalID: milestoneID, dayKey: "2026-04-03", completedAt: completedAt)
             ]
         )
-
-        try fixture.backupRepository.importDocument(document)
-
-        let goals = try fixture.fetchFinalGoals()
-        let milestones = try fixture.fetchMilestones()
-        let completions = try fixture.fetchCompletions()
-        XCTAssertEqual(goals.map(\.id), [finalGoalID])
-        XCTAssertEqual(goals.first?.title, "Imported Goal")
-        XCTAssertEqual(goals.first?.goalDescription, "Restored")
-        XCTAssertEqual(goals.first?.targetCalendarDays, 90)
-        XCTAssertEqual(goals.first?.startDayKey, "2026-04-01")
-        XCTAssertEqual(goals.first?.sortOrder, 7)
-        XCTAssertEqual(goals.first?.archivedAt, archivedAt)
-        XCTAssertEqual(goals.first?.createdAt, createdAt)
-        XCTAssertEqual(goals.first?.updatedAt, updatedAt)
-        XCTAssertEqual(milestones.map(\.id), [milestoneID])
-        XCTAssertEqual(milestones.first?.title, "Imported Milestone")
-        XCTAssertEqual(milestones.first?.targetCompletionDays, 12)
-        XCTAssertEqual(milestones.first?.finalGoalID, finalGoalID)
-        XCTAssertEqual(milestones.first?.sortOrder, 3)
-        XCTAssertEqual(milestones.first?.isActive, false)
-        XCTAssertEqual(milestones.first?.startDayKey, "2026-04-02")
-        XCTAssertEqual(milestones.first?.completedAt, completedAt)
-        XCTAssertEqual(completions.map(\.id), [completionID])
-        XCTAssertEqual(completions.first?.uniqueKey, DailyCompletion.makeUniqueKey(goalID: milestoneID, dayKey: "2026-04-03"))
     }
 
     func testImportRejectsDanglingMilestoneAndKeepsExistingData() throws {

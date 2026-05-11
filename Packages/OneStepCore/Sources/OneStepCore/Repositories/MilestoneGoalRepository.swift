@@ -14,6 +14,32 @@ public struct MilestoneGoalRepository {
         return MilestoneGoalRepository(modelContext: ModelContext(container))
     }
 
+    public func backfillLegacyActiveMilestonesIfNeeded() throws {
+        var didChange = false
+        let activeFinalGoals = try fetchFinalGoals().filter(\.isActive)
+        for finalGoal in activeFinalGoals {
+            let milestones = try fetchMilestones(for: finalGoal.id)
+            let incompleteMilestones = milestones.filter { $0.completedAt == nil }
+
+            for milestone in milestones where milestone.completedAt != nil && milestone.isActive {
+                milestone.isActive = false
+                milestone.updatedAt = Date()
+                didChange = true
+            }
+
+            if !incompleteMilestones.contains(where: \.isActive),
+               let firstIncomplete = incompleteMilestones.first {
+                firstIncomplete.isActive = true
+                firstIncomplete.updatedAt = Date()
+                didChange = true
+            }
+        }
+
+        if didChange {
+            try save()
+        }
+    }
+
     public func createMilestoneGoal(_ input: CreateMilestoneGoalInput) throws -> UUID {
         let finalGoal = try fetchFinalGoal(finalGoalID: input.finalGoalID)
         guard finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
@@ -83,6 +109,7 @@ public struct MilestoneGoalRepository {
         let newCompletedDays = try completedDays(for: milestoneGoalID)
         if newCompletedDays >= milestone.targetCompletionDays {
             milestone.completedAt = Date()
+            milestone.isActive = false
         }
 
         try save()
@@ -99,6 +126,7 @@ public struct MilestoneGoalRepository {
             let remaining = try completedDays(for: milestoneGoalID) - 1
             if remaining < milestone.targetCompletionDays {
                 milestone.completedAt = nil
+                milestone.isActive = true
             }
             milestone.updatedAt = Date()
             try save()
@@ -136,7 +164,7 @@ public struct MilestoneGoalRepository {
                 targetCompletionDays: milestone.targetCompletionDays,
                 finalGoalID: milestone.finalGoalID,
                 sortOrder: milestone.sortOrder,
-                isActive: milestone.isActive,
+                isActive: milestone.isActive && milestone.completedAt == nil,
                 completedDays: completedDays,
                 isCompletedToday: isCompletedToday,
                 startDayKey: milestone.startDayKey,
