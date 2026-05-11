@@ -73,6 +73,7 @@ final class OneStepBackupRepositoryTests: XCTestCase {
     func testImportDocumentRollsBackWhenSaveFails() throws {
         let fixture = try makeFixture()
         _ = try fixture.createFinalGoal(title: "Existing")
+        try fixture.modelContext.save()
         let document = makeImportDocument()
         let backupRepository = OneStepBackupRepository(modelContext: fixture.modelContext) { _ in
             throw NSError(domain: "OneStepBackupRepositoryTests", code: 1)
