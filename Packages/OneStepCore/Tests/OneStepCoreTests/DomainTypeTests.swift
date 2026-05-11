@@ -1,3 +1,4 @@
+import SwiftData
 import XCTest
 @testable import OneStepCore
 
@@ -28,9 +29,12 @@ final class DomainTypeTests: XCTestCase {
         XCTAssertNotNil(milestone.completedAt)
     }
 
-    func testDailyCompletionUniqueKeyUsesMilestoneAndDay() {
+    func testDailyCompletionUniqueKeyUsesMilestoneAndDay() throws {
+        let container = try OneStepModelContainerFactory.makeInMemory()
+        let context = ModelContext(container)
         let milestoneID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         let completion = DailyCompletion(goalID: milestoneID, dayKey: "2026-04-29")
+        context.insert(completion)
 
         XCTAssertEqual(completion.uniqueKey, "00000000-0000-0000-0000-000000000001#2026-04-29")
         XCTAssertEqual(
