@@ -90,13 +90,6 @@
 		A100000000000000000000C2 /* MilestoneGoalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneGoalStore.swift; sourceTree = "<group>"; };
 		A100000000000000000000C4 /* FinalGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalDetailView.swift; sourceTree = "<group>"; };
 		E22B711C2FAF32A900D253D3 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
-		E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp.md"; sourceTree = "<group>"; };
-		E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-01-scaffold.md"; sourceTree = "<group>"; };
-		E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-02-core-data.md"; sourceTree = "<group>"; };
-		E23586A82FA1FD1400E2888E /* 2026-04-29-one-step-mvp-03-app-group-widget-spike.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-03-app-group-widget-spike.md"; sourceTree = "<group>"; };
-		E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-04-main-app.md"; sourceTree = "<group>"; };
-		E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-05-widget.md"; sourceTree = "<group>"; };
-		E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-04-29-one-step-mvp-06-verification-docs.md"; sourceTree = "<group>"; };
 		E2597E1A2FAB269E00518077 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -137,7 +130,6 @@
 				A10000000000000000000047 /* OneStepTests */,
 				A10000000000000000000046 /* Products */,
 				E22B711D2FAF32A900D253D3 /* scripts */,
-				E23586AE2FA1FD1400E2888E /* docs */,
 			);
 			sourceTree = "<group>";
 		};
@@ -216,36 +208,6 @@
 				E22B711C2FAF32A900D253D3 /* release.sh */,
 			);
 			path = scripts;
-			sourceTree = "<group>";
-		};
-		E23586AC2FA1FD1400E2888E /* plans */ = {
-			isa = PBXGroup;
-			children = (
-				E23586A52FA1FD1400E2888E /* 2026-04-29-one-step-mvp.md */,
-				E23586A62FA1FD1400E2888E /* 2026-04-29-one-step-mvp-01-scaffold.md */,
-				E23586A72FA1FD1400E2888E /* 2026-04-29-one-step-mvp-02-core-data.md */,
-				E23586A82FA1FD1400E2888E /* 2026-04-29-one-step-mvp-03-app-group-widget-spike.md */,
-				E23586A92FA1FD1400E2888E /* 2026-04-29-one-step-mvp-04-main-app.md */,
-				E23586AA2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-05-widget.md */,
-				E23586AB2FA1FD1400E2888E /* 2026-04-29-one-step-mvp-06-verification-docs.md */,
-			);
-			path = plans;
-			sourceTree = "<group>";
-		};
-		E23586AD2FA1FD1400E2888E /* superpowers */ = {
-			isa = PBXGroup;
-			children = (
-				E23586AC2FA1FD1400E2888E /* plans */,
-			);
-			path = superpowers;
-			sourceTree = "<group>";
-		};
-		E23586AE2FA1FD1400E2888E /* docs */ = {
-			isa = PBXGroup;
-			children = (
-				E23586AD2FA1FD1400E2888E /* superpowers */,
-			);
-			path = docs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -496,7 +458,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -556,7 +518,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -587,7 +549,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -617,7 +579,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -643,7 +605,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep.OneStepWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -670,7 +632,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.3;
+				MARKETING_VERSION = 0.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep.OneStepWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
