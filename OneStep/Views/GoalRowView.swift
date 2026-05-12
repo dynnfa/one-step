@@ -7,7 +7,9 @@ struct FinalGoalRowView: View {
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(goal.title).font(.headline)
+                Text(goal.title)
+                    .font(.headline)
+                    .foregroundStyle(Color(goalHex: goal.colorHex))
                 if goal.totalMilestoneCount > 0 {
                     Text("\(goal.completedMilestoneCount)/\(goal.totalMilestoneCount) milestones")
                         .font(.caption)
@@ -48,6 +50,7 @@ struct MilestoneGoalRowView: View {
                 HStack(spacing: 6) {
                     Text(milestone.title)
                         .font(.headline)
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .layoutPriority(0)

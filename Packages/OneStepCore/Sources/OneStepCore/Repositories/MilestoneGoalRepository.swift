@@ -192,6 +192,10 @@ public struct MilestoneGoalRepository {
                     id: milestone.id,
                     title: milestone.title,
                     parentFinalGoalTitle: finalGoal.title,
+                    colorHex: FinalGoalColorTheme.resolvedHex(
+                        themeID: finalGoal.colorThemeID,
+                        customColorHex: finalGoal.customColorHex
+                    ),
                     targetCompletionDays: milestone.targetCompletionDays,
                     completedDays: completedDays,
                     isCompletedToday: try isCompleted(goalID: milestone.id, day: day)

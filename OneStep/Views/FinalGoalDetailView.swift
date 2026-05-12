@@ -52,7 +52,9 @@ struct FinalGoalDetailView: View {
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(goal.title).font(.largeTitle.bold())
+                Text(goal.title)
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(Color(goalHex: goal.colorHex))
                 if let desc = goal.goalDescription, !desc.isEmpty {
                     Text(desc).foregroundStyle(.secondary)
                 }
@@ -148,3 +150,4 @@ struct FinalGoalDetailActionPolicy {
         goal.archivedAt == nil ? "Archive Goal" : "Reactivate Goal"
     }
 }
+
