@@ -28,6 +28,44 @@ xcodebuild build -project OneStep.xcodeproj -scheme OneStepWidget -destination '
 
 If App Group provisioning profiles need refreshing, add `-allowProvisioningUpdates` to the xcodebuild command.
 
+## Release Builds
+
+To produce a distributable DMG, use the release script:
+
+### Prerequisites
+
+```bash
+brew install create-dmg
+```
+
+### Usage
+
+```bash
+# Build with the current MARKETING_VERSION from the Xcode project
+./scripts/release.sh
+
+# Set a specific version and build
+./scripts/release.sh 1.2.0
+```
+
+The version must be numeric `MAJOR.MINOR.PATCH` (e.g. `0.0.3`). When a version is passed, the script updates `MARKETING_VERSION` in `project.pbxproj` before building.
+
+### What it does
+
+1. Cleans old artifacts (`.build/`, `dist/`)
+2. Builds `OneStep` scheme in `Release` configuration
+3. Packages `OneStep.app` into a DMG with a drag-to-Applications layout
+
+### Output
+
+```
+dist/
+├── OneStep-1.2.0.dmg
+└── xcodebuild.log
+```
+
+Before shipping, run through [docs/qa/release-checklist.md](docs/qa/release-checklist.md).
+
 ## Pull Request Expectations
 
 - **Add tests** for changes to repository logic, date handling, completion semantics, or data validation.
