@@ -23,10 +23,17 @@ final class FinalGoalStoreTests: XCTestCase {
     func testCreateFinalGoalMarksFirstGoalAndRefreshes() throws {
         let fixture = try makeFixture()
 
-        fixture.store.createFinalGoal(title: "Pass IELTS", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(
+            title: "Pass IELTS",
+            goalDescription: nil,
+            targetCalendarDays: nil,
+            colorThemeID: FinalGoalColorTheme.orange.id,
+            customColorHex: nil
+        )
 
         XCTAssertTrue(fixture.store.didCreateFirstGoal)
         XCTAssertEqual(fixture.store.finalGoals.map(\.title), ["Pass IELTS"])
+        XCTAssertEqual(fixture.store.finalGoals.first?.colorThemeID, FinalGoalColorTheme.orange.id)
     }
 
     func testUpdateFinalGoalRefreshesListAndReportsErrors() throws {
@@ -34,8 +41,16 @@ final class FinalGoalStoreTests: XCTestCase {
         fixture.store.createFinalGoal(title: "Old", goalDescription: nil, targetCalendarDays: nil)
         let fgID = try XCTUnwrap(fixture.store.finalGoals.first?.id)
 
-        fixture.store.updateFinalGoal(finalGoalID: fgID, title: "New", goalDescription: "Updated", targetCalendarDays: 200)
+        fixture.store.updateFinalGoal(
+            finalGoalID: fgID,
+            title: "New",
+            goalDescription: "Updated",
+            targetCalendarDays: 200,
+            colorThemeID: FinalGoalColorTheme.customID,
+            customColorHex: "#112233"
+        )
         XCTAssertEqual(fixture.store.finalGoals.first?.title, "New")
+        XCTAssertEqual(fixture.store.finalGoals.first?.colorHex, "#112233")
         XCTAssertNil(fixture.store.errorMessage)
 
         fixture.store.updateFinalGoal(finalGoalID: fgID, title: "   ", goalDescription: nil, targetCalendarDays: nil)
@@ -104,6 +119,17 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertEqual(archivedPolicy.archiveButtonTitle, "Reactivate Goal")
     }
 
+    func testFinalGoalDetailColorPolicyThemesHeaderOnly() {
+        let policy = FinalGoalDetailColorPolicy(goal: makeSnapshot(
+            archivedAt: nil,
+            colorThemeID: FinalGoalColorTheme.customID,
+            customColorHex: "#112233"
+        ))
+
+        XCTAssertEqual(policy.headerTitleHex, "#112233")
+        XCTAssertFalse(policy.shouldThemeMilestoneTitle)
+    }
+
     func testDeleteFinalGoalRemovesItFromListAndClearsSelection() throws {
         let fixture = try makeFixture()
         fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
@@ -145,6 +171,8 @@ final class FinalGoalStoreTests: XCTestCase {
                     title: "Imported",
                     goalDescription: nil,
                     targetCalendarDays: nil,
+                    colorThemeID: FinalGoalColorTheme.pink.id,
+                    customColorHex: nil,
                     startDayKey: "2026-04-29",
                     sortOrder: 0,
                     archivedAt: nil,
@@ -164,6 +192,7 @@ final class FinalGoalStoreTests: XCTestCase {
 
         fixture.store.refresh()
         XCTAssertEqual(fixture.store.finalGoals.map(\.title), ["Imported"])
+        XCTAssertEqual(fixture.store.finalGoals.first?.colorThemeID, FinalGoalColorTheme.pink.id)
         XCTAssertEqual(dataPortStore.statusMessage, "Import complete.")
         XCTAssertNil(dataPortStore.errorMessage)
     }
@@ -201,12 +230,18 @@ final class FinalGoalStoreTests: XCTestCase {
         )
     }
 
-    private func makeSnapshot(archivedAt: Date?) -> FinalGoalListSnapshot {
+    private func makeSnapshot(
+        archivedAt: Date?,
+        colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+        customColorHex: String? = nil
+    ) -> FinalGoalListSnapshot {
         FinalGoalListSnapshot(
             id: UUID(),
             title: "Goal",
             goalDescription: nil,
             targetCalendarDays: nil,
+            colorThemeID: colorThemeID,
+            customColorHex: customColorHex,
             completedMilestoneCount: 0,
             totalMilestoneCount: 0,
             activeMilestoneCount: 0,

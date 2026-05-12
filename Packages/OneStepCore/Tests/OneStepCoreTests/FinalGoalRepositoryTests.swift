@@ -24,6 +24,9 @@ final class FinalGoalRepositoryTests: XCTestCase {
         XCTAssertEqual(snapshot.title, "Pass IELTS")
         XCTAssertEqual(snapshot.goalDescription, "Score 7.0+")
         XCTAssertEqual(snapshot.targetCalendarDays, 180)
+        XCTAssertEqual(snapshot.colorThemeID, FinalGoalColorTheme.defaultTheme.id)
+        XCTAssertNil(snapshot.customColorHex)
+        XCTAssertEqual(snapshot.colorHex, FinalGoalColorTheme.defaultTheme.hex)
         XCTAssertEqual(snapshot.completedMilestoneCount, 0)
         XCTAssertEqual(snapshot.totalMilestoneCount, 0)
         XCTAssertEqual(snapshot.activeMilestoneCount, 0)
@@ -70,6 +73,33 @@ final class FinalGoalRepositoryTests: XCTestCase {
         XCTAssertNil(snapshot.remainingCalendarDays)
     }
 
+    func testCreateFinalGoalStoresPresetAndCustomColors() throws {
+        let fixture = try makeFixture()
+        let startDay = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+
+        let presetID = try fixture.repository.createFinalGoal(CreateFinalGoalInput(
+            title: "Preset",
+            colorThemeID: FinalGoalColorTheme.orange.id,
+            startDay: startDay
+        ))
+        let customID = try fixture.repository.createFinalGoal(CreateFinalGoalInput(
+            title: "Custom",
+            colorThemeID: FinalGoalColorTheme.customID,
+            customColorHex: "abc",
+            startDay: startDay
+        ))
+
+        let snapshots = try fixture.repository.finalGoalsForList()
+        let preset = try XCTUnwrap(snapshots.first { $0.id == presetID })
+        let custom = try XCTUnwrap(snapshots.first { $0.id == customID })
+        XCTAssertEqual(preset.colorThemeID, FinalGoalColorTheme.orange.id)
+        XCTAssertNil(preset.customColorHex)
+        XCTAssertEqual(preset.colorHex, FinalGoalColorTheme.orange.hex)
+        XCTAssertEqual(custom.colorThemeID, FinalGoalColorTheme.customID)
+        XCTAssertEqual(custom.customColorHex, "#AABBCC")
+        XCTAssertEqual(custom.colorHex, "#AABBCC")
+    }
+
     // MARK: - Update
 
     func testUpdateFinalGoalAppliesTrimmedValues() throws {
@@ -79,13 +109,22 @@ final class FinalGoalRepositoryTests: XCTestCase {
 
         try fixture.repository.updateFinalGoal(
             finalGoalID: id,
-            input: UpdateFinalGoalInput(title: "  New Title  ", goalDescription: "  Updated  ", targetCalendarDays: 200)
+            input: UpdateFinalGoalInput(
+                title: "  New Title  ",
+                goalDescription: "  Updated  ",
+                targetCalendarDays: 200,
+                colorThemeID: FinalGoalColorTheme.customID,
+                customColorHex: "#123abc"
+            )
         )
 
         let snapshot = try XCTUnwrap(try fixture.repository.finalGoalsForList().first { $0.id == id })
         XCTAssertEqual(snapshot.title, "New Title")
         XCTAssertEqual(snapshot.goalDescription, "Updated")
         XCTAssertEqual(snapshot.targetCalendarDays, 200)
+        XCTAssertEqual(snapshot.colorThemeID, FinalGoalColorTheme.customID)
+        XCTAssertEqual(snapshot.customColorHex, "#123ABC")
+        XCTAssertEqual(snapshot.colorHex, "#123ABC")
     }
 
     // MARK: - Move

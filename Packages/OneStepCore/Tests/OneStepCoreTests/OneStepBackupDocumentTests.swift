@@ -17,6 +17,8 @@ final class OneStepBackupDocumentTests: XCTestCase {
                     title: "Pass IELTS",
                     goalDescription: "Score 7.0+",
                     targetCalendarDays: 180,
+                    colorThemeID: FinalGoalColorTheme.green.id,
+                    customColorHex: nil,
                     startDayKey: "2026-04-29",
                     sortOrder: 0,
                     archivedAt: nil,
@@ -61,6 +63,7 @@ final class OneStepBackupDocumentTests: XCTestCase {
         let json = String(decoding: data, as: UTF8.self)
         XCTAssertTrue(json.contains("\"schemaVersion\" : 1"))
         XCTAssertTrue(json.contains("\"finalGoals\""))
+        XCTAssertTrue(json.contains("\"colorThemeID\" : \"green\""))
         XCTAssertTrue(json.contains("\"milestones\""))
         XCTAssertTrue(json.contains("\"dailyCompletions\""))
     }

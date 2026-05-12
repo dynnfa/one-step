@@ -256,8 +256,8 @@ final class MilestoneGoalRepositoryTests: XCTestCase {
 
     func testActiveMilestonesForWidgetReturnsActiveMilestonesForEachFinalGoalInOrder() throws {
         let fixture = try makeFixture()
-        let fg1 = try fixture.createFinalGoal()
-        let fg2 = try fixture.createFinalGoal()
+        let fg1 = try fixture.createFinalGoal(colorThemeID: FinalGoalColorTheme.teal.id)
+        let fg2 = try fixture.createFinalGoal(colorThemeID: FinalGoalColorTheme.customID, customColorHex: "#112233")
         let a1 = try fixture.createMilestone(title: "A1", targetDays: 5, finalGoalID: fg1)
         _ = try fixture.createMilestone(title: "A2", targetDays: 5, finalGoalID: fg1)
         let b1 = try fixture.createMilestone(title: "B1", targetDays: 5, finalGoalID: fg2)
@@ -267,6 +267,7 @@ final class MilestoneGoalRepositoryTests: XCTestCase {
         let snapshots = try fixture.repository.activeMilestonesForWidget(limit: 10, day: fixture.day)
 
         XCTAssertEqual(snapshots.map(\.title), ["A1", "B1"])
+        XCTAssertEqual(snapshots.map(\.colorHex), [FinalGoalColorTheme.teal.hex, "#112233"])
     }
 
     func testActiveMilestonesForWidgetRespectsLimitAcrossActiveMilestones() throws {
@@ -457,9 +458,17 @@ private struct MilestoneGoalRepositoryFixture {
     let repository: MilestoneGoalRepository
     let day: LocalDay
 
-    func createFinalGoal() throws -> UUID {
+    func createFinalGoal(
+        colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+        customColorHex: String? = nil
+    ) throws -> UUID {
         let repo = FinalGoalRepository(modelContext: modelContext)
-        return try repo.createFinalGoal(CreateFinalGoalInput(title: "Test Goal", startDay: day))
+        return try repo.createFinalGoal(CreateFinalGoalInput(
+            title: "Test Goal",
+            colorThemeID: colorThemeID,
+            customColorHex: customColorHex,
+            startDay: day
+        ))
     }
 
     func createMilestone(title: String, targetDays: Int, finalGoalID: UUID) throws -> UUID {

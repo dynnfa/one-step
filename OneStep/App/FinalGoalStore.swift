@@ -31,13 +31,21 @@ final class FinalGoalStore {
         }
     }
 
-    func createFinalGoal(title: String, goalDescription: String?, targetCalendarDays: Int?) {
+    func createFinalGoal(
+        title: String,
+        goalDescription: String?,
+        targetCalendarDays: Int?,
+        colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+        customColorHex: String? = nil
+    ) {
         do {
             let wasEmpty = finalGoals.filter { $0.archivedAt == nil }.isEmpty
             _ = try repository.createFinalGoal(CreateFinalGoalInput(
                 title: title,
                 goalDescription: goalDescription,
                 targetCalendarDays: targetCalendarDays,
+                colorThemeID: colorThemeID,
+                customColorHex: customColorHex,
                 startDay: .today
             ))
             didCreateFirstGoal = wasEmpty
@@ -47,11 +55,24 @@ final class FinalGoalStore {
         }
     }
 
-    func updateFinalGoal(finalGoalID: UUID, title: String, goalDescription: String?, targetCalendarDays: Int?) {
+    func updateFinalGoal(
+        finalGoalID: UUID,
+        title: String,
+        goalDescription: String?,
+        targetCalendarDays: Int?,
+        colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+        customColorHex: String? = nil
+    ) {
         do {
             try repository.updateFinalGoal(
                 finalGoalID: finalGoalID,
-                input: UpdateFinalGoalInput(title: title, goalDescription: goalDescription, targetCalendarDays: targetCalendarDays)
+                input: UpdateFinalGoalInput(
+                    title: title,
+                    goalDescription: goalDescription,
+                    targetCalendarDays: targetCalendarDays,
+                    colorThemeID: colorThemeID,
+                    customColorHex: customColorHex
+                )
             )
             refreshAndReloadWidget()
         } catch {
