@@ -87,8 +87,10 @@ final class DomainTypeTests: XCTestCase {
     }
 
     func testFinalGoalColorThemeNormalizesInputs() {
-        XCTAssertEqual(FinalGoalColorTheme.defaultTheme.id, "blue")
-        XCTAssertEqual(FinalGoalColorTheme.theme(id: "missing").id, "blue")
+        XCTAssertEqual(FinalGoalColorTheme.defaultTheme.id, "black")
+        XCTAssertEqual(FinalGoalColorTheme.defaultTheme.hex, "#000000")
+        XCTAssertEqual(FinalGoalColorTheme.theme(id: "missing").id, "black")
+        XCTAssertTrue(FinalGoalColorTheme.presets.contains { $0.id == "black" })
         XCTAssertEqual(FinalGoalColorTheme.normalizedHex("#abc"), "#AABBCC")
         XCTAssertEqual(FinalGoalColorTheme.normalizedHex("12abef"), "#12ABEF")
         XCTAssertNil(FinalGoalColorTheme.normalizedHex("oops"))
