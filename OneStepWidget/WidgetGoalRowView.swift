@@ -23,7 +23,7 @@ struct WidgetGoalRowView: View {
                         .lineLimit(1)
                     Text(milestone.parentFinalGoalTitle)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(rowColor)
                         .lineLimit(1)
                     Text("\(milestone.completedDays)/\(milestone.targetCompletionDays)")
                         .font(.caption2.monospacedDigit())

@@ -23,16 +23,16 @@
 		A1000000000000000000000E /* FinalGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* FinalGoalStore.swift */; };
 		A1000000000000000000000F /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* EmptyStateView.swift */; };
 		A10000000000000000000010 /* GoalEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000020 /* GoalEditorView.swift */; };
-		A100000000000000000000D0 /* DataPortStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D2 /* DataPortStore.swift */; };
-		A100000000000000000000D1 /* OneStepBackupFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D3 /* OneStepBackupFile.swift */; };
 		A10000000000000000000024 /* RecentActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* RecentActivityView.swift */; };
 		A10000000000000000000025 /* GoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000028 /* GoalRowView.swift */; };
 		A10000000000000000000026 /* GoalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* GoalListView.swift */; };
 		A1000000000000000000002A /* WidgetGoalRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000002B /* WidgetGoalRowView.swift */; };
 		A100000000000000000000C1 /* MilestoneGoalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C2 /* MilestoneGoalStore.swift */; };
 		A100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000C4 /* FinalGoalDetailView.swift */; };
+		A100000000000000000000D0 /* DataPortStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D2 /* DataPortStore.swift */; };
+		A100000000000000000000D1 /* OneStepBackupFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D3 /* OneStepBackupFile.swift */; };
+		A100000000000000000000E2 /* Color+GoalHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000E1 /* Color+GoalHex.swift */; };
 		E2597E1E2FAB441600518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
-			A100000000000000000000E2 /* Color+GoalHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000E1 /* Color+GoalHex.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,9 +94,9 @@
 		A100000000000000000000C4 /* FinalGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalGoalDetailView.swift; sourceTree = "<group>"; };
 		A100000000000000000000D2 /* DataPortStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPortStore.swift; sourceTree = "<group>"; };
 		A100000000000000000000D3 /* OneStepBackupFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepBackupFile.swift; sourceTree = "<group>"; };
+		A100000000000000000000E1 /* Color+GoalHex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+GoalHex.swift"; sourceTree = "<group>"; };
 		E22B711C2FAF32A900D253D3 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		E2597E1A2FAB269E00518077 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
-			A100000000000000000000E1 /* Color+GoalHex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+GoalHex.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +211,14 @@
 			path = OneStepTests;
 			sourceTree = "<group>";
 		};
+		A100000000000000000000E3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				A100000000000000000000E1 /* Color+GoalHex.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		E22B711D2FAF32A900D253D3 /* scripts */ = {
 			isa = PBXGroup;
 			children = (
@@ -219,14 +227,6 @@
 			path = scripts;
 			sourceTree = "<group>";
 		};
-			A100000000000000000000E3 /* Extensions */ = {
-				isa = PBXGroup;
-				children = (
-					A100000000000000000000E1 /* Color+GoalHex.swift */,
-				);
-				path = Extensions;
-				sourceTree = "<group>";
-			};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -478,7 +478,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.0.4;
+				MARKETING_VERSION = 0.0.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -538,7 +538,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.0.4;
+				MARKETING_VERSION = 0.0.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -557,19 +557,31 @@
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_ENTITLEMENTS = OneStep/OneStep.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4FU949C7U7;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				INFOPLIST_FILE = OneStep/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = oneStep;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.4;
+				MARKETING_VERSION = 0.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -587,19 +599,31 @@
 				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_ENTITLEMENTS = OneStep/OneStep.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4FU949C7U7;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				INFOPLIST_FILE = OneStep/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = oneStep;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.4;
+				MARKETING_VERSION = 0.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -625,7 +649,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.4;
+				MARKETING_VERSION = 0.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep.OneStepWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -652,7 +676,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.4;
+				MARKETING_VERSION = 0.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.dynnfa.OneStep.OneStepWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

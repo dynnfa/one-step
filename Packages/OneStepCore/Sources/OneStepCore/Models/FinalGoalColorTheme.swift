@@ -3,6 +3,7 @@ import Foundation
 public struct FinalGoalColorTheme: Equatable, Identifiable, Sendable {
     public static let customID = "custom"
 
+    public static let black = FinalGoalColorTheme(id: "black", displayName: "Black", hex: "#000000")
     public static let blue = FinalGoalColorTheme(id: "blue", displayName: "Blue", hex: "#007AFF")
     public static let green = FinalGoalColorTheme(id: "green", displayName: "Green", hex: "#34C759")
     public static let orange = FinalGoalColorTheme(id: "orange", displayName: "Orange", hex: "#FF9500")
@@ -10,8 +11,8 @@ public struct FinalGoalColorTheme: Equatable, Identifiable, Sendable {
     public static let purple = FinalGoalColorTheme(id: "purple", displayName: "Purple", hex: "#AF52DE")
     public static let teal = FinalGoalColorTheme(id: "teal", displayName: "Teal", hex: "#30B0C7")
 
-    public static let presets = [blue, green, orange, pink, purple, teal]
-    public static let defaultTheme = blue
+    public static let presets = [black, blue, green, orange, pink, purple, teal]
+    public static let defaultTheme = black
 
     public let id: String
     public let displayName: String
