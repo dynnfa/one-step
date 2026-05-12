@@ -53,12 +53,8 @@ public struct OneStepBackupDocument: Codable, Equatable, Sendable {
             self.title = title
             self.goalDescription = goalDescription
             self.targetCalendarDays = targetCalendarDays
-            let colorSelection = FinalGoalColorTheme.sanitizedSelection(
-                themeID: colorThemeID,
-                customColorHex: customColorHex
-            )
-            self.colorThemeID = colorSelection.themeID
-            self.customColorHex = colorSelection.customColorHex
+            self.colorThemeID = colorThemeID
+            self.customColorHex = customColorHex
             self.startDayKey = startDayKey
             self.sortOrder = sortOrder
             self.archivedAt = archivedAt

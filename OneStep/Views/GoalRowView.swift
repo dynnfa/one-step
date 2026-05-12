@@ -129,25 +129,6 @@ struct MilestoneGoalRowView: View {
     }
 }
 
-private extension Color {
-    init(goalHex hex: String) {
-        guard let normalizedHex = FinalGoalColorTheme.normalizedHex(hex) else {
-            self = Color.accentColor
-            return
-        }
-
-        let rawHex = String(normalizedHex.dropFirst())
-        let scanner = Scanner(string: rawHex)
-        var value: UInt64 = 0
-        scanner.scanHexInt64(&value)
-        self = Color(
-            red: Double((value >> 16) & 0xFF) / 255,
-            green: Double((value >> 8) & 0xFF) / 255,
-            blue: Double(value & 0xFF) / 255
-        )
-    }
-}
-
 private struct CapsuleToggleButton: View {
     let title: String
     let strokeColor: Color

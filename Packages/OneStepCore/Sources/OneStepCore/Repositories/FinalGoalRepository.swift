@@ -19,17 +19,12 @@ public struct FinalGoalRepository {
         if let calendarDays = input.targetCalendarDays {
             try validateTargetCalendarDays(calendarDays)
         }
-        let colorSelection = FinalGoalColorTheme.sanitizedSelection(
-            themeID: input.colorThemeID,
-            customColorHex: input.customColorHex
-        )
-
         let goal = FinalGoal(
             title: title,
             goalDescription: input.goalDescription?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             targetCalendarDays: input.targetCalendarDays,
-            colorThemeID: colorSelection.themeID,
-            customColorHex: colorSelection.customColorHex,
+            colorThemeID: input.colorThemeID,
+            customColorHex: input.customColorHex,
             startDayKey: input.startDay.rawValue,
             sortOrder: try nextSortOrder()
         )
@@ -47,13 +42,9 @@ public struct FinalGoalRepository {
         if let calendarDays = input.targetCalendarDays {
             try validateTargetCalendarDays(calendarDays)
         }
-        let colorSelection = FinalGoalColorTheme.sanitizedSelection(
-            themeID: input.colorThemeID,
-            customColorHex: input.customColorHex
-        )
         goal.targetCalendarDays = input.targetCalendarDays
-        goal.colorThemeID = colorSelection.themeID
-        goal.customColorHex = colorSelection.customColorHex
+        goal.colorThemeID = input.colorThemeID
+        goal.customColorHex = input.customColorHex
         goal.updatedAt = Date()
         try save()
     }
