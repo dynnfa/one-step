@@ -9,6 +9,12 @@ private struct DropHoverState: Equatable {
     let isAbove: Bool
 }
 
+private struct RowDragState {
+    let isBeingDragged: Bool
+    let isDropTargetAbove: Bool
+    let isDropTargetBelow: Bool
+}
+
 private struct GoalRowDropDelegate: DropDelegate {
     let goalID: UUID
     let onHoverUpdate: (DropHoverState?) -> Void
@@ -246,11 +252,13 @@ private struct GoalSidebarView: View {
                             GoalSidebarRowView(
                                 goal: goal,
                                 isSelected: selectedFinalGoalID == goal.id,
-                                isDropTargetAbove: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == true,
-                                isDropTargetBelow: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == false,
+                                dragState: RowDragState(
+                                    isBeingDragged: draggedGoalID == goal.id,
+                                    isDropTargetAbove: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == true,
+                                    isDropTargetBelow: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == false
+                                ),
                                 onSelect: { onSelectGoal(goal.id) }
                             )
-                            .opacity(draggedGoalID == goal.id ? 0 : 1)
                             .onDrag {
                                 draggedGoalID = goal.id
                                 return NSItemProvider(object: goal.id.uuidString as NSString)
@@ -271,9 +279,8 @@ private struct GoalSidebarView: View {
                                         guard let draggedID = draggedGoalID else { return false }
                                         draggedGoalID = nil
                                         var result = false
-                                        withAnimation(.none) {
+                                        withAnimation(.easeInOut(duration: 0.25)) {
                                             result = onMoveActiveGoal(draggedID, destinationGoalID, insertAbove)
-                                            dropHoverState = nil
                                         }
                                         return result
                                     }
@@ -288,8 +295,6 @@ private struct GoalSidebarView: View {
                                 GoalSidebarRowView(
                                     goal: goal,
                                     isSelected: selectedFinalGoalID == goal.id,
-                                    isDropTargetAbove: false,
-                                    isDropTargetBelow: false,
                                     onSelect: { onSelectGoal(goal.id) }
                                 )
                             }
@@ -381,9 +386,10 @@ private struct GoalSidebarSection<Content: View>: View {
 private struct GoalSidebarRowView: View {
     let goal: FinalGoalListSnapshot
     let isSelected: Bool
-    let isDropTargetAbove: Bool
-    let isDropTargetBelow: Bool
+    var dragState: RowDragState?
     let onSelect: () -> Void
+
+    private var isBeingDragged: Bool { dragState?.isBeingDragged == true }
 
     var body: some View {
         Button(action: onSelect) {
@@ -396,16 +402,24 @@ private struct GoalSidebarRowView: View {
         .buttonStyle(.plain)
         .background {
             RoundedRectangle(cornerRadius: 6)
-                .fill(isSelected ? Color.accentColor.opacity(0.18) : Color.clear)
+                .fill(isSelected && !isBeingDragged ? Color.accentColor.opacity(0.18) : Color.clear)
+        }
+        .redacted(reason: isBeingDragged ? .placeholder : [])
+        .overlay {
+            if isBeingDragged {
+                RoundedRectangle(cornerRadius: 6)
+                    .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                    .foregroundStyle(.secondary.opacity(0.3))
+            }
         }
         .overlay(alignment: .top) {
-            if isDropTargetAbove {
+            if dragState?.isDropTargetAbove == true {
                 DropIndicatorLine()
                     .offset(y: -1)
             }
         }
         .overlay(alignment: .bottom) {
-            if isDropTargetBelow {
+            if dragState?.isDropTargetBelow == true {
                 DropIndicatorLine()
                     .offset(y: 1)
             }
