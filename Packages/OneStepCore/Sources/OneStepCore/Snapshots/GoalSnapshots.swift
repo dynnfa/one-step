@@ -4,12 +4,27 @@ public struct CreateFinalGoalInput: Equatable, Sendable {
     public let title: String
     public let goalDescription: String?
     public let targetCalendarDays: Int?
+    public let colorThemeID: String
+    public let customColorHex: String?
     public let startDay: LocalDay
 
-    public init(title: String, goalDescription: String? = nil, targetCalendarDays: Int? = nil, startDay: LocalDay) {
+    public init(
+        title: String,
+        goalDescription: String? = nil,
+        targetCalendarDays: Int? = nil,
+        colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+        customColorHex: String? = nil,
+        startDay: LocalDay
+    ) {
         self.title = title
         self.goalDescription = goalDescription
         self.targetCalendarDays = targetCalendarDays
+        let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+            themeID: colorThemeID,
+            customColorHex: customColorHex
+        )
+        self.colorThemeID = colorSelection.themeID
+        self.customColorHex = colorSelection.customColorHex
         self.startDay = startDay
     }
 }
@@ -18,11 +33,25 @@ public struct UpdateFinalGoalInput: Equatable, Sendable {
     public let title: String
     public let goalDescription: String?
     public let targetCalendarDays: Int?
+    public let colorThemeID: String
+    public let customColorHex: String?
 
-    public init(title: String, goalDescription: String? = nil, targetCalendarDays: Int? = nil) {
+    public init(
+        title: String,
+        goalDescription: String? = nil,
+        targetCalendarDays: Int? = nil,
+        colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+        customColorHex: String? = nil
+    ) {
         self.title = title
         self.goalDescription = goalDescription
         self.targetCalendarDays = targetCalendarDays
+        let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+            themeID: colorThemeID,
+            customColorHex: customColorHex
+        )
+        self.colorThemeID = colorSelection.themeID
+        self.customColorHex = colorSelection.customColorHex
     }
 }
 
@@ -53,6 +82,9 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
     public let title: String
     public let goalDescription: String?
     public let targetCalendarDays: Int?
+    public let colorThemeID: String
+    public let customColorHex: String?
+    public let colorHex: String
     public let completedMilestoneCount: Int
     public let totalMilestoneCount: Int
     public let activeMilestoneCount: Int
@@ -65,6 +97,9 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
         title: String,
         goalDescription: String?,
         targetCalendarDays: Int?,
+        colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+        customColorHex: String? = nil,
+        colorHex: String? = nil,
         completedMilestoneCount: Int,
         totalMilestoneCount: Int,
         activeMilestoneCount: Int,
@@ -76,6 +111,13 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
         self.title = title
         self.goalDescription = goalDescription
         self.targetCalendarDays = targetCalendarDays
+        let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+            themeID: colorThemeID,
+            customColorHex: customColorHex
+        )
+        self.colorThemeID = colorSelection.themeID
+        self.customColorHex = colorSelection.customColorHex
+        self.colorHex = FinalGoalColorTheme.normalizedHex(colorHex) ?? colorSelection.colorHex
         self.completedMilestoneCount = completedMilestoneCount
         self.totalMilestoneCount = totalMilestoneCount
         self.activeMilestoneCount = activeMilestoneCount
@@ -129,6 +171,7 @@ public struct WidgetMilestoneSnapshot: Identifiable, Equatable, Sendable {
     public let id: UUID
     public let title: String
     public let parentFinalGoalTitle: String
+    public let colorHex: String
     public let targetCompletionDays: Int
     public let completedDays: Int
     public let isCompletedToday: Bool
@@ -137,6 +180,7 @@ public struct WidgetMilestoneSnapshot: Identifiable, Equatable, Sendable {
         id: UUID,
         title: String,
         parentFinalGoalTitle: String,
+        colorHex: String = FinalGoalColorTheme.defaultTheme.hex,
         targetCompletionDays: Int,
         completedDays: Int,
         isCompletedToday: Bool
@@ -144,6 +188,7 @@ public struct WidgetMilestoneSnapshot: Identifiable, Equatable, Sendable {
         self.id = id
         self.title = title
         self.parentFinalGoalTitle = parentFinalGoalTitle
+        self.colorHex = FinalGoalColorTheme.normalizedHex(colorHex) ?? FinalGoalColorTheme.defaultTheme.hex
         self.targetCompletionDays = targetCompletionDays
         self.completedDays = completedDays
         self.isCompletedToday = isCompletedToday

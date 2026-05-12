@@ -1,3 +1,5 @@
+import AppKit
+import OneStepCore
 import SwiftUI
 
 struct FinalGoalEditorView: View {
@@ -5,7 +7,13 @@ struct FinalGoalEditorView: View {
 
     enum Mode {
         case create
-        case edit(title: String, goalDescription: String?, targetCalendarDays: Int?)
+        case edit(
+            title: String,
+            goalDescription: String?,
+            targetCalendarDays: Int?,
+            colorThemeID: String,
+            customColorHex: String?
+        )
 
         var title: String {
             switch self {
@@ -16,7 +24,7 @@ struct FinalGoalEditorView: View {
     }
 
     let mode: Mode
-    let onSave: (String, String?, Int?) -> Void
+    let onSave: (String, String?, Int?, String, String?) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var title: String
@@ -24,8 +32,11 @@ struct FinalGoalEditorView: View {
     @State private var hasCalendarLimit: Bool
     @State private var targetCalendarDays: Int
     @State private var isTargetCalendarDaysValid = true
+    @State private var colorThemeID: String
+    @State private var customColorHex: String?
+    @State private var customColor: Color
 
-    init(mode: Mode, onSave: @escaping (String, String?, Int?) -> Void) {
+    init(mode: Mode, onSave: @escaping (String, String?, Int?, String, String?) -> Void) {
         self.mode = mode
         self.onSave = onSave
         switch mode {
@@ -34,11 +45,21 @@ struct FinalGoalEditorView: View {
             _goalDescription = State(initialValue: "")
             _hasCalendarLimit = State(initialValue: false)
             _targetCalendarDays = State(initialValue: 180)
-        case let .edit(title, description, target):
+            _colorThemeID = State(initialValue: FinalGoalColorTheme.defaultTheme.id)
+            _customColorHex = State(initialValue: nil)
+            _customColor = State(initialValue: Color(goalHex: FinalGoalColorTheme.defaultTheme.hex))
+        case let .edit(title, description, target, colorThemeID, customColorHex):
             _title = State(initialValue: title)
             _goalDescription = State(initialValue: description ?? "")
             _hasCalendarLimit = State(initialValue: target != nil)
             _targetCalendarDays = State(initialValue: target ?? 180)
+            let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+                themeID: colorThemeID,
+                customColorHex: customColorHex
+            )
+            _colorThemeID = State(initialValue: colorSelection.themeID)
+            _customColorHex = State(initialValue: colorSelection.customColorHex)
+            _customColor = State(initialValue: Color(goalHex: colorSelection.colorHex))
         }
     }
 
@@ -64,6 +85,11 @@ struct FinalGoalEditorView: View {
                     isValid: $isTargetCalendarDaysValid
                 )
             }
+            GoalColorPicker(
+                selectedThemeID: $colorThemeID,
+                customColorHex: $customColorHex,
+                customColor: $customColor
+            )
             HStack {
                 Spacer()
                 Button("Cancel") { dismiss() }
@@ -72,7 +98,9 @@ struct FinalGoalEditorView: View {
                     onSave(
                         title,
                         trimmedDesc.isEmpty ? nil : trimmedDesc,
-                        hasCalendarLimit ? targetCalendarDays : nil
+                        hasCalendarLimit ? targetCalendarDays : nil,
+                        colorThemeID,
+                        customColorHex
                     )
                 }
                 .buttonStyle(.borderedProminent)
@@ -81,6 +109,73 @@ struct FinalGoalEditorView: View {
         }
         .padding(24)
         .frame(width: 420)
+    }
+}
+
+private struct GoalColorPicker: View {
+    @Binding var selectedThemeID: String
+    @Binding var customColorHex: String?
+    @Binding var customColor: Color
+
+    private var customColorBinding: Binding<Color> {
+        Binding(
+            get: { customColor },
+            set: { newColor in
+                customColor = newColor
+                selectedThemeID = FinalGoalColorTheme.customID
+                customColorHex = newColor.goalHex
+            }
+        )
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Color")
+                .font(.headline)
+            HStack(spacing: 10) {
+                ForEach(FinalGoalColorTheme.presets) { theme in
+                    Button {
+                        selectedThemeID = theme.id
+                        customColorHex = nil
+                    } label: {
+                        colorSwatch(
+                            color: Color(goalHex: theme.hex),
+                            isSelected: selectedThemeID == theme.id
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .help(theme.displayName)
+                }
+
+                Button {
+                    selectedThemeID = FinalGoalColorTheme.customID
+                    customColorHex = customColor.goalHex
+                } label: {
+                    colorSwatch(
+                        color: customColor,
+                        isSelected: selectedThemeID == FinalGoalColorTheme.customID
+                    )
+                }
+                .buttonStyle(.plain)
+                .help("Custom")
+
+                ColorPicker("", selection: customColorBinding, supportsOpacity: false)
+                .labelsHidden()
+                .frame(width: 28)
+                .help("Choose Custom Color")
+            }
+        }
+    }
+
+    private func colorSwatch(color: Color, isSelected: Bool) -> some View {
+        Circle()
+            .fill(color)
+            .frame(width: 24, height: 24)
+            .overlay {
+                Circle()
+                    .stroke(isSelected ? Color.primary : Color.secondary.opacity(0.35), lineWidth: isSelected ? 3 : 1)
+            }
+            .padding(3)
     }
 }
 
@@ -148,6 +243,7 @@ struct MilestoneGoalEditorView: View {
         .frame(width: 420)
     }
 }
+
 
 struct DayCountInputValidator {
     static func parse(_ text: String, range: ClosedRange<Int>) -> Int? {

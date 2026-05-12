@@ -62,9 +62,13 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingCreateGoal) {
             if let finalGoalStore {
-                FinalGoalEditorView(mode: .create) { title, description, target in
+                FinalGoalEditorView(mode: .create) { title, description, target, colorThemeID, customColorHex in
                     finalGoalStore.createFinalGoal(
-                        title: title, goalDescription: description, targetCalendarDays: target
+                        title: title,
+                        goalDescription: description,
+                        targetCalendarDays: target,
+                        colorThemeID: colorThemeID,
+                        customColorHex: customColorHex
                     )
                     isShowingCreateGoal = false
                 }
