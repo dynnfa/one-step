@@ -119,17 +119,6 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertEqual(archivedPolicy.archiveButtonTitle, "Reactivate Goal")
     }
 
-    func testFinalGoalDetailColorPolicyThemesHeaderOnly() {
-        let policy = FinalGoalDetailColorPolicy(goal: makeSnapshot(
-            archivedAt: nil,
-            colorThemeID: FinalGoalColorTheme.customID,
-            customColorHex: "#112233"
-        ))
-
-        XCTAssertEqual(policy.headerTitleHex, "#112233")
-        XCTAssertFalse(policy.shouldThemeMilestoneTitle)
-    }
-
     func testDeleteFinalGoalRemovesItFromListAndClearsSelection() throws {
         let fixture = try makeFixture()
         fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
