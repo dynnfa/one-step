@@ -12,6 +12,8 @@ Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Mode
 | `title` | String | Non-empty after trim. User-editable. |
 | `goalDescription` | String? | Optional longer description. `nil` when unset. |
 | `targetCalendarDays` | Int? | Optional deadline in calendar days from creation. `nil` means no deadline. |
+| `colorThemeID` | String | User-selected FinalGoal color theme. Defaults to `blue`; `custom` uses `customColorHex`. |
+| `customColorHex` | String? | Normalized `#RRGGBB` color for custom themes. `nil` for preset themes. |
 | `startDayKey` | String | YYYY-MM-DD format. Set on creation. |
 | `sortOrder` | Int | Manual ordering. Defaults to creation order (incrementing). |
 | `archivedAt` | Date? | `nil` when active. Set when complete, ended, or archived. |
@@ -70,6 +72,7 @@ Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Mode
 8. **Progress uses completion count, not elapsed days.** Progress = `completedDays / targetCompletionDays`.
 9. **Target completion days cannot drop below completed count.** Enforced in `MilestoneGoalRepository.updateMilestoneGoal`.
 10. **IDs are stable UUIDs.** Never reused or recycled.
+11. **Goal colors are FinalGoal-owned.** App and Widget snapshots inherit the parent FinalGoal color for goal-level accents; milestone titles stay on the system primary text color. Missing or invalid color data falls back to the default blue theme.
 
 ## Migration Policy
 
@@ -91,6 +94,7 @@ The schema has no explicit version number yet. One will be assigned before the v
 ### Pre-v1 Compatibility Notes
 
 - 0.0.4 adds `MilestoneGoal.isActive` as explicit state. On first app launch after the update, the app backfills active goals that have milestones but no active incomplete milestone by marking the first incomplete milestone active.
+- 0.0.5 adds `FinalGoal.colorThemeID` and `FinalGoal.customColorHex`. Existing local stores use SwiftData defaults, and legacy backup files without color fields import as the default blue theme.
 
 ## PR Checklist for Schema Changes
 

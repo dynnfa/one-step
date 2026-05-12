@@ -7,6 +7,8 @@ public final class FinalGoal {
     public var title: String
     public var goalDescription: String?
     public var targetCalendarDays: Int?
+    public var colorThemeID: String = FinalGoalColorTheme.defaultTheme.id
+    public var customColorHex: String?
     public var startDayKey: String
     public var sortOrder: Int
     public var archivedAt: Date?
@@ -18,6 +20,8 @@ public final class FinalGoal {
         title: String,
         goalDescription: String? = nil,
         targetCalendarDays: Int? = nil,
+        colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+        customColorHex: String? = nil,
         startDayKey: String,
         sortOrder: Int,
         archivedAt: Date? = nil,
@@ -28,6 +32,12 @@ public final class FinalGoal {
         self.title = title
         self.goalDescription = goalDescription
         self.targetCalendarDays = targetCalendarDays
+        let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+            themeID: colorThemeID,
+            customColorHex: customColorHex
+        )
+        self.colorThemeID = colorSelection.themeID
+        self.customColorHex = colorSelection.customColorHex
         self.startDayKey = startDayKey
         self.sortOrder = sortOrder
         self.archivedAt = archivedAt

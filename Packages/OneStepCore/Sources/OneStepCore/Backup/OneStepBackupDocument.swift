@@ -28,6 +28,8 @@ public struct OneStepBackupDocument: Codable, Equatable, Sendable {
         public let title: String
         public let goalDescription: String?
         public let targetCalendarDays: Int?
+        public let colorThemeID: String
+        public let customColorHex: String?
         public let startDayKey: String
         public let sortOrder: Int
         public let archivedAt: Date?
@@ -39,6 +41,8 @@ public struct OneStepBackupDocument: Codable, Equatable, Sendable {
             title: String,
             goalDescription: String?,
             targetCalendarDays: Int?,
+            colorThemeID: String = FinalGoalColorTheme.defaultTheme.id,
+            customColorHex: String? = nil,
             startDayKey: String,
             sortOrder: Int,
             archivedAt: Date?,
@@ -49,11 +53,52 @@ public struct OneStepBackupDocument: Codable, Equatable, Sendable {
             self.title = title
             self.goalDescription = goalDescription
             self.targetCalendarDays = targetCalendarDays
+            let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+                themeID: colorThemeID,
+                customColorHex: customColorHex
+            )
+            self.colorThemeID = colorSelection.themeID
+            self.customColorHex = colorSelection.customColorHex
             self.startDayKey = startDayKey
             self.sortOrder = sortOrder
             self.archivedAt = archivedAt
             self.createdAt = createdAt
             self.updatedAt = updatedAt
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id
+            case title
+            case goalDescription
+            case targetCalendarDays
+            case colorThemeID
+            case customColorHex
+            case startDayKey
+            case sortOrder
+            case archivedAt
+            case createdAt
+            case updatedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(UUID.self, forKey: .id)
+            title = try container.decode(String.self, forKey: .title)
+            goalDescription = try container.decodeIfPresent(String.self, forKey: .goalDescription)
+            targetCalendarDays = try container.decodeIfPresent(Int.self, forKey: .targetCalendarDays)
+            let decodedThemeID = try container.decodeIfPresent(String.self, forKey: .colorThemeID)
+            let decodedCustomColorHex = try container.decodeIfPresent(String.self, forKey: .customColorHex)
+            let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+                themeID: decodedThemeID,
+                customColorHex: decodedCustomColorHex
+            )
+            colorThemeID = colorSelection.themeID
+            customColorHex = colorSelection.customColorHex
+            startDayKey = try container.decode(String.self, forKey: .startDayKey)
+            sortOrder = try container.decode(Int.self, forKey: .sortOrder)
+            archivedAt = try container.decodeIfPresent(Date.self, forKey: .archivedAt)
+            createdAt = try container.decode(Date.self, forKey: .createdAt)
+            updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         }
     }
 

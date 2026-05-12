@@ -19,11 +19,17 @@ public struct FinalGoalRepository {
         if let calendarDays = input.targetCalendarDays {
             try validateTargetCalendarDays(calendarDays)
         }
+        let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+            themeID: input.colorThemeID,
+            customColorHex: input.customColorHex
+        )
 
         let goal = FinalGoal(
             title: title,
             goalDescription: input.goalDescription?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             targetCalendarDays: input.targetCalendarDays,
+            colorThemeID: colorSelection.themeID,
+            customColorHex: colorSelection.customColorHex,
             startDayKey: input.startDay.rawValue,
             sortOrder: try nextSortOrder()
         )
@@ -41,7 +47,13 @@ public struct FinalGoalRepository {
         if let calendarDays = input.targetCalendarDays {
             try validateTargetCalendarDays(calendarDays)
         }
+        let colorSelection = FinalGoalColorTheme.sanitizedSelection(
+            themeID: input.colorThemeID,
+            customColorHex: input.customColorHex
+        )
         goal.targetCalendarDays = input.targetCalendarDays
+        goal.colorThemeID = colorSelection.themeID
+        goal.customColorHex = colorSelection.customColorHex
         goal.updatedAt = Date()
         try save()
     }
@@ -165,6 +177,12 @@ private extension FinalGoalRepository {
             title: goal.title,
             goalDescription: goal.goalDescription,
             targetCalendarDays: goal.targetCalendarDays,
+            colorThemeID: goal.colorThemeID,
+            customColorHex: goal.customColorHex,
+            colorHex: FinalGoalColorTheme.resolvedHex(
+                themeID: goal.colorThemeID,
+                customColorHex: goal.customColorHex
+            ),
             completedMilestoneCount: completedMilestoneCount,
             totalMilestoneCount: totalMilestoneCount,
             activeMilestoneCount: activeMilestoneCount,

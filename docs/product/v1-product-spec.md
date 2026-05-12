@@ -23,6 +23,8 @@ Fields:
 | Title | String | Non-empty after trim. |
 | Description | String? | Optional longer context. |
 | Target calendar days | Int? | Optional deadline from creation date. `nil` means no deadline. |
+| Color theme ID | String | User-selected color theme. Defaults to `blue`; preset IDs map to built-in colors. |
+| Custom color hex | String? | `#RRGGBB` custom color when the theme ID is `custom`; otherwise `nil`. |
 | Start day | String (YYYY-MM-DD) | Set on creation. |
 | Sort order | Int | Manual ordering for display. |
 | Archived at | Date? | `nil` when active. Set when the goal is completed, ended, or archived. |
@@ -48,8 +50,8 @@ At any time, a FinalGoal has at most one **current active milestone**: the first
 
 ## FinalGoal Lifecycle
 
-1. **Create.** User enters title, optional description, and optional calendar-day limit. The FinalGoal appears in the sidebar and is available to the Widget through its milestones.
-2. **Edit.** User can change title, description, and calendar-day limit.
+1. **Create.** User enters title, optional description, optional calendar-day limit, and a color theme. The FinalGoal appears in the sidebar and is available to the Widget through its milestones.
+2. **Edit.** User can change title, description, calendar-day limit, and color theme.
 3. **Complete/archive.** Available at any time. Sets `archivedAt`, removes the FinalGoal from active tracking, and removes its milestones from the Widget. Milestones are not archived; they are either incomplete or complete.
 4. **Reorder.** User drags FinalGoals into a preferred order. The Widget follows this order.
 5. **Delete.** Removes the FinalGoal, all its milestones, and all completions.
@@ -80,6 +82,8 @@ Each visible milestone displays:
 - Today's completion state
 - Completed days / target days
 
+The completion icon uses the parent FinalGoal color. Milestone titles remain the system primary text color, and secondary text remains system secondary color for readability.
+
 Interaction rules:
 
 - Clicking an incomplete milestone in the Widget completes it for today without opening the app.
@@ -100,6 +104,7 @@ Empty state: when no active milestones exist, the Widget shows "Create a goal in
 - **Empty states.** First launch invites the user to create a FinalGoal. After the first FinalGoal is saved, the app briefly points toward adding the Widget.
 - **Error states.** Repository errors surface as user-visible messages in the app. Widget errors are logged and result in empty data display rather than a crash.
 - **Long text.** Titles and descriptions may be long. The app list and Widget rows truncate gracefully without breaking layout.
+- **Color themes.** FinalGoal color applies as a title/icon accent in the sidebar, the FinalGoal detail header, and Widget completion icons. Milestone titles remain system primary text color. Invalid or missing theme values fall back to the default blue theme.
 - **Many goals.** There is no hard cap on FinalGoal or MilestoneGoal count. The Widget shows the first N current milestones based on family size and final-goal sort order.
 - **Sequential milestone advancement.** Only the current active milestone accepts check-ins. Completing the current milestone automatically promotes the next one.
 - **Accessibility.** Interactive controls have VoiceOver labels. The app list is keyboard-navigable. Deeper accessibility hardening is planned for v1.x.

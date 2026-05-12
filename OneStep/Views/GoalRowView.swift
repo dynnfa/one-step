@@ -7,7 +7,9 @@ struct FinalGoalRowView: View {
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(goal.title).font(.headline)
+                Text(goal.title)
+                    .font(.headline)
+                    .foregroundStyle(Color(goalHex: goal.colorHex))
                 if goal.totalMilestoneCount > 0 {
                     Text("\(goal.completedMilestoneCount)/\(goal.totalMilestoneCount) milestones")
                         .font(.caption)
@@ -48,6 +50,7 @@ struct MilestoneGoalRowView: View {
                 HStack(spacing: 6) {
                     Text(milestone.title)
                         .font(.headline)
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .layoutPriority(0)
@@ -123,6 +126,25 @@ struct MilestoneGoalRowView: View {
         } message: {
             Text("This permanently deletes the milestone and its completion history.")
         }
+    }
+}
+
+private extension Color {
+    init(goalHex hex: String) {
+        guard let normalizedHex = FinalGoalColorTheme.normalizedHex(hex) else {
+            self = Color.accentColor
+            return
+        }
+
+        let rawHex = String(normalizedHex.dropFirst())
+        let scanner = Scanner(string: rawHex)
+        var value: UInt64 = 0
+        scanner.scanHexInt64(&value)
+        self = Color(
+            red: Double((value >> 16) & 0xFF) / 255,
+            green: Double((value >> 8) & 0xFF) / 255,
+            blue: Double(value & 0xFF) / 255
+        )
     }
 }
 

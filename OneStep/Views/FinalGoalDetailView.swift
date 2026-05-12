@@ -49,10 +49,16 @@ struct FinalGoalDetailView: View {
         FinalGoalDetailActionPolicy(goal: goal)
     }
 
+    private var colorPolicy: FinalGoalDetailColorPolicy {
+        FinalGoalDetailColorPolicy(goal: goal)
+    }
+
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(goal.title).font(.largeTitle.bold())
+                Text(goal.title)
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(Color(goalHex: colorPolicy.headerTitleHex))
                 if let desc = goal.goalDescription, !desc.isEmpty {
                     Text(desc).foregroundStyle(.secondary)
                 }
@@ -146,5 +152,36 @@ struct FinalGoalDetailActionPolicy {
 
     var archiveButtonTitle: String {
         goal.archivedAt == nil ? "Archive Goal" : "Reactivate Goal"
+    }
+}
+
+struct FinalGoalDetailColorPolicy {
+    let goal: FinalGoalListSnapshot
+
+    var headerTitleHex: String {
+        goal.colorHex
+    }
+
+    var shouldThemeMilestoneTitle: Bool {
+        false
+    }
+}
+
+private extension Color {
+    init(goalHex hex: String) {
+        guard let normalizedHex = FinalGoalColorTheme.normalizedHex(hex) else {
+            self = Color.accentColor
+            return
+        }
+
+        let rawHex = String(normalizedHex.dropFirst())
+        let scanner = Scanner(string: rawHex)
+        var value: UInt64 = 0
+        scanner.scanHexInt64(&value)
+        self = Color(
+            red: Double((value >> 16) & 0xFF) / 255,
+            green: Double((value >> 8) & 0xFF) / 255,
+            blue: Double(value & 0xFF) / 255
+        )
     }
 }

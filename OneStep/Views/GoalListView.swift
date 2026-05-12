@@ -93,12 +93,17 @@ struct GoalListView: View {
                 mode: .edit(
                     title: goal.title,
                     goalDescription: goal.goalDescription,
-                    targetCalendarDays: goal.targetCalendarDays
+                    targetCalendarDays: goal.targetCalendarDays,
+                    colorThemeID: goal.colorThemeID,
+                    customColorHex: goal.customColorHex
                 )
-            ) { title, description, target in
+            ) { title, description, target, colorThemeID, customColorHex in
                 finalGoalStore.updateFinalGoal(
                     finalGoalID: goal.id, title: title,
-                    goalDescription: description, targetCalendarDays: target
+                    goalDescription: description,
+                    targetCalendarDays: target,
+                    colorThemeID: colorThemeID,
+                    customColorHex: customColorHex
                 )
                 editingFinalGoal = nil
             }
