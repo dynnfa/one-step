@@ -101,7 +101,7 @@ public struct OneStepBackupDocument: Codable, Equatable, Sendable {
     public struct MilestoneGoalRecord: Codable, Equatable, Sendable {
         public let id: UUID
         public let title: String
-        public let targetCompletionDays: Int
+        public let targetCompletionTimes: Int?
         public let finalGoalID: UUID
         public let sortOrder: Int
         public let isActive: Bool
@@ -113,7 +113,7 @@ public struct OneStepBackupDocument: Codable, Equatable, Sendable {
         public init(
             id: UUID,
             title: String,
-            targetCompletionDays: Int,
+            targetCompletionTimes: Int?,
             finalGoalID: UUID,
             sortOrder: Int,
             isActive: Bool,
@@ -124,7 +124,7 @@ public struct OneStepBackupDocument: Codable, Equatable, Sendable {
         ) {
             self.id = id
             self.title = title
-            self.targetCompletionDays = targetCompletionDays
+            self.targetCompletionTimes = targetCompletionTimes
             self.finalGoalID = finalGoalID
             self.sortOrder = sortOrder
             self.isActive = isActive
@@ -132,6 +132,56 @@ public struct OneStepBackupDocument: Codable, Equatable, Sendable {
             self.completedAt = completedAt
             self.createdAt = createdAt
             self.updatedAt = updatedAt
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id
+            case title
+            case targetCompletionTimes
+            case targetCompletionDays
+            case finalGoalID
+            case sortOrder
+            case isActive
+            case startDayKey
+            case completedAt
+            case createdAt
+            case updatedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(UUID.self, forKey: .id)
+            title = try container.decode(String.self, forKey: .title)
+            if container.contains(.targetCompletionTimes) {
+                targetCompletionTimes = try container.decodeIfPresent(Int.self, forKey: .targetCompletionTimes)
+            } else {
+                targetCompletionTimes = try container.decodeIfPresent(Int.self, forKey: .targetCompletionDays)
+            }
+            finalGoalID = try container.decode(UUID.self, forKey: .finalGoalID)
+            sortOrder = try container.decode(Int.self, forKey: .sortOrder)
+            isActive = try container.decode(Bool.self, forKey: .isActive)
+            startDayKey = try container.decodeIfPresent(String.self, forKey: .startDayKey)
+            completedAt = try container.decodeIfPresent(Date.self, forKey: .completedAt)
+            createdAt = try container.decode(Date.self, forKey: .createdAt)
+            updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(id, forKey: .id)
+            try container.encode(title, forKey: .title)
+            if let targetCompletionTimes {
+                try container.encode(targetCompletionTimes, forKey: .targetCompletionTimes)
+            } else {
+                try container.encodeNil(forKey: .targetCompletionTimes)
+            }
+            try container.encode(finalGoalID, forKey: .finalGoalID)
+            try container.encode(sortOrder, forKey: .sortOrder)
+            try container.encode(isActive, forKey: .isActive)
+            try container.encodeIfPresent(startDayKey, forKey: .startDayKey)
+            try container.encodeIfPresent(completedAt, forKey: .completedAt)
+            try container.encode(createdAt, forKey: .createdAt)
+            try container.encode(updatedAt, forKey: .updatedAt)
         }
     }
 

@@ -307,7 +307,7 @@ private struct FinalGoalRepositoryFixture {
     func createMilestone(title: String, targetDays: Int, finalGoalID: UUID) throws -> UUID {
         try MilestoneGoalRepository(modelContext: modelContext).createMilestoneGoal(CreateMilestoneGoalInput(
             title: title,
-            targetCompletionDays: targetDays,
+            targetCompletionTimes: targetDays,
             finalGoalID: finalGoalID
         ))
     }

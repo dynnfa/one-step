@@ -24,7 +24,7 @@ final class DomainTypeTests: XCTestCase {
     func testMilestoneGoalCompletionStateIsStoredWithoutActivationState() {
         let milestone = MilestoneGoal(
             title: "Finish vocabulary",
-            targetCompletionDays: 30,
+            targetCompletionTimes: 30,
             finalGoalID: UUID(),
             sortOrder: 0
         )
@@ -118,7 +118,7 @@ final class DomainTypeTests: XCTestCase {
         let snapshot = MilestoneGoalSnapshot(
             id: milestoneID,
             title: "Vocabulary",
-            targetCompletionDays: 30,
+            targetCompletionTimes: 30,
             finalGoalID: parentID,
             sortOrder: 0,
             isActive: true,
@@ -140,7 +140,7 @@ final class DomainTypeTests: XCTestCase {
             title: "Vocabulary",
             parentFinalGoalTitle: "Pass IELTS",
             colorHex: FinalGoalColorTheme.purple.hex,
-            targetCompletionDays: 30,
+            targetCompletionTimes: 30,
             completedDays: 12,
             isCompletedToday: true
         )

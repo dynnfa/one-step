@@ -8,6 +8,13 @@ struct WidgetGoalRowView: View {
     let compact: Bool
     let narrow: Bool
 
+    private var progressText: String {
+        if let targetCompletionTimes = milestone.targetCompletionTimes {
+            return "\(milestone.completedDays)/\(targetCompletionTimes)"
+        }
+        return "\(milestone.completedDays) times"
+    }
+
     var body: some View {
         let rowColor = Color(goalHex: milestone.colorHex)
         Button(intent: CompleteGoalIntent(goalID: milestone.id)) {
@@ -25,7 +32,7 @@ struct WidgetGoalRowView: View {
                         .font(.caption)
                         .foregroundStyle(rowColor)
                         .lineLimit(1)
-                    Text("\(milestone.completedDays)/\(milestone.targetCompletionDays)")
+                    Text(progressText)
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(.secondary)
                 }

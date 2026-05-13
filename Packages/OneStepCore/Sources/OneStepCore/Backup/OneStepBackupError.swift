@@ -42,7 +42,7 @@ public enum OneStepBackupError: Error, Equatable, LocalizedError {
         case .invalidTargetCalendarDays:
             return "A final goal in the backup has a calendar day limit below one."
         case .invalidTargetCompletionDays:
-            return "A milestone in the backup has a target completion count below one."
+            return "A milestone in the backup has a target completion times value below one."
         case .missingFinalGoalForMilestone:
             return "A milestone in the backup points to a missing final goal."
         case .missingMilestoneForCompletion:

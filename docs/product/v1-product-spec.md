@@ -38,15 +38,15 @@ Fields:
 | Field | Type | Rules |
 |-------|------|-------|
 | Title | String | Non-empty after trim. |
-| Target completion days | Int | Must be > 0. Represents intended completed days, not calendar duration. |
+| Target completion times | Int? | Optional. `nil` means unlimited; finite values must be > 0. Represents intended completion count, not calendar duration. |
 | Final goal ID | UUID | Parent FinalGoal. |
 | Sort order | Int | Determines sequence within the FinalGoal. |
 | Start day | String? (YYYY-MM-DD) | Set on first check-in. `nil` until then. |
-| Completed at | Date? | Auto-set when `completedDays >= targetCompletionDays`. |
+| Completed at | Date? | Auto-set when a finite target reaches its completion count. Unlimited milestones do not auto-complete. |
 
-### Current Active Milestone
+### Active Milestones
 
-At any time, a FinalGoal has at most one **current active milestone**: the first `MilestoneGoal` where `completedAt == nil`, ordered by `sortOrder`. Only the current active milestone can receive check-ins. When it completes, the next incomplete milestone in sort order becomes current.
+Each `MilestoneGoal` stores explicit active state. One or more incomplete milestones can be active at the same time, and only active incomplete milestones can receive check-ins. When a milestone auto-completes, it becomes inactive; the user chooses which milestone becomes active next.
 
 ## FinalGoal Lifecycle
 
@@ -58,16 +58,16 @@ At any time, a FinalGoal has at most one **current active milestone**: the first
 
 ## MilestoneGoal Lifecycle
 
-1. **Create.** User enters title and target completion days within a FinalGoal. The milestone is appended at the end of the sort order.
-2. **Edit.** User can change title and target completion days. Target days cannot drop below completed count.
-3. **Check in (complete today).** Mark daily effort on the current active milestone. Available from the app and the Widget. Sets `startDayKey` on first check-in.
+1. **Create.** User enters title and optional target completion times within a FinalGoal. The milestone is appended at the end of the sort order.
+2. **Edit.** User can change title and optional target completion times. Finite targets cannot drop below completed count.
+3. **Check in (complete today).** Mark daily effort on an active incomplete milestone. Available from the app and the Widget. Sets `startDayKey` on first check-in.
 4. **Undo today.** Remove today's completion from the main app. If the milestone was auto-completed, undoing reopens it.
-5. **Auto-complete.** When `completedDays >= targetCompletionDays`, the milestone's `completedAt` is set and the next active milestone becomes current.
+5. **Auto-complete.** When a finite target reaches its completion count, the milestone's `completedAt` is set. Unlimited milestones stay open until edited or deleted.
 6. **Delete.** Removes the milestone and its completions.
 
 ## Widget Behavior
 
-The Widget is the primary daily interface. It shows the **current active milestone** for each active FinalGoal, in the user's manual sort order.
+The Widget is the primary daily interface. It shows active incomplete milestones from active FinalGoals, in the user's manual sort order.
 
 | Widget family | Milestones shown |
 |---------------|-----------------|
@@ -80,7 +80,7 @@ Each visible milestone displays:
 - Milestone title
 - Parent FinalGoal title
 - Today's completion state
-- Completed days / target days
+- Completed times / target times, or completed times for unlimited milestones
 
 The completion icon uses the parent FinalGoal color. Milestone titles remain the system primary text color, and secondary text remains system secondary color for readability.
 
@@ -96,7 +96,7 @@ Empty state: when no active milestones exist, the Widget shows "Create a goal in
 ## Missed-Day Semantics
 
 - A missed day has no completion record. It is not backfilled, not repairable, and not highlighted.
-- Progress counts completed days toward the target, not elapsed calendar days.
+- Progress counts completed times toward the target, not elapsed calendar days. Unlimited milestones show completed times without a total.
 - The product does not display streaks, chains, or break counts. The emotional stance is: "I am still on the path," not "I failed."
 
 ## Edge Cases
@@ -106,5 +106,5 @@ Empty state: when no active milestones exist, the Widget shows "Create a goal in
 - **Long text.** Titles and descriptions may be long. The app list and Widget rows truncate gracefully without breaking layout.
 - **Color themes.** FinalGoal color applies as a title/icon accent in the sidebar, the FinalGoal detail header, and Widget completion icons. Milestone titles remain system primary text color. Invalid or missing theme values fall back to the default blue theme.
 - **Many goals.** There is no hard cap on FinalGoal or MilestoneGoal count. The Widget shows the first N current milestones based on family size and final-goal sort order.
-- **Sequential milestone advancement.** Only the current active milestone accepts check-ins. Completing the current milestone automatically promotes the next one.
+- **Milestone activation.** Only active incomplete milestones accept check-ins. Completing a milestone clears its active state; users choose the next active milestone.
 - **Accessibility.** Interactive controls have VoiceOver labels. The app list is keyboard-navigable. Deeper accessibility hardening is planned for v1.x.
