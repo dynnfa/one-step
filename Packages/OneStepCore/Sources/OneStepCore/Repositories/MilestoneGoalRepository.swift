@@ -45,12 +45,12 @@ public struct MilestoneGoalRepository {
         guard finalGoal.isActive else { throw GoalRepositoryError.finalGoalNotActive }
 
         let title = try validateTitle(input.title)
-        try validateTargetCompletionDays(input.targetCompletionDays)
+        try validateTargetCompletionTimes(input.targetCompletionTimes)
 
         let sortOrder = try nextMilestoneSortOrder(for: input.finalGoalID)
         let milestone = MilestoneGoal(
             title: title,
-            targetCompletionDays: input.targetCompletionDays,
+            targetCompletionTimes: input.targetCompletionTimes,
             finalGoalID: input.finalGoalID,
             sortOrder: sortOrder
         )
@@ -64,15 +64,17 @@ public struct MilestoneGoalRepository {
         guard milestone.completedAt == nil else { throw GoalRepositoryError.milestoneNotActive }
 
         let title = try validateTitle(input.title)
-        try validateTargetCompletionDays(input.targetCompletionDays)
+        try validateTargetCompletionTimes(input.targetCompletionTimes)
         let currentCompletedDays = try completedDays(for: milestoneGoalID)
-        guard input.targetCompletionDays >= currentCompletedDays else {
+        if let targetCompletionTimes = input.targetCompletionTimes,
+           targetCompletionTimes < currentCompletedDays {
             throw GoalRepositoryError.targetBelowCompletedCount
         }
 
         milestone.title = title
-        milestone.targetCompletionDays = input.targetCompletionDays
-        if currentCompletedDays >= input.targetCompletionDays {
+        milestone.targetCompletionTimes = input.targetCompletionTimes
+        if let targetCompletionTimes = input.targetCompletionTimes,
+           currentCompletedDays >= targetCompletionTimes {
             milestone.completedAt = Date()
             milestone.isActive = false
         }
@@ -107,7 +109,8 @@ public struct MilestoneGoalRepository {
         milestone.updatedAt = Date()
 
         let newCompletedDays = try completedDays(for: milestoneGoalID)
-        if newCompletedDays >= milestone.targetCompletionDays {
+        if let targetCompletionTimes = milestone.targetCompletionTimes,
+           newCompletedDays >= targetCompletionTimes {
             milestone.completedAt = Date()
             milestone.isActive = false
         }
@@ -124,7 +127,7 @@ public struct MilestoneGoalRepository {
         if let completion = try fetchCompletion(uniqueKey: uniqueKey) {
             modelContext.delete(completion)
             let remaining = try completedDays(for: milestoneGoalID) - 1
-            if remaining < milestone.targetCompletionDays {
+            if shouldReopenMilestone(remainingCompletionCount: remaining, targetCompletionTimes: milestone.targetCompletionTimes) {
                 milestone.completedAt = nil
                 milestone.isActive = true
             }
@@ -156,12 +159,18 @@ public struct MilestoneGoalRepository {
         return try milestones.map { milestone in
             let completedDays = try completedDays(for: milestone.id)
             let isCompletedToday = try isCompleted(goalID: milestone.id, day: day)
-            let activityLimit = min(max(recentActivityDayLimit, 0), milestone.targetCompletionDays)
+            let requestedActivityLimit = max(recentActivityDayLimit, 0)
+            let activityLimit: Int
+            if let targetCompletionTimes = milestone.targetCompletionTimes {
+                activityLimit = min(requestedActivityLimit, targetCompletionTimes)
+            } else {
+                activityLimit = requestedActivityLimit
+            }
 
             return MilestoneGoalSnapshot(
                 id: milestone.id,
                 title: milestone.title,
-                targetCompletionDays: milestone.targetCompletionDays,
+                targetCompletionTimes: milestone.targetCompletionTimes,
                 finalGoalID: milestone.finalGoalID,
                 sortOrder: milestone.sortOrder,
                 isActive: milestone.isActive && milestone.completedAt == nil,
@@ -196,7 +205,7 @@ public struct MilestoneGoalRepository {
                         themeID: finalGoal.colorThemeID,
                         customColorHex: finalGoal.customColorHex
                     ),
-                    targetCompletionDays: milestone.targetCompletionDays,
+                    targetCompletionTimes: milestone.targetCompletionTimes,
                     completedDays: completedDays,
                     isCompletedToday: try isCompleted(goalID: milestone.id, day: day)
                 ))
@@ -285,6 +294,11 @@ private extension MilestoneGoalRepository {
         try fetchCompletions(goalID: goalID).count
     }
 
+    func shouldReopenMilestone(remainingCompletionCount: Int, targetCompletionTimes: Int?) -> Bool {
+        guard let targetCompletionTimes else { return true }
+        return remainingCompletionCount < targetCompletionTimes
+    }
+
     func nextMilestoneSortOrder(for finalGoalID: UUID) throws -> Int {
         (try fetchMilestones(for: finalGoalID).map(\.sortOrder).max() ?? -1) + 1
     }
@@ -323,8 +337,9 @@ private extension MilestoneGoalRepository {
         return trimmed
     }
 
-    func validateTargetCompletionDays(_ days: Int) throws {
-        guard days > 0 else { throw GoalRepositoryError.invalidTargetCompletionDays }
+    func validateTargetCompletionTimes(_ times: Int?) throws {
+        guard let times else { return }
+        guard times > 0 else { throw GoalRepositoryError.invalidTargetCompletionDays }
     }
 
     func save() throws {

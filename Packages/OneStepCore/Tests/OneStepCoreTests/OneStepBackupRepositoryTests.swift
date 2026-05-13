@@ -11,7 +11,7 @@ final class OneStepBackupRepositoryTests: XCTestCase {
             colorThemeID: FinalGoalColorTheme.customID,
             customColorHex: "#445566"
         )
-        let milestoneID = try fixture.createMilestone(title: "Listening", targetDays: 2, finalGoalID: finalGoalID)
+        let milestoneID = try fixture.createMilestone(title: "Listening", targetTimes: 2, finalGoalID: finalGoalID)
         try fixture.milestoneRepository.setMilestoneActive(milestoneGoalID: milestoneID, isActive: true)
         let completionDay = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
         try fixture.milestoneRepository.completeToday(milestoneGoalID: milestoneID, day: completionDay)
@@ -25,6 +25,7 @@ final class OneStepBackupRepositoryTests: XCTestCase {
         XCTAssertEqual(document.finalGoals.first?.customColorHex, "#445566")
         XCTAssertEqual(document.milestones.map(\.id), [milestoneID])
         XCTAssertEqual(document.milestones.first?.finalGoalID, finalGoalID)
+        XCTAssertEqual(document.milestones.first?.targetCompletionTimes, 2)
         XCTAssertEqual(document.dailyCompletions.map(\.goalID), [milestoneID])
         XCTAssertEqual(document.dailyCompletions.map(\.dayKey), ["2026-04-29"])
     }
@@ -52,7 +53,7 @@ final class OneStepBackupRepositoryTests: XCTestCase {
         XCTAssertEqual(goals.first?.updatedAt, Date(timeIntervalSince1970: 1_777_000_060))
         XCTAssertEqual(milestones.map(\.id), [document.milestones[0].id])
         XCTAssertEqual(milestones.first?.title, "Imported Milestone")
-        XCTAssertEqual(milestones.first?.targetCompletionDays, 12)
+        XCTAssertEqual(milestones.first?.targetCompletionTimes, 12)
         XCTAssertEqual(milestones.first?.finalGoalID, document.finalGoals[0].id)
         XCTAssertEqual(milestones.first?.sortOrder, 3)
         XCTAssertEqual(milestones.first?.isActive, false)
@@ -135,6 +136,101 @@ final class OneStepBackupRepositoryTests: XCTestCase {
         XCTAssertNil(goal.customColorHex)
     }
 
+    func testImportBackupAcceptsUnlimitedMilestoneTarget() throws {
+        let fixture = try makeFixture()
+        let json = """
+        {
+          "schemaVersion": 1,
+          "exportedAt": "2026-04-29T00:00:00Z",
+          "finalGoals": [
+            {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "title": "Goal",
+              "goalDescription": null,
+              "targetCalendarDays": null,
+              "colorThemeID": "black",
+              "customColorHex": null,
+              "startDayKey": "2026-04-29",
+              "sortOrder": 0,
+              "archivedAt": null,
+              "createdAt": "2026-04-29T00:00:00Z",
+              "updatedAt": "2026-04-29T00:00:00Z"
+            }
+          ],
+          "milestones": [
+            {
+              "id": "22222222-2222-2222-2222-222222222222",
+              "title": "Open-ended",
+              "targetCompletionTimes": null,
+              "finalGoalID": "11111111-1111-1111-1111-111111111111",
+              "sortOrder": 0,
+              "isActive": true,
+              "startDayKey": null,
+              "completedAt": null,
+              "createdAt": "2026-04-29T00:00:00Z",
+              "updatedAt": "2026-04-29T00:00:00Z"
+            }
+          ],
+          "dailyCompletions": []
+        }
+        """
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let document = try decoder.decode(OneStepBackupDocument.self, from: Data(json.utf8))
+
+        try fixture.backupRepository.importDocument(document)
+
+        let milestone = try XCTUnwrap(try fixture.fetchMilestones().first)
+        XCTAssertNil(milestone.targetCompletionTimes)
+    }
+
+    func testImportLegacyBackupWithMissingMilestoneTargetTreatsItAsUnlimited() throws {
+        let fixture = try makeFixture()
+        let json = """
+        {
+          "schemaVersion": 1,
+          "exportedAt": "2026-04-29T00:00:00Z",
+          "finalGoals": [
+            {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "title": "Goal",
+              "goalDescription": null,
+              "targetCalendarDays": null,
+              "colorThemeID": "black",
+              "customColorHex": null,
+              "startDayKey": "2026-04-29",
+              "sortOrder": 0,
+              "archivedAt": null,
+              "createdAt": "2026-04-29T00:00:00Z",
+              "updatedAt": "2026-04-29T00:00:00Z"
+            }
+          ],
+          "milestones": [
+            {
+              "id": "22222222-2222-2222-2222-222222222222",
+              "title": "Missing target",
+              "finalGoalID": "11111111-1111-1111-1111-111111111111",
+              "sortOrder": 0,
+              "isActive": true,
+              "startDayKey": null,
+              "completedAt": null,
+              "createdAt": "2026-04-29T00:00:00Z",
+              "updatedAt": "2026-04-29T00:00:00Z"
+            }
+          ],
+          "dailyCompletions": []
+        }
+        """
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let document = try decoder.decode(OneStepBackupDocument.self, from: Data(json.utf8))
+
+        try fixture.backupRepository.importDocument(document)
+
+        let milestone = try XCTUnwrap(try fixture.fetchMilestones().first)
+        XCTAssertNil(milestone.targetCompletionTimes)
+    }
+
     private func makeImportDocument(schemaVersion: Int = OneStepBackupDocument.currentSchemaVersion) -> OneStepBackupDocument {
         let finalGoalID = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
         let milestoneID = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
@@ -165,7 +261,7 @@ final class OneStepBackupRepositoryTests: XCTestCase {
                 .init(
                     id: milestoneID,
                     title: "Imported Milestone",
-                    targetCompletionDays: 12,
+                    targetCompletionTimes: 12,
                     finalGoalID: finalGoalID,
                     sortOrder: 3,
                     isActive: false,
@@ -192,7 +288,7 @@ final class OneStepBackupRepositoryTests: XCTestCase {
                 .init(
                     id: UUID(),
                     title: "Orphan",
-                    targetCompletionDays: 1,
+                    targetCompletionTimes: 1,
                     finalGoalID: UUID(),
                     sortOrder: 0,
                     isActive: false,
@@ -236,7 +332,7 @@ final class OneStepBackupRepositoryTests: XCTestCase {
                 .init(
                     id: milestoneID,
                     title: "Milestone",
-                    targetCompletionDays: 2,
+                    targetCompletionTimes: 2,
                     finalGoalID: finalGoalID,
                     sortOrder: 0,
                     isActive: true,
@@ -293,10 +389,10 @@ private struct Fixture {
         ))
     }
 
-    func createMilestone(title: String, targetDays: Int, finalGoalID: UUID) throws -> UUID {
+    func createMilestone(title: String, targetTimes: Int?, finalGoalID: UUID) throws -> UUID {
         try milestoneRepository.createMilestoneGoal(CreateMilestoneGoalInput(
             title: title,
-            targetCompletionDays: targetDays,
+            targetCompletionTimes: targetTimes,
             finalGoalID: finalGoalID
         ))
     }

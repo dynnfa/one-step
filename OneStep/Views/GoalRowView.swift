@@ -37,10 +37,21 @@ struct MilestoneGoalRowView: View {
 
     @State private var isConfirmingDelete = false
 
+    private var showsCheckedState: Bool {
+        milestone.isCompletedToday || milestone.completedAt != nil
+    }
+
+    private var progressText: String {
+        if let targetCompletionTimes = milestone.targetCompletionTimes {
+            return "\(milestone.completedDays)/\(targetCompletionTimes) times"
+        }
+        return "\(milestone.completedDays) times"
+    }
+
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
             Button(action: milestone.isCompletedToday ? onUndo : onCheckIn) {
-                Image(systemName: milestone.isCompletedToday ? "checkmark.circle.fill" : "circle")
+                Image(systemName: showsCheckedState ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
             }
             .buttonStyle(.plain)
@@ -83,7 +94,7 @@ struct MilestoneGoalRowView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 RecentActivityView(
                     activity: milestone.recentActivity,
-                    targetCompletionDays: milestone.targetCompletionDays,
+                    targetCompletionTimes: milestone.targetCompletionTimes,
                     onRequiredDayCountChange: onRecentActivityDayLimitChange
                 )
             }
@@ -98,7 +109,7 @@ struct MilestoneGoalRowView: View {
                     ) { onSetActive(!milestone.isActive) }
                 }
 
-                Text("\(milestone.completedDays)/\(milestone.targetCompletionDays)")
+                Text(progressText)
                     .font(.headline.monospacedDigit())
             }
 
