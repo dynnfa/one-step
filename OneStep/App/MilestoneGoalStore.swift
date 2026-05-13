@@ -20,7 +20,7 @@ final class MilestoneGoalStore {
     }
 
     static func live() throws -> MilestoneGoalStore {
-        MilestoneGoalStore(repository: try MilestoneGoalRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier))
+        MilestoneGoalStore(repository: try MilestoneGoalRepository.shared(appGroupIdentifier: AppIdentifiers.appGroupIdentifier))
     }
 
     func refresh(finalGoalID: UUID, day: LocalDay = .today) {
@@ -113,7 +113,7 @@ final class MilestoneGoalStore {
         pendingRecentActivityRefreshTask?.cancel()
         pendingRecentActivityRefreshTask = nil
         refresh(finalGoalID: finalGoalID)
-        WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")
+        WidgetCenter.shared.reloadTimelines(ofKind: AppIdentifiers.widgetKind)
         onMilestonesChanged?()
     }
 }

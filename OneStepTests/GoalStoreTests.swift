@@ -497,6 +497,48 @@ final class GoalReorderIndexTests: XCTestCase {
     }
 }
 
+final class GoalSidebarDragStateTests: XCTestCase {
+    func testLeavingSidebarDropTargetClearsHoverButKeepsActiveDrag() {
+        let draggedGoalID = UUID()
+        let destinationGoalID = UUID()
+        var state = GoalSidebarDragState()
+
+        state.startDragging(goalID: draggedGoalID)
+        state.setSidebarDropTargeted(true)
+        state.updateDropHover(DropHoverState(goalID: destinationGoalID, isAbove: true))
+
+        state.setSidebarDropTargeted(false)
+
+        XCTAssertEqual(state.draggedGoalID, draggedGoalID)
+        XCTAssertNil(state.dropHoverState)
+        XCTAssertFalse(state.isShowingDraggedRow(goalID: draggedGoalID))
+    }
+
+    func testClearingDragClearsAllSidebarDragState() {
+        let draggedGoalID = UUID()
+        var state = GoalSidebarDragState()
+
+        state.startDragging(goalID: draggedGoalID)
+        state.setSidebarDropTargeted(true)
+        state.updateDropHover(DropHoverState(goalID: UUID(), isAbove: false))
+
+        state.clearDrag()
+
+        XCTAssertNil(state.draggedGoalID)
+        XCTAssertNil(state.dropHoverState)
+        XCTAssertFalse(state.isSidebarDropTargeted)
+        XCTAssertFalse(state.isShowingDraggedRow(goalID: draggedGoalID))
+    }
+
+    func testHoverUpdatesAreIgnoredWhenNoDragIsActive() {
+        var state = GoalSidebarDragState()
+
+        state.updateDropHover(DropHoverState(goalID: UUID(), isAbove: true))
+
+        XCTAssertNil(state.dropHoverState)
+    }
+}
+
 final class DayCountInputValidatorTests: XCTestCase {
     func testAcceptsTrimmedIntegerWithinRange() {
         XCTAssertEqual(DayCountInputValidator.parse(" 365 ", range: 1...10_000), 365)

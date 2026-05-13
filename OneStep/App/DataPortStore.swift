@@ -16,7 +16,7 @@ final class DataPortStore {
     }
 
     static func live() throws -> DataPortStore {
-        DataPortStore(repository: try OneStepBackupRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier))
+        DataPortStore(repository: try OneStepBackupRepository.shared(appGroupIdentifier: AppIdentifiers.appGroupIdentifier))
     }
 
     func makeExportFile() -> OneStepBackupFile? {
@@ -42,7 +42,7 @@ final class DataPortStore {
             decoder.dateDecodingStrategy = .iso8601
             let document = try decoder.decode(OneStepBackupDocument.self, from: data)
             try repository.importDocument(document)
-            WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")
+            WidgetCenter.shared.reloadTimelines(ofKind: AppIdentifiers.widgetKind)
             statusMessage = "Import complete."
             errorMessage = nil
         } catch let backupError as OneStepBackupError {

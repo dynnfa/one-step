@@ -3,7 +3,7 @@ import SwiftUI
 import WidgetKit
 
 struct OneStepWidget: Widget {
-    static let kind = "OneStepWidget"
+    static let kind = AppIdentifiers.widgetKind
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: Self.kind, provider: OneStepTimelineProvider()) { entry in

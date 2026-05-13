@@ -22,7 +22,7 @@ struct CompleteGoalIntent: AppIntent {
         }
 
         do {
-            let repository = try MilestoneGoalRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier)
+            let repository = try MilestoneGoalRepository.shared(appGroupIdentifier: AppIdentifiers.appGroupIdentifier)
             try repository.completeToday(milestoneGoalID: id, day: .today)
             WidgetCenter.shared.reloadTimelines(ofKind: OneStepWidget.kind)
         } catch GoalRepositoryError.milestoneGoalNotFound {
