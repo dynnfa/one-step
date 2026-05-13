@@ -54,17 +54,13 @@ private struct RowDragState {
     let isDropTargetBelow: Bool
 }
 
-private extension UTType {
-    static let oneStepGoalDrag = UTType(exportedAs: "dev.dynnfa.OneStep.goal-drag")
-}
-
 private struct GoalRowDropDelegate: DropDelegate {
     let goalID: UUID
     let onHoverUpdate: (DropHoverState?) -> Void
     let onPerformDrop: (_ destinationGoalID: UUID, _ insertAbove: Bool) -> Bool
 
     func validateDrop(info: DropInfo) -> Bool {
-        info.hasItemsConforming(to: [.oneStepGoalDrag])
+        true
     }
 
     func dropEntered(info: DropInfo) {
@@ -268,7 +264,9 @@ private struct GoalSidebarView: View {
     let onSelectGoal: (UUID) -> Void
     let onMoveActiveGoal: (UUID, UUID, Bool) -> Bool
 
-    @State private var dragState = GoalSidebarDragState()
+    @State private var dropHoverState: DropHoverState?
+    @State private var draggedGoalID: UUID?
+    @State private var isSidebarDropTargeted = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -294,27 +292,31 @@ private struct GoalSidebarView: View {
                                 goal: goal,
                                 isSelected: selectedFinalGoalID == goal.id,
                                 dragState: RowDragState(
-                                    isBeingDragged: dragState.isShowingDraggedRow(goalID: goal.id),
-                                    isDropTargetAbove: dragState.dropHoverState?.goalID == goal.id && dragState.dropHoverState?.isAbove == true,
-                                    isDropTargetBelow: dragState.dropHoverState?.goalID == goal.id && dragState.dropHoverState?.isAbove == false
+                                    isBeingDragged: draggedGoalID == goal.id,
+                                    isDropTargetAbove: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == true,
+                                    isDropTargetBelow: dropHoverState?.goalID == goal.id && dropHoverState?.isAbove == false
                                 ),
                                 onSelect: { onSelectGoal(goal.id) }
                             )
                             .onDrag {
-                                dragState.startDragging(goalID: goal.id)
-                                return makeDragItemProvider(goalID: goal.id)
+                                draggedGoalID = goal.id
+                                return NSItemProvider(object: goal.id.uuidString as NSString)
                             }
                             .onDrop(
-                                of: [.oneStepGoalDrag],
+                                of: [.text],
                                 delegate: GoalRowDropDelegate(
                                     goalID: goal.id,
                                     onHoverUpdate: { newState in
-                                        dragState.updateDropHover(newState)
+                                        guard draggedGoalID != nil else {
+                                            dropHoverState = nil
+                                            return
+                                        }
+                                        dropHoverState = newState
                                     },
                                     onPerformDrop: { destinationGoalID, insertAbove in
-                                        dragState.clearDropHover()
-                                        guard let draggedID = dragState.draggedGoalID else { return false }
-                                        dragState.clearDrag()
+                                        dropHoverState = nil
+                                        guard let draggedID = draggedGoalID else { return false }
+                                        draggedGoalID = nil
                                         var result = false
                                         withAnimation(.easeInOut(duration: 0.25)) {
                                             result = onMoveActiveGoal(draggedID, destinationGoalID, insertAbove)
@@ -340,7 +342,7 @@ private struct GoalSidebarView: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 12)
-                .onDrop(of: [.oneStepGoalDrag], isTargeted: sidebarDropTargetBinding) { _ in
+                .onDrop(of: [.text], isTargeted: sidebarDropTargetBinding) { _ in
                     clearDragState()
                     return false
                 }
@@ -354,31 +356,23 @@ private struct GoalSidebarView: View {
 
     private var sidebarDropTargetBinding: Binding<Bool> {
         Binding(
-            get: { dragState.isSidebarDropTargeted },
+            get: { isSidebarDropTargeted },
             set: { isTargeted in
-                dragState.setSidebarDropTargeted(isTargeted)
+                isSidebarDropTargeted = isTargeted
+                if !isTargeted {
+                    clearDropHoverState()
+                }
             }
         )
     }
 
     private func clearDragState() {
-        dragState.clearDrag()
+        draggedGoalID = nil
+        dropHoverState = nil
     }
 
     private func clearDropHoverState() {
-        dragState.clearDropHover()
-    }
-
-    private func makeDragItemProvider(goalID: UUID) -> NSItemProvider {
-        let provider = NSItemProvider()
-        provider.registerDataRepresentation(
-            forTypeIdentifier: UTType.oneStepGoalDrag.identifier,
-            visibility: .ownProcess
-        ) { completion in
-            completion(goalID.uuidString.data(using: .utf8), nil)
-            return nil
-        }
-        return provider
+        dropHoverState = nil
     }
 
     private var header: some View {
