@@ -321,7 +321,7 @@ private struct GoalSidebarView: View {
             set: { isTargeted in
                 isSidebarDropTargeted = isTargeted
                 if !isTargeted {
-                    clearDragState()
+                    clearDropHoverState()
                 }
             }
         )
@@ -329,6 +329,10 @@ private struct GoalSidebarView: View {
 
     private func clearDragState() {
         draggedGoalID = nil
+        dropHoverState = nil
+    }
+
+    private func clearDropHoverState() {
         dropHoverState = nil
     }
 
