@@ -439,6 +439,21 @@ final class MilestoneGoalRepositoryTests: XCTestCase {
         XCTAssertEqual(completions.map(\.dayKey), ["2026-03-20", "2026-04-29"])
     }
 
+    func testMilestonesForFinalGoalDoesNotSilentlySwallowSnapshotErrors() throws {
+        let testFile = URL(fileURLWithPath: #filePath)
+        let sourceURL = testFile
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources/OneStepCore/Repositories/MilestoneGoalRepository.swift")
+        let source = try String(contentsOf: sourceURL, encoding: .utf8)
+        let methodStart = try XCTUnwrap(source.range(of: "public func milestonesForFinalGoal("))
+        let methodEnd = try XCTUnwrap(source.range(of: "public func activeMilestonesForWidget("))
+        let methodBody = source[methodStart.lowerBound..<methodEnd.lowerBound]
+
+        XCTAssertFalse(methodBody.contains("try?"))
+    }
+
     // MARK: - Helpers
 
     private func makeFixture() throws -> MilestoneGoalRepositoryFixture {

@@ -3,6 +3,11 @@ import XCTest
 @testable import OneStepCore
 
 final class DomainTypeTests: XCTestCase {
+    func testAppIdentifiersCentralizeSharedAppAndWidgetConstants() {
+        XCTAssertEqual(AppIdentifiers.appGroupIdentifier, "group.dev.dynnfa.OneStep")
+        XCTAssertEqual(AppIdentifiers.widgetKind, "OneStepWidget")
+    }
+
     func testFinalGoalActiveStateOnlyDependsOnArchivedAt() {
         let goal = FinalGoal(
             title: "Pass IELTS",

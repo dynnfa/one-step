@@ -4,9 +4,11 @@ import SwiftData
 @MainActor
 public struct FinalGoalRepository {
     private let modelContext: ModelContext
+    private let today: () -> LocalDay
 
-    public init(modelContext: ModelContext) {
+    public init(modelContext: ModelContext, today: @escaping () -> LocalDay = { .today }) {
         self.modelContext = modelContext
+        self.today = today
     }
 
     public static func shared(appGroupIdentifier: String) throws -> FinalGoalRepository {
@@ -156,10 +158,8 @@ private extension FinalGoalRepository {
         let activeMilestoneCount = milestones.filter { $0.isActive && $0.completedAt == nil }.count
 
         let remainingCalendarDays: Int? = goal.targetCalendarDays.map { limit in
-            let startString = goal.startDayKey
-            guard let startDate = dayDateFormatter.date(from: startString) else { return limit }
-            let calendar = Calendar(identifier: .gregorian)
-            let daysSinceStart = calendar.dateComponents([.day], from: startDate, to: Date()).day ?? 0
+            guard let startDay = LocalDay(rawValue: goal.startDayKey) else { return limit }
+            let daysSinceStart = startDay.days(until: today())
             return max(limit - daysSinceStart, 0)
         }
 
@@ -201,15 +201,6 @@ private extension FinalGoalRepository {
         }
     }
 
-    var dayDateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.isLenient = false
-        return formatter
-    }
 }
 
 extension String {
