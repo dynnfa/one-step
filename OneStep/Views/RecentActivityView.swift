@@ -3,7 +3,7 @@ import SwiftUI
 
 struct RecentActivityView: View {
     let activity: [RecentActivityDay]
-    let targetCompletionDays: Int
+    let targetCompletionTimes: Int?
     var onRequiredDayCountChange: (Int) -> Void = { _ in }
 
     @State private var availableWidth: CGFloat?
@@ -13,7 +13,7 @@ struct RecentActivityView: View {
         RecentActivityLayout.computeVisibleDayCount(
             availableWidth: availableWidth,
             activityCount: activity.count,
-            targetCompletionDays: targetCompletionDays
+            targetCompletionTimes: targetCompletionTimes
         )
     }
 
@@ -41,7 +41,7 @@ struct RecentActivityView: View {
             }
             let newLimit = RecentActivityLayout.computeRequiredDayLimit(
                 availableWidth: width,
-                targetCompletionDays: targetCompletionDays
+                targetCompletionTimes: targetCompletionTimes
             )
             guard newLimit != lastEmittedDayLimit else { return }
             lastEmittedDayLimit = newLimit
@@ -59,13 +59,13 @@ enum RecentActivityLayout {
     static func computeVisibleDayCount(
         availableWidth: CGFloat?,
         activityCount: Int,
-        targetCompletionDays: Int,
+        targetCompletionTimes: Int?,
         fallback: Int = fallbackDayCount
     ) -> Int {
-        guard activityCount > 0, targetCompletionDays > 0 else { return 0 }
+        guard activityCount > 0 else { return 0 }
         let requestedDayCount = computeRequiredDayLimit(
             availableWidth: availableWidth,
-            targetCompletionDays: targetCompletionDays,
+            targetCompletionTimes: targetCompletionTimes,
             fallback: fallback
         )
         return min(activityCount, requestedDayCount)
@@ -73,17 +73,22 @@ enum RecentActivityLayout {
 
     static func computeRequiredDayLimit(
         availableWidth: CGFloat?,
-        targetCompletionDays: Int,
+        targetCompletionTimes: Int?,
         fallback: Int = fallbackDayCount
     ) -> Int {
-        guard targetCompletionDays > 0 else { return 0 }
         guard let availableWidth, availableWidth.isFinite else {
-            return min(fallback, targetCompletionDays)
+            return boundedByTarget(fallback, targetCompletionTimes: targetCompletionTimes)
         }
 
         let slotWidth = blockWidth + spacing
         let capacity = Int((availableWidth + spacing) / slotWidth)
-        return min(max(1, capacity), targetCompletionDays)
+        return boundedByTarget(max(1, capacity), targetCompletionTimes: targetCompletionTimes)
+    }
+
+    private static func boundedByTarget(_ dayCount: Int, targetCompletionTimes: Int?) -> Int {
+        guard let targetCompletionTimes else { return dayCount }
+        guard targetCompletionTimes > 0 else { return 0 }
+        return min(dayCount, targetCompletionTimes)
     }
 }
 

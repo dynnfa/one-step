@@ -5,7 +5,7 @@ import SwiftData
 public final class MilestoneGoal {
     @Attribute(.unique) public var id: UUID
     public var title: String
-    public var targetCompletionDays: Int
+    public var targetCompletionDays: Int?
     public var finalGoalID: UUID
     public var sortOrder: Int
     public var isActive: Bool
@@ -17,7 +17,7 @@ public final class MilestoneGoal {
     public init(
         id: UUID = UUID(),
         title: String,
-        targetCompletionDays: Int,
+        targetCompletionTimes: Int?,
         finalGoalID: UUID,
         sortOrder: Int,
         isActive: Bool = false,
@@ -28,7 +28,7 @@ public final class MilestoneGoal {
     ) {
         self.id = id
         self.title = title
-        self.targetCompletionDays = targetCompletionDays
+        self.targetCompletionDays = targetCompletionTimes
         self.finalGoalID = finalGoalID
         self.sortOrder = sortOrder
         self.isActive = isActive
@@ -36,5 +36,10 @@ public final class MilestoneGoal {
         self.completedAt = completedAt
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+    }
+
+    public var targetCompletionTimes: Int? {
+        get { targetCompletionDays }
+        set { targetCompletionDays = newValue }
     }
 }

@@ -32,11 +32,11 @@ Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Mode
 |-------|------|-------|
 | `id` | UUID | `@Attribute(.unique)`. Stable identifier. Never reused. |
 | `title` | String | Non-empty after trim. User-editable. |
-| `targetCompletionDays` | Int | Must be > 0. Represents intended completed days, not calendar duration. |
+| `targetCompletionDays` | Int? | Stored legacy column name. Exposed as target completion times. `nil` means unlimited; non-`nil` values must be > 0. |
 | `finalGoalID` | UUID | Foreign key to `FinalGoal.id`. |
 | `sortOrder` | Int | Determines milestone sequence within a FinalGoal. |
 | `startDayKey` | String? | YYYY-MM-DD format. Set on first check-in. `nil` until then. |
-| `completedAt` | Date? | `nil` while in progress. Auto-set when `completedDays >= targetCompletionDays`. |
+| `completedAt` | Date? | `nil` while in progress. Auto-set only for finite targets when completion count reaches target completion times. |
 | `createdAt` | Date | Set once on creation. |
 | `updatedAt` | Date | Updated on every mutation. |
 
@@ -65,12 +65,12 @@ Stored as a SwiftData `@Model` in `Packages/OneStepCore/Sources/OneStepCore/Mode
 1. **One completion per milestone per local day.** Enforced by the unique `uniqueKey` on `DailyCompletion`. Duplicate same-day writes are repository-level no-ops.
 2. **Only the current incomplete milestone can receive check-ins.** `MilestoneGoalRepository.completeToday` rejects completed milestones and non-current milestones.
 3. **Check-in requires an active parent FinalGoal.** `completeToday` rejects if the parent FinalGoal is archived.
-4. **Each active FinalGoal contributes at most one Widget milestone.** Widget snapshots include the first incomplete milestone from each active FinalGoal, ordered by FinalGoal order, up to the Widget family limit.
-5. **Milestone auto-completes when target is reached.** `completedAt` is set automatically when `completedDays >= targetCompletionDays`.
+4. **Active milestones drive Widget visibility.** Widget snapshots include active incomplete milestones from active FinalGoals, ordered by FinalGoal order and milestone order, up to the Widget family limit.
+5. **Milestone auto-completes when a finite target is reached.** `completedAt` is set automatically when completion count reaches target completion times. Unlimited milestones do not auto-complete.
 6. **FinalGoal completion is archival.** Completing/ending a FinalGoal sets `archivedAt`; it does not mutate its milestones and does not require all milestones to be complete.
 7. **Delete cascades.** Deleting a FinalGoal removes all its milestones and their completions. Deleting a MilestoneGoal removes its completions.
-8. **Progress uses completion count, not elapsed days.** Progress = `completedDays / targetCompletionDays`.
-9. **Target completion days cannot drop below completed count.** Enforced in `MilestoneGoalRepository.updateMilestoneGoal`.
+8. **Progress uses completion count, not elapsed days.** Finite progress shows completed times / target times; unlimited progress shows completed times.
+9. **Finite target completion times cannot drop below completed count.** Enforced in `MilestoneGoalRepository.updateMilestoneGoal`.
 10. **IDs are stable UUIDs.** Never reused or recycled.
 11. **Goal colors are FinalGoal-owned.** App and Widget snapshots inherit the parent FinalGoal color for goal-level accents; milestone titles stay on the system primary text color. Missing or invalid color data falls back to the default blue theme.
 

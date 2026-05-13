@@ -30,7 +30,7 @@ final class OneStepBackupDocumentTests: XCTestCase {
                 OneStepBackupDocument.MilestoneGoalRecord(
                     id: milestoneID,
                     title: "Listening practice",
-                    targetCompletionDays: 30,
+                    targetCompletionTimes: 30,
                     finalGoalID: finalGoalID,
                     sortOrder: 0,
                     isActive: true,
@@ -64,8 +64,55 @@ final class OneStepBackupDocumentTests: XCTestCase {
         XCTAssertTrue(json.contains("\"schemaVersion\" : 1"))
         XCTAssertTrue(json.contains("\"finalGoals\""))
         XCTAssertTrue(json.contains("\"colorThemeID\" : \"green\""))
+        XCTAssertTrue(json.contains("\"targetCompletionTimes\" : 30"))
         XCTAssertTrue(json.contains("\"milestones\""))
         XCTAssertTrue(json.contains("\"dailyCompletions\""))
+    }
+
+    func testLegacyMilestoneTargetCompletionDaysDecodesAsTimes() throws {
+        let json = """
+        {
+          "id": "22222222-2222-2222-2222-222222222222",
+          "title": "Legacy milestone",
+          "targetCompletionDays": 12,
+          "finalGoalID": "11111111-1111-1111-1111-111111111111",
+          "sortOrder": 0,
+          "isActive": true,
+          "startDayKey": null,
+          "completedAt": null,
+          "createdAt": "2026-04-29T00:00:00Z",
+          "updatedAt": "2026-04-29T00:00:00Z"
+        }
+        """
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+
+        let record = try decoder.decode(OneStepBackupDocument.MilestoneGoalRecord.self, from: Data(json.utf8))
+
+        XCTAssertEqual(record.targetCompletionTimes, 12)
+    }
+
+    func testUnlimitedMilestoneEncodesTargetCompletionTimesNull() throws {
+        let record = OneStepBackupDocument.MilestoneGoalRecord(
+            id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
+            title: "Open-ended",
+            targetCompletionTimes: nil,
+            finalGoalID: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+            sortOrder: 0,
+            isActive: true,
+            startDayKey: nil,
+            completedAt: nil,
+            createdAt: Date(timeIntervalSince1970: 1_777_000_000),
+            updatedAt: Date(timeIntervalSince1970: 1_777_000_000)
+        )
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+        let data = try encoder.encode(record)
+
+        let json = String(decoding: data, as: UTF8.self)
+        XCTAssertTrue(json.contains("\"targetCompletionTimes\" : null"))
     }
 
     func testBackupErrorDescriptionsAreUserFacing() {
