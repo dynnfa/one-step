@@ -51,7 +51,7 @@ public struct OneStepBackupRepository {
                 .init(
                     id: $0.id,
                     title: $0.title,
-                    targetCompletionDays: $0.targetCompletionDays,
+                    targetCompletionTimes: $0.targetCompletionTimes,
                     finalGoalID: $0.finalGoalID,
                     sortOrder: $0.sortOrder,
                     isActive: $0.isActive,
@@ -94,7 +94,7 @@ public struct OneStepBackupRepository {
                 modelContext.insert(MilestoneGoal(
                     id: record.id,
                     title: record.title.trimmingCharacters(in: .whitespacesAndNewlines),
-                    targetCompletionDays: record.targetCompletionDays,
+                    targetCompletionTimes: record.targetCompletionTimes,
                     finalGoalID: record.finalGoalID,
                     sortOrder: record.sortOrder,
                     isActive: record.isActive,
@@ -150,7 +150,9 @@ private extension OneStepBackupRepository {
             guard !record.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 throw OneStepBackupError.invalidMilestoneTitle
             }
-            guard record.targetCompletionDays > 0 else { throw OneStepBackupError.invalidTargetCompletionDays }
+            if let targetCompletionTimes = record.targetCompletionTimes, targetCompletionTimes <= 0 {
+                throw OneStepBackupError.invalidTargetCompletionDays
+            }
             if let startDayKey = record.startDayKey, LocalDay(rawValue: startDayKey) == nil {
                 throw OneStepBackupError.invalidMilestoneStartDay
             }
@@ -210,7 +212,7 @@ private extension OneStepBackupRepository {
             modelContext.insert(MilestoneGoal(
                 id: record.id,
                 title: record.title,
-                targetCompletionDays: record.targetCompletionDays,
+                targetCompletionTimes: record.targetCompletionTimes,
                 finalGoalID: record.finalGoalID,
                 sortOrder: record.sortOrder,
                 isActive: record.isActive,

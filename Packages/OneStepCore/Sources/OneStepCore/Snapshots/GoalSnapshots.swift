@@ -57,23 +57,23 @@ public struct UpdateFinalGoalInput: Equatable, Sendable {
 
 public struct CreateMilestoneGoalInput: Equatable, Sendable {
     public let title: String
-    public let targetCompletionDays: Int
+    public let targetCompletionTimes: Int?
     public let finalGoalID: UUID
 
-    public init(title: String, targetCompletionDays: Int, finalGoalID: UUID) {
+    public init(title: String, targetCompletionTimes: Int?, finalGoalID: UUID) {
         self.title = title
-        self.targetCompletionDays = targetCompletionDays
+        self.targetCompletionTimes = targetCompletionTimes
         self.finalGoalID = finalGoalID
     }
 }
 
 public struct UpdateMilestoneGoalInput: Equatable, Sendable {
     public let title: String
-    public let targetCompletionDays: Int
+    public let targetCompletionTimes: Int?
 
-    public init(title: String, targetCompletionDays: Int) {
+    public init(title: String, targetCompletionTimes: Int?) {
         self.title = title
-        self.targetCompletionDays = targetCompletionDays
+        self.targetCompletionTimes = targetCompletionTimes
     }
 }
 
@@ -130,7 +130,7 @@ public struct FinalGoalListSnapshot: Identifiable, Equatable, Sendable {
 public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
     public let id: UUID
     public let title: String
-    public let targetCompletionDays: Int
+    public let targetCompletionTimes: Int?
     public let finalGoalID: UUID
     public let sortOrder: Int
     public let isActive: Bool
@@ -143,7 +143,7 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
     public init(
         id: UUID,
         title: String,
-        targetCompletionDays: Int,
+        targetCompletionTimes: Int?,
         finalGoalID: UUID,
         sortOrder: Int,
         isActive: Bool,
@@ -155,7 +155,7 @@ public struct MilestoneGoalSnapshot: Identifiable, Equatable, Sendable {
     ) {
         self.id = id
         self.title = title
-        self.targetCompletionDays = targetCompletionDays
+        self.targetCompletionTimes = targetCompletionTimes
         self.finalGoalID = finalGoalID
         self.sortOrder = sortOrder
         self.isActive = isActive
@@ -172,7 +172,7 @@ public struct WidgetMilestoneSnapshot: Identifiable, Equatable, Sendable {
     public let title: String
     public let parentFinalGoalTitle: String
     public let colorHex: String
-    public let targetCompletionDays: Int
+    public let targetCompletionTimes: Int?
     public let completedDays: Int
     public let isCompletedToday: Bool
 
@@ -181,7 +181,7 @@ public struct WidgetMilestoneSnapshot: Identifiable, Equatable, Sendable {
         title: String,
         parentFinalGoalTitle: String,
         colorHex: String = FinalGoalColorTheme.defaultTheme.hex,
-        targetCompletionDays: Int,
+        targetCompletionTimes: Int?,
         completedDays: Int,
         isCompletedToday: Bool
     ) {
@@ -189,7 +189,7 @@ public struct WidgetMilestoneSnapshot: Identifiable, Equatable, Sendable {
         self.title = title
         self.parentFinalGoalTitle = parentFinalGoalTitle
         self.colorHex = FinalGoalColorTheme.normalizedHex(colorHex) ?? FinalGoalColorTheme.defaultTheme.hex
-        self.targetCompletionDays = targetCompletionDays
+        self.targetCompletionTimes = targetCompletionTimes
         self.completedDays = completedDays
         self.isCompletedToday = isCompletedToday
     }

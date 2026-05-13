@@ -157,23 +157,23 @@ struct GoalListView: View {
             MilestoneGoalEditorView(
                 mode: .edit(
                     title: milestone.title,
-                    targetCompletionDays: milestone.targetCompletionDays
+                    targetCompletionTimes: milestone.targetCompletionTimes
                 )
-            ) { title, targetDays in
+            ) { title, targetTimes in
                 milestoneStore.updateMilestone(
                     milestoneGoalID: milestone.id,
                     finalGoalID: milestone.finalGoalID,
                     title: title,
-                    targetCompletionDays: targetDays
+                    targetCompletionTimes: targetTimes
                 )
                 editingMilestone = nil
             }
         }
         .sheet(isPresented: $isAddingMilestone) {
             if let fgID = finalGoalStore.selectedFinalGoalID {
-                MilestoneGoalEditorView(mode: .create) { title, targetDays in
+                MilestoneGoalEditorView(mode: .create) { title, targetTimes in
                     milestoneStore.createMilestone(
-                        title: title, targetCompletionDays: targetDays, finalGoalID: fgID
+                        title: title, targetCompletionTimes: targetTimes, finalGoalID: fgID
                     )
                     isAddingMilestone = false
                 }

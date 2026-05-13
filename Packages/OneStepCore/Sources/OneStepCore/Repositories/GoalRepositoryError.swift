@@ -25,9 +25,9 @@ public enum GoalRepositoryError: Error, Equatable, LocalizedError {
         case .invalidTargetCalendarDays:
             return "Calendar day limit must be greater than zero."
         case .invalidTargetCompletionDays:
-            return "Target completion days must be greater than zero."
+            return "Target completion times must be greater than zero."
         case .targetBelowCompletedCount:
-            return "Target completion days cannot be below completed days."
+            return "Target completion times cannot be below completed times."
         case .milestoneNotActive:
             return "Milestone is not current or is already complete."
         case .storeUnavailable:

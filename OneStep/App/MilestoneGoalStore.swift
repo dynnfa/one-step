@@ -48,11 +48,11 @@ final class MilestoneGoalStore {
         }
     }
 
-    func createMilestone(title: String, targetCompletionDays: Int, finalGoalID: UUID) {
+    func createMilestone(title: String, targetCompletionTimes: Int?, finalGoalID: UUID) {
         do {
             _ = try repository.createMilestoneGoal(CreateMilestoneGoalInput(
                 title: title,
-                targetCompletionDays: targetCompletionDays,
+                targetCompletionTimes: targetCompletionTimes,
                 finalGoalID: finalGoalID
             ))
             refreshAndReloadWidget(finalGoalID: finalGoalID)
@@ -61,11 +61,11 @@ final class MilestoneGoalStore {
         }
     }
 
-    func updateMilestone(milestoneGoalID: UUID, finalGoalID: UUID, title: String, targetCompletionDays: Int) {
+    func updateMilestone(milestoneGoalID: UUID, finalGoalID: UUID, title: String, targetCompletionTimes: Int?) {
         do {
             try repository.updateMilestoneGoal(
                 milestoneGoalID: milestoneGoalID,
-                input: UpdateMilestoneGoalInput(title: title, targetCompletionDays: targetCompletionDays)
+                input: UpdateMilestoneGoalInput(title: title, targetCompletionTimes: targetCompletionTimes)
             )
             refreshAndReloadWidget(finalGoalID: finalGoalID)
         } catch {

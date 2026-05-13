@@ -180,11 +180,11 @@ private struct GoalColorPicker: View {
 }
 
 struct MilestoneGoalEditorView: View {
-    private static let dayCountRange = 1...10_000
+    private static let timesCountRange = 1...10_000
 
     enum Mode {
         case create
-        case edit(title: String, targetCompletionDays: Int)
+        case edit(title: String, targetCompletionTimes: Int?)
 
         var title: String {
             switch self {
@@ -195,46 +195,57 @@ struct MilestoneGoalEditorView: View {
     }
 
     let mode: Mode
-    let onSave: (String, Int) -> Void
+    let onSave: (String, Int?) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var title: String
-    @State private var targetCompletionDays: Int
-    @State private var isTargetCompletionDaysValid = true
+    @State private var hasTargetCompletionTimes: Bool
+    @State private var targetCompletionTimes: Int
+    @State private var isTargetCompletionTimesValid = true
 
-    init(mode: Mode, onSave: @escaping (String, Int) -> Void) {
+    init(mode: Mode, onSave: @escaping (String, Int?) -> Void) {
         self.mode = mode
         self.onSave = onSave
         switch mode {
         case .create:
             _title = State(initialValue: "")
-            _targetCompletionDays = State(initialValue: 30)
-        case let .edit(title, targetCompletionDays):
+            _hasTargetCompletionTimes = State(initialValue: true)
+            _targetCompletionTimes = State(initialValue: 30)
+        case let .edit(title, targetCompletionTimes):
             _title = State(initialValue: title)
-            _targetCompletionDays = State(initialValue: targetCompletionDays)
+            _hasTargetCompletionTimes = State(initialValue: targetCompletionTimes != nil)
+            _targetCompletionTimes = State(initialValue: targetCompletionTimes ?? 30)
         }
     }
 
     private var isValid: Bool {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && isTargetCompletionDaysValid
+            && (!hasTargetCompletionTimes || isTargetCompletionTimesValid)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(mode.title).font(.title2.bold())
             TextField("Milestone title", text: $title).textFieldStyle(.roundedBorder)
-            DayCountStepperInput(
-                title: "Target",
-                unit: "completed days",
-                value: $targetCompletionDays,
-                range: Self.dayCountRange,
-                isValid: $isTargetCompletionDaysValid
-            )
+            Toggle("Set target times", isOn: $hasTargetCompletionTimes)
+            if hasTargetCompletionTimes {
+                DayCountStepperInput(
+                    title: "Target",
+                    unit: "times",
+                    value: $targetCompletionTimes,
+                    range: Self.timesCountRange,
+                    isValid: $isTargetCompletionTimesValid
+                )
+            } else {
+                Label("Unlimited", systemImage: "infinity")
+                    .foregroundStyle(.secondary)
+            }
             HStack {
                 Spacer()
                 Button("Cancel") { dismiss() }
-                Button("Save") { onSave(title, targetCompletionDays) }
+                Button("Save") {
+                    onSave(title, hasTargetCompletionTimes ? targetCompletionTimes : nil)
+                }
                     .buttonStyle(.borderedProminent)
                     .disabled(!isValid)
             }
