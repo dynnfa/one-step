@@ -62,7 +62,11 @@ The app and Widget share a SwiftData `ModelContainer` stored in the App Group co
 
 ## Active Milestones
 
-Each active `FinalGoal` has at most one current milestone. The current milestone is derived, not stored: `MilestoneGoalRepository` selects the first milestone by `sortOrder` where `completedAt == nil`. When that milestone reaches its target, the repository sets `completedAt`; the next incomplete milestone becomes current automatically.
+Milestone active state is explicit. A `MilestoneGoal` stores `isActive`, and `MilestoneGoalRepository` preserves that state when rendering app and Widget snapshots. This lets a final goal have one or more active milestones at the same time.
+
+When a milestone reaches its target, the repository sets `completedAt` and clears `isActive`. It does not automatically advance the next incomplete milestone. The user chooses which milestone becomes active next.
+
+Legacy data created before explicit active state is backfilled once on app launch by `MilestoneGoalRepository.backfillLegacyActiveMilestonesIfNeeded()`: completed milestones are deactivated, and the first incomplete milestone is activated only when a final goal has no active incomplete milestones.
 
 ## Widget Tap Flow
 
@@ -70,7 +74,7 @@ Each active `FinalGoal` has at most one current milestone. The current milestone
 Widget tap
         → CompleteGoalIntent.perform()
         → MilestoneGoalRepository.completeToday(milestoneGoalID, LocalDay.today)
-            → validates milestone is current, incomplete, and parent FinalGoal is active
+            → validates milestone is active, incomplete, and parent FinalGoal is active
             → SwiftData store in App Group container
                 → WidgetCenter.shared.reloadTimelines(ofKind:)
                     → Widget shows completed state

@@ -153,9 +153,9 @@ public struct MilestoneGoalRepository {
     ) throws -> [MilestoneGoalSnapshot] {
         let milestones = try fetchMilestones(for: finalGoalID)
 
-        return milestones.map { milestone in
-            let completedDays = (try? completedDays(for: milestone.id)) ?? 0
-            let isCompletedToday = (try? isCompleted(goalID: milestone.id, day: day)) ?? false
+        return try milestones.map { milestone in
+            let completedDays = try completedDays(for: milestone.id)
+            let isCompletedToday = try isCompleted(goalID: milestone.id, day: day)
             let activityLimit = min(max(recentActivityDayLimit, 0), milestone.targetCompletionDays)
 
             return MilestoneGoalSnapshot(
@@ -169,7 +169,7 @@ public struct MilestoneGoalRepository {
                 isCompletedToday: isCompletedToday,
                 startDayKey: milestone.startDayKey,
                 completedAt: milestone.completedAt,
-                recentActivity: (try? recentActivity(goalID: milestone.id, endingOn: day, dayCount: activityLimit)) ?? []
+                recentActivity: try recentActivity(goalID: milestone.id, endingOn: day, dayCount: activityLimit)
             )
         }
     }

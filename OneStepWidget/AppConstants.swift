@@ -1,5 +1,5 @@
-import Foundation
+import OneStepCore
 
 enum AppConstants {
-    static let appGroupIdentifier = "group.dev.dynnfa.OneStep"
+    static let appGroupIdentifier = AppIdentifiers.appGroupIdentifier
 }

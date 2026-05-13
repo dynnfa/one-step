@@ -30,7 +30,7 @@ struct OneStepTimelineProvider: TimelineProvider {
     @MainActor
     private func loadEntry(family: WidgetFamily) -> OneStepWidgetEntry {
         do {
-            let repository = try MilestoneGoalRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier)
+            let repository = try MilestoneGoalRepository.shared(appGroupIdentifier: AppIdentifiers.appGroupIdentifier)
             let milestones = try repository.activeMilestonesForWidget(limit: family.goalLimit, day: .today)
             return OneStepWidgetEntry(date: Date(), milestones: milestones)
         } catch {

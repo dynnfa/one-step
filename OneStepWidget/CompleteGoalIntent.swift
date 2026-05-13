@@ -22,13 +22,15 @@ struct CompleteGoalIntent: AppIntent {
         }
 
         do {
-            let repository = try MilestoneGoalRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier)
+            let repository = try MilestoneGoalRepository.shared(appGroupIdentifier: AppIdentifiers.appGroupIdentifier)
             try repository.completeToday(milestoneGoalID: id, day: .today)
             WidgetCenter.shared.reloadTimelines(ofKind: OneStepWidget.kind)
         } catch GoalRepositoryError.milestoneGoalNotFound {
             OneStepLog.appIntent.error("Stale widget tap ignored because milestone was missing: \(goalID)")
         } catch GoalRepositoryError.milestoneNotActive {
             OneStepLog.appIntent.error("Stale widget tap ignored because milestone was not active or was complete: \(goalID)")
+        } catch GoalRepositoryError.finalGoalNotActive {
+            OneStepLog.appIntent.error("Stale widget tap ignored because parent final goal was archived: \(goalID)")
         } catch {
             OneStepLog.appIntent.error("CompleteGoalIntent failed: \(error.localizedDescription)")
         }
