@@ -18,7 +18,7 @@ final class FinalGoalStore {
     }
 
     static func live() throws -> FinalGoalStore {
-        FinalGoalStore(repository: try FinalGoalRepository.shared(appGroupIdentifier: AppConstants.appGroupIdentifier))
+        FinalGoalStore(repository: try FinalGoalRepository.shared(appGroupIdentifier: AppIdentifiers.appGroupIdentifier))
     }
 
     func refresh() {
@@ -110,7 +110,7 @@ final class FinalGoalStore {
         do {
             try repository.moveActiveFinalGoal(finalGoalID: activeGoals[sourceIndex].id, toIndex: destination)
             reorderLocally(activeGoals: activeGoals, source: sourceIndex, destination: destination)
-            WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")
+            WidgetCenter.shared.reloadTimelines(ofKind: AppIdentifiers.widgetKind)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -142,7 +142,7 @@ final class FinalGoalStore {
 
     private func refreshAndReloadWidget() {
         refresh()
-        WidgetCenter.shared.reloadTimelines(ofKind: "OneStepWidget")
+        WidgetCenter.shared.reloadTimelines(ofKind: AppIdentifiers.widgetKind)
     }
 }
 

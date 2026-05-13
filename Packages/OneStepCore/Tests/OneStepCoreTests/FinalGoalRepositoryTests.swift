@@ -73,6 +73,33 @@ final class FinalGoalRepositoryTests: XCTestCase {
         XCTAssertNil(snapshot.remainingCalendarDays)
     }
 
+    func testRemainingCalendarDaysUsesInjectedLocalDayAndClampsAtZero() throws {
+        let today = try XCTUnwrap(LocalDay(rawValue: "2026-05-13"))
+        let fixture = try makeFixture(today: today)
+
+        _ = try fixture.repository.createFinalGoal(CreateFinalGoalInput(
+            title: "Starts today",
+            targetCalendarDays: 10,
+            startDay: today
+        ))
+        _ = try fixture.repository.createFinalGoal(CreateFinalGoalInput(
+            title: "Started earlier",
+            targetCalendarDays: 10,
+            startDay: try XCTUnwrap(LocalDay(rawValue: "2026-05-10"))
+        ))
+        _ = try fixture.repository.createFinalGoal(CreateFinalGoalInput(
+            title: "Expired",
+            targetCalendarDays: 5,
+            startDay: try XCTUnwrap(LocalDay(rawValue: "2026-05-01"))
+        ))
+
+        let snapshots = try fixture.repository.finalGoalsForList()
+
+        XCTAssertEqual(snapshots.first { $0.title == "Starts today" }?.remainingCalendarDays, 10)
+        XCTAssertEqual(snapshots.first { $0.title == "Started earlier" }?.remainingCalendarDays, 7)
+        XCTAssertEqual(snapshots.first { $0.title == "Expired" }?.remainingCalendarDays, 0)
+    }
+
     func testCreateFinalGoalStoresPresetAndCustomColors() throws {
         let fixture = try makeFixture()
         let startDay = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
@@ -258,12 +285,12 @@ final class FinalGoalRepositoryTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeFixture() throws -> FinalGoalRepositoryFixture {
+    private func makeFixture(today: LocalDay = .today) throws -> FinalGoalRepositoryFixture {
         let container = try OneStepModelContainerFactory.makeInMemory()
         let context = ModelContext(container)
         return FinalGoalRepositoryFixture(
             modelContext: context,
-            repository: FinalGoalRepository(modelContext: context)
+            repository: FinalGoalRepository(modelContext: context, today: { today })
         )
     }
 }

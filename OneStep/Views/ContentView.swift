@@ -41,7 +41,7 @@ struct ContentView: View {
             guard finalGoalStore == nil else { return }
             do {
                 let container = try OneStepModelContainerFactory.sharedContainer(
-                    appGroupIdentifier: AppConstants.appGroupIdentifier
+                    appGroupIdentifier: AppIdentifiers.appGroupIdentifier
                 )
                 let modelContext = ModelContext(container)
 
@@ -143,7 +143,7 @@ struct ContentView: View {
     }
 
     private func backfillLegacyActiveMilestonesIfNeeded(repository: MilestoneGoalRepository) throws {
-        let defaults = UserDefaults(suiteName: AppConstants.appGroupIdentifier) ?? .standard
+        let defaults = UserDefaults(suiteName: AppIdentifiers.appGroupIdentifier) ?? .standard
         let key = "didBackfillLegacyActiveMilestonesForExplicitState"
         guard !defaults.bool(forKey: key) else { return }
         try repository.backfillLegacyActiveMilestonesIfNeeded()

@@ -28,4 +28,21 @@ final class LocalDayTests: XCTestCase {
         XCTAssertNil(LocalDay(rawValue: "2026-4-9"))
         XCTAssertNil(LocalDay(rawValue: "not-a-day"))
     }
+
+    func testDaysUntilCountsCalendarDays() throws {
+        let start = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        let nextDay = try XCTUnwrap(LocalDay(rawValue: "2026-04-30"))
+        let previousDay = try XCTUnwrap(LocalDay(rawValue: "2026-04-28"))
+
+        XCTAssertEqual(start.days(until: nextDay), 1)
+        XCTAssertEqual(start.days(until: start), 0)
+        XCTAssertEqual(start.days(until: previousDay), -1)
+    }
+
+    func testDaysUntilUsesLocalDayKeysRatherThanCurrentInstant() throws {
+        let shanghaiDay = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        let losAngelesDay = try XCTUnwrap(LocalDay(rawValue: "2026-04-28"))
+
+        XCTAssertEqual(losAngelesDay.days(until: shanghaiDay), 1)
+    }
 }

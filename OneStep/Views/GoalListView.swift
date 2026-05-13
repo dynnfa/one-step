@@ -2,11 +2,50 @@ import OneStepCore
 import SwiftUI
 import UniformTypeIdentifiers
 
-// MARK: - Drop Indicator Types
+// MARK: - Drag and Drop Types
 
-private struct DropHoverState: Equatable {
+struct DropHoverState: Equatable {
     let goalID: UUID
     let isAbove: Bool
+}
+
+struct GoalSidebarDragState {
+    private(set) var draggedGoalID: UUID?
+    private(set) var dropHoverState: DropHoverState?
+    private(set) var isSidebarDropTargeted = false
+
+    func isShowingDraggedRow(goalID: UUID) -> Bool {
+        isSidebarDropTargeted && draggedGoalID == goalID
+    }
+
+    mutating func startDragging(goalID: UUID) {
+        draggedGoalID = goalID
+    }
+
+    mutating func updateDropHover(_ newState: DropHoverState?) {
+        guard draggedGoalID != nil else {
+            dropHoverState = nil
+            return
+        }
+        dropHoverState = newState
+    }
+
+    mutating func setSidebarDropTargeted(_ isTargeted: Bool) {
+        isSidebarDropTargeted = isTargeted
+        if !isTargeted {
+            clearDropHover()
+        }
+    }
+
+    mutating func clearDrag() {
+        draggedGoalID = nil
+        dropHoverState = nil
+        isSidebarDropTargeted = false
+    }
+
+    mutating func clearDropHover() {
+        dropHoverState = nil
+    }
 }
 
 private struct RowDragState {
