@@ -54,7 +54,7 @@ Run every check before tagging an open-source release. Initial releases are sour
 
 - [ ] Create one active goal with two milestones and at least one completion.
 - [ ] Archive a second goal.
-- [ ] Export data from the Goals sidebar menu.
+- [ ] Export data from the Goals sidebar bottom toolbar.
 - [ ] Delete or change local data.
 - [ ] Import the exported `.onestepbackup` file and confirm the app asks before replacing data.
 - [ ] Confirm active goals, archived goals, milestone active state, and completion history are restored.
