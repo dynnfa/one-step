@@ -22,7 +22,7 @@ Each row shows the active milestone, its parent goal, and today's completion sta
 
 ## Data Backup
 
-One Step can export all local data from the Goals sidebar menu:
+One Step can export all local data from the Goals sidebar bottom toolbar:
 
 - Choose **Export Data...** to save a `.onestepbackup` JSON file containing goals, milestones, archived state, and completion history.
 - Choose **Import Data...** to restore a backup. Import replaces all current local data after confirmation.

@@ -267,6 +267,7 @@ private struct GoalSidebarView: View {
     @State private var dropHoverState: DropHoverState?
     @State private var draggedGoalID: UUID?
     @State private var isSidebarDropTargeted = false
+    @State private var hoveredFooterToolbarButton: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -347,6 +348,8 @@ private struct GoalSidebarView: View {
                     return false
                 }
             }
+            Divider()
+            footerToolbar
         }
         .background(.bar)
         .onChange(of: activeGoals.map(\.id)) { _, _ in
@@ -380,19 +383,6 @@ private struct GoalSidebarView: View {
             Text("Goals")
                 .font(.headline)
             Spacer()
-            Menu {
-                Button(action: onImportData) {
-                    Label("Import Data...", systemImage: "square.and.arrow.down")
-                }
-                Button(action: onExportData) {
-                    Label("Export Data...", systemImage: "square.and.arrow.up")
-                }
-            } label: {
-                Image(systemName: "ellipsis.circle")
-            }
-            .menuStyle(.button)
-            .help("Import or Export Data")
-
             Button(action: onAddGoal) {
                 Image(systemName: "plus")
             }
@@ -401,6 +391,64 @@ private struct GoalSidebarView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
+    }
+
+    private var footerToolbar: some View {
+        HStack(spacing: 8) {
+            footerToolbarButton(
+                systemImage: "square.and.arrow.up",
+                accessibilityLabel: "Export Data",
+                action: onExportData
+            )
+
+            footerToolbarButton(
+                systemImage: "square.and.arrow.down",
+                accessibilityLabel: "Import Data",
+                action: onImportData
+            )
+
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+    }
+
+    private func footerToolbarButton(
+        systemImage: String,
+        accessibilityLabel: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+        }
+        .buttonStyle(.borderless)
+        .frame(width: 28, height: 28)
+        .contentShape(Rectangle())
+        .accessibilityLabel(accessibilityLabel)
+        .onHover { isHovered in
+            if isHovered {
+                hoveredFooterToolbarButton = accessibilityLabel
+            } else if hoveredFooterToolbarButton == accessibilityLabel {
+                hoveredFooterToolbarButton = nil
+            }
+        }
+        .overlay(alignment: .topLeading) {
+            if hoveredFooterToolbarButton == accessibilityLabel {
+                footerToolbarHoverLabel(accessibilityLabel)
+                    .offset(y: -30)
+                    .allowsHitTesting(false)
+            }
+        }
+    }
+
+    private func footerToolbarHoverLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.caption)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(.regularMaterial, in: Capsule())
     }
 }
 
