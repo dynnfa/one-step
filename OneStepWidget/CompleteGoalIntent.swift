@@ -24,6 +24,7 @@ struct CompleteGoalIntent: AppIntent {
         do {
             let repository = try MilestoneGoalRepository.shared(appGroupIdentifier: AppIdentifiers.appGroupIdentifier)
             try repository.completeToday(milestoneGoalID: id, day: .today)
+            GoalDataChangeNotifier.post()
             WidgetCenter.shared.reloadTimelines(ofKind: OneStepWidget.kind)
         } catch GoalRepositoryError.milestoneGoalNotFound {
             OneStepLog.appIntent.error("Stale widget tap ignored because milestone was missing: \(goalID)")

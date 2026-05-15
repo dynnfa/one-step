@@ -32,6 +32,7 @@
 		A100000000000000000000D0 /* DataPortStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D2 /* DataPortStore.swift */; };
 		A100000000000000000000D1 /* OneStepBackupFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000D3 /* OneStepBackupFile.swift */; };
 		A100000000000000000000E2 /* Color+GoalHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000E1 /* Color+GoalHex.swift */; };
+		A100000000000000000000F0 /* GoalDataRefreshCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100000000000000000000F1 /* GoalDataRefreshCoordinator.swift */; };
 		E2597E1E2FAB441600518077 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2597E1A2FAB269E00518077 /* Media.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -95,6 +96,7 @@
 		A100000000000000000000D2 /* DataPortStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPortStore.swift; sourceTree = "<group>"; };
 		A100000000000000000000D3 /* OneStepBackupFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneStepBackupFile.swift; sourceTree = "<group>"; };
 		A100000000000000000000E1 /* Color+GoalHex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+GoalHex.swift"; sourceTree = "<group>"; };
+		A100000000000000000000F1 /* GoalDataRefreshCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDataRefreshCoordinator.swift; sourceTree = "<group>"; };
 		E22B711C2FAF32A900D253D3 /* release.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = release.sh; sourceTree = "<group>"; };
 		E2597E1A2FAB269E00518077 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -160,6 +162,7 @@
 				A100000000000000000000C2 /* MilestoneGoalStore.swift */,
 				A100000000000000000000D3 /* OneStepBackupFile.swift */,
 				A10000000000000000000012 /* OneStepApp.swift */,
+				A100000000000000000000F1 /* GoalDataRefreshCoordinator.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -377,6 +380,7 @@
 				A100000000000000000000E2 /* Color+GoalHex.swift in Sources */,
 				A100000000000000000000C3 /* FinalGoalDetailView.swift in Sources */,
 				A10000000000000000000002 /* OneStepApp.swift in Sources */,
+				A100000000000000000000F0 /* GoalDataRefreshCoordinator.swift in Sources */,
 				A10000000000000000000003 /* ContentView.swift in Sources */,
 				A1000000000000000000000F /* EmptyStateView.swift in Sources */,
 				A10000000000000000000010 /* GoalEditorView.swift in Sources */,

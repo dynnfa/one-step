@@ -322,11 +322,10 @@ final class MilestoneGoalStoreTests: XCTestCase {
         let finalGoalStore = FinalGoalStore(repository: fixture.fgRepo)
 
         finalGoalStore.refresh()
-        XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 0)
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+        GoalDataRefreshCoordinator.connect(finalGoalStore: finalGoalStore, milestoneStore: fixture.store)
 
-        fixture.store.onMilestonesChanged = {
-            finalGoalStore.refresh()
-        }
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 0)
 
         fixture.store.createMilestone(title: "Phase 1", targetCompletionTimes: 1, finalGoalID: fgID)
         let milestoneID = try XCTUnwrap(fixture.store.milestones.first?.id)
@@ -337,6 +336,59 @@ final class MilestoneGoalStoreTests: XCTestCase {
         fixture.store.completeToday(milestoneGoalID: milestoneID, finalGoalID: fgID)
 
         XCTAssertEqual(finalGoalStore.finalGoals.first?.completedMilestoneCount, 1)
+    }
+
+    func testAppMilestoneCompletionRefreshesFinalGoalSnapshotCountsWithoutManualRefresh() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        let finalGoalStore = FinalGoalStore(repository: fixture.fgRepo)
+
+        finalGoalStore.refresh()
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+        GoalDataRefreshCoordinator.connect(finalGoalStore: finalGoalStore, milestoneStore: fixture.store)
+
+        fixture.store.createMilestone(title: "Phase 1", targetCompletionTimes: 1, finalGoalID: fgID)
+        let milestoneID = try XCTUnwrap(fixture.store.milestones.first?.id)
+        fixture.store.setMilestoneActive(milestoneGoalID: milestoneID, finalGoalID: fgID, isActive: true)
+
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.totalMilestoneCount, 1)
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.completedMilestoneCount, 0)
+
+        fixture.store.completeToday(milestoneGoalID: milestoneID, finalGoalID: fgID)
+
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.completedMilestoneCount, 1)
+    }
+
+    func testExternalGoalDataChangeRefreshesSelectedGoalMilestonesAndClearsMissingSelection() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        let finalGoalStore = FinalGoalStore(repository: fixture.fgRepo)
+        let milestoneID = try fixture.createMilestone(title: "Phase 1", targetDays: 1, finalGoalID: fgID)
+
+        try fixture.msRepo.setMilestoneActive(milestoneGoalID: milestoneID, isActive: true)
+        finalGoalStore.refresh()
+        finalGoalStore.select(fgID)
+        fixture.store.refresh(finalGoalID: fgID, day: fixture.day)
+
+        try fixture.msRepo.completeToday(milestoneGoalID: milestoneID, day: fixture.day)
+        GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
+            finalGoalStore: finalGoalStore,
+            milestoneStore: fixture.store,
+            day: fixture.day
+        )
+
+        XCTAssertEqual(finalGoalStore.finalGoals.first?.completedMilestoneCount, 1)
+        XCTAssertEqual(fixture.store.milestones.first?.completedDays, 1)
+
+        try fixture.fgRepo.deleteFinalGoal(finalGoalID: fgID)
+        GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
+            finalGoalStore: finalGoalStore,
+            milestoneStore: fixture.store,
+            day: fixture.day
+        )
+
+        XCTAssertNil(finalGoalStore.selectedFinalGoalID)
+        XCTAssertTrue(fixture.store.milestones.isEmpty)
     }
 
     func testDeletingMilestoneCanRefreshFinalGoalSnapshotCounts() throws {
