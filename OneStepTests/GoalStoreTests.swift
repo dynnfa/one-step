@@ -1,4 +1,5 @@
 import SwiftData
+import SwiftUI
 import UniformTypeIdentifiers
 import XCTest
 import OneStepCore
@@ -391,6 +392,56 @@ final class MilestoneGoalStoreTests: XCTestCase {
         XCTAssertTrue(fixture.store.milestones.isEmpty)
     }
 
+    func testExternalGoalDataChangeRefreshesCompletionWrittenBySeparateContainer() throws {
+        let fixture = try makeExternalGoalChangeFixture()
+
+        GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
+            finalGoalStore: fixture.finalGoalStore,
+            milestoneStore: fixture.milestoneStore,
+            day: fixture.day
+        )
+
+        assertExternalCompletionVisible(fixture)
+    }
+
+    func testGoalDataChangeNotificationRefreshesSelectedGoal() async throws {
+        let fixture = try makeExternalGoalChangeFixture(completeFromWidget: false)
+
+        let notificationReceived = expectation(description: "goal data change notification received")
+        let observation = GoalDataChangeNotifier.observe {
+            GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
+                finalGoalStore: fixture.finalGoalStore,
+                milestoneStore: fixture.milestoneStore,
+                day: fixture.day
+            )
+            notificationReceived.fulfill()
+        }
+        _ = observation
+
+        try completeFromWidget(fixture)
+
+        GoalDataChangeNotifier.post()
+        await fulfillment(of: [notificationReceived], timeout: 1)
+
+        assertExternalCompletionVisible(fixture)
+    }
+
+    func testInactiveControlStateSchedulesExternalRefreshForVisibleDetailPane() async throws {
+        let fixture = try makeExternalGoalChangeFixture()
+
+        let scheduler = GoalDataExternalRefreshScheduler()
+        scheduler.controlActiveStateDidChange(
+            .inactive,
+            finalGoalStore: fixture.finalGoalStore,
+            milestoneStore: fixture.milestoneStore,
+            day: fixture.day,
+            inactiveDelay: .zero
+        )
+        await Task.yield()
+
+        assertExternalCompletionVisible(fixture)
+    }
+
     func testDeletingMilestoneCanRefreshFinalGoalSnapshotCounts() throws {
         let fixture = try makeFixture()
         let fgID = try fixture.createFinalGoal()
@@ -462,6 +513,120 @@ final class MilestoneGoalStoreTests: XCTestCase {
             store: MilestoneGoalStore(repository: msRepo),
             day: day
         )
+    }
+
+    private func makeExternalGoalChangeFixture(
+        completeFromWidget: Bool = true
+    ) throws -> ExternalGoalChangeFixture {
+        let day = try XCTUnwrap(LocalDay(rawValue: "2026-04-29"))
+        let tempDirectory = FileManager.default.temporaryDirectory
+            .appending(path: "OneStepTests-\(UUID().uuidString)", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+
+        let storeURL = tempDirectory.appending(path: OneStepModelContainerFactory.storeFileName)
+        let appContainer = try makePersistentContainer(url: storeURL)
+        let appContext = ModelContext(appContainer)
+        let finalGoalRepository = FinalGoalRepository(modelContext: appContext)
+        let milestoneRepository = MilestoneGoalRepository(modelContext: appContext)
+        let finalGoalStore = FinalGoalStore(repository: finalGoalRepository)
+        let milestoneStore = MilestoneGoalStore(repository: milestoneRepository)
+
+        let finalGoalID = try finalGoalRepository.createFinalGoal(CreateFinalGoalInput(
+            title: "App-visible goal",
+            startDay: day
+        ))
+        let milestoneID = try milestoneRepository.createMilestoneGoal(CreateMilestoneGoalInput(
+            title: "Widget-visible milestone",
+            targetCompletionTimes: 1,
+            finalGoalID: finalGoalID
+        ))
+        try milestoneRepository.setMilestoneActive(milestoneGoalID: milestoneID, isActive: true)
+
+        finalGoalStore.refresh()
+        finalGoalStore.select(finalGoalID)
+        milestoneStore.refresh(finalGoalID: finalGoalID, day: day)
+
+        let fixture = ExternalGoalChangeFixture(
+            tempDirectory: tempDirectory,
+            storeURL: storeURL,
+            day: day,
+            finalGoalStore: finalGoalStore,
+            milestoneStore: milestoneStore,
+            milestoneID: milestoneID
+        )
+
+        if completeFromWidget {
+            try self.completeFromWidget(fixture)
+        }
+
+        return fixture
+    }
+
+    private func completeFromWidget(_ fixture: ExternalGoalChangeFixture) throws {
+        let widgetContainer = try makePersistentContainer(url: fixture.storeURL)
+        let widgetRepository = MilestoneGoalRepository(modelContext: ModelContext(widgetContainer))
+        try widgetRepository.completeToday(milestoneGoalID: fixture.milestoneID, day: fixture.day)
+    }
+
+    private func assertExternalCompletionVisible(
+        _ fixture: ExternalGoalChangeFixture,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertEqual(
+            fixture.finalGoalStore.finalGoals.first?.completedMilestoneCount,
+            1,
+            file: file,
+            line: line
+        )
+        XCTAssertEqual(
+            fixture.milestoneStore.milestones.first?.completedDays,
+            1,
+            file: file,
+            line: line
+        )
+        XCTAssertEqual(
+            fixture.milestoneStore.milestones.first?.isCompletedToday,
+            true,
+            file: file,
+            line: line
+        )
+    }
+
+    private func makePersistentContainer(url: URL) throws -> ModelContainer {
+        let schema = Schema([FinalGoal.self, MilestoneGoal.self, DailyCompletion.self])
+        let configuration = ModelConfiguration("OneStepTests", schema: schema, url: url)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+}
+
+@MainActor
+private final class ExternalGoalChangeFixture {
+    let tempDirectory: URL
+    let storeURL: URL
+    let day: LocalDay
+    let finalGoalStore: FinalGoalStore
+    let milestoneStore: MilestoneGoalStore
+    let milestoneID: UUID
+
+    init(
+        tempDirectory: URL,
+        storeURL: URL,
+        day: LocalDay,
+        finalGoalStore: FinalGoalStore,
+        milestoneStore: MilestoneGoalStore,
+        milestoneID: UUID
+    ) {
+        self.tempDirectory = tempDirectory
+        self.storeURL = storeURL
+        self.day = day
+        self.finalGoalStore = finalGoalStore
+        self.milestoneStore = milestoneStore
+        self.milestoneID = milestoneID
+    }
+
+    deinit {
+        try? FileManager.default.removeItem(at: tempDirectory)
     }
 }
 
