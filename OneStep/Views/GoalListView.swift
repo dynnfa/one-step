@@ -122,12 +122,6 @@ struct GoalListView: View {
             detailPane
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .onAppear {
-            milestoneStore.onMilestonesChanged = {
-                finalGoalStore.refresh()
-            }
-            finalGoalStore.refresh()
-        }
         .onChange(of: finalGoalStore.selectedFinalGoalID) { _, newID in
             if let newID {
                 milestoneStore.refresh(finalGoalID: newID)
