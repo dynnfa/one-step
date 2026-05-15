@@ -3,11 +3,12 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.controlActiveState) private var controlActiveState
     @State private var finalGoalStore: FinalGoalStore?
     @State private var milestoneStore: MilestoneGoalStore?
     @State private var dataPortStore: DataPortStore?
     @State private var goalDataChangeObservation: GoalDataChangeObservation?
+    @State private var externalRefreshScheduler = GoalDataExternalRefreshScheduler()
     @State private var startupError: String?
     @State private var isShowingCreateGoal = false
     @State private var isShowingImporter = false
@@ -69,11 +70,11 @@ struct ContentView: View {
                 startupError = error.localizedDescription
             }
         }
-        .onChange(of: scenePhase) { _, newPhase in
-            guard newPhase == .active,
-                  let finalGoalStore,
+        .onChange(of: controlActiveState) { _, newState in
+            guard let finalGoalStore,
                   let milestoneStore else { return }
-            GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
+            externalRefreshScheduler.controlActiveStateDidChange(
+                newState,
                 finalGoalStore: finalGoalStore,
                 milestoneStore: milestoneStore
             )
