@@ -3,9 +3,11 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var finalGoalStore: FinalGoalStore?
     @State private var milestoneStore: MilestoneGoalStore?
     @State private var dataPortStore: DataPortStore?
+    @State private var goalDataChangeObservation: GoalDataChangeObservation?
     @State private var startupError: String?
     @State private var isShowingCreateGoal = false
     @State private var isShowingImporter = false
@@ -53,12 +55,28 @@ struct ContentView: View {
                 finalGoalStore = fgStore
 
                 let msStore = MilestoneGoalStore(repository: milestoneRepository)
+                GoalDataRefreshCoordinator.connect(finalGoalStore: fgStore, milestoneStore: msStore)
+                goalDataChangeObservation = GoalDataChangeNotifier.observe {
+                    GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
+                        finalGoalStore: fgStore,
+                        milestoneStore: msStore
+                    )
+                }
                 milestoneStore = msStore
 
                 dataPortStore = DataPortStore(repository: OneStepBackupRepository(modelContext: modelContext))
             } catch {
                 startupError = error.localizedDescription
             }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active,
+                  let finalGoalStore,
+                  let milestoneStore else { return }
+            GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
+                finalGoalStore: finalGoalStore,
+                milestoneStore: milestoneStore
+            )
         }
         .sheet(isPresented: $isShowingCreateGoal) {
             if let finalGoalStore {
@@ -102,15 +120,11 @@ struct ContentView: View {
                 do {
                     let data = try Data(contentsOf: url)
                     dataPortStore?.importData(data)
-                    finalGoalStore?.refresh()
-                    if let selectedID = finalGoalStore?.selectedFinalGoalID {
-                        if finalGoalStore?.finalGoals.contains(where: { $0.id == selectedID }) == true {
-                            milestoneStore?.refresh(finalGoalID: selectedID)
-                        } else {
-                            finalGoalStore?.select(nil)
-                            milestoneStore?.milestones = []
-                        }
-                    }
+                    guard let finalGoalStore, let milestoneStore else { return }
+                    GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
+                        finalGoalStore: finalGoalStore,
+                        milestoneStore: milestoneStore
+                    )
                 } catch {
                     dataPortStore?.errorMessage = error.localizedDescription
                 }
