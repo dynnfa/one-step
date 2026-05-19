@@ -2,6 +2,10 @@
 
 Daily planning, one tap at a time.
 
+<p align="center">
+  <img src="one-step-demo.gif" alt="One Step app and Widget daily check-in demo" width="900">
+</p>
+
 One Step is a quiet, local-first macOS app for tracking regular goals and routines through desktop Widgets. Create a long-term goal, break it into active milestones, and check off today's progress from the Widget or the main app without turning the day into a task-management ritual.
 
 ## Why One Step Exists
