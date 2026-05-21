@@ -1,18 +1,46 @@
-# One Step
+# One Step — Local-first macOS Widget Goal Tracker
+
+[![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](#requirements)
+[![Xcode](https://img.shields.io/badge/Xcode-15%2B-blue?logo=xcode)](#requirements)
+[![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange?logo=swift)](#requirements)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/dynnfa/one-step?display_name=tag&sort=semver)](https://github.com/dynnfa/one-step/releases/latest)
+[![Release Date](https://img.shields.io/github/release-date/dynnfa/one-step)](https://github.com/dynnfa/one-step/releases/latest)
 
 Daily planning, one tap at a time.
+
+One Step is a local-first macOS app for tracking long-term goals, milestones, and daily progress from desktop Widgets.
 
 <p align="center">
   <img src="one-step-demo.gif" alt="One Step app and Widget daily check-in demo" width="900">
 </p>
 
-One Step is a quiet, local-first macOS app for tracking regular goals and routines through desktop Widgets. Create a long-term goal, break it into active milestones, and check off today's progress from the Widget or the main app without turning the day into a task-management ritual.
+Create a long-term goal, break it into active milestones, and check off today's progress from the Widget or the main app without turning the day into a task-management ritual.
 
-## Why One Step Exists
+## Download
 
-I built One Step because I wanted a simple place to record regular goals and routines: the things I want to keep showing up for, one day at a time.
+Download the latest `.zip` or `.dmg` from the Releases page.
 
-Most goal, habit, and productivity apps eventually grow into something broader than that. They add feeds, reminders, dashboards, gamification, collaboration, categories, projects, and a dozen other features that may be useful somewhere, but are unrelated to the basic act of recording steady progress. One Step is intentionally smaller. It exists to answer one question quickly: did I make progress on this goal today?
+> One Step currently supports macOS 14+.
+
+## Who is this for?
+
+One Step is for people who want to keep showing up for long-term goals without turning life into a task-management ritual.
+
+It is useful if you want:
+
+- A quiet macOS Widget for daily progress check-ins
+- Long-term goals broken into milestones
+- Local-first data with no accounts, analytics, or telemetry
+- No streak repair, no guilt mechanics, no social feed
+
+## Technical Highlights
+
+- Native macOS app built with SwiftUI
+- WidgetKit extension with AppIntent-based check-ins
+- SwiftData persistence shared through an App Group container
+- Local-first data model with import/export backup files
+- No accounts, no analytics, no telemetry
 
 ## Current Status
 
