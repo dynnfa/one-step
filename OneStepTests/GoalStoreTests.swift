@@ -21,6 +21,54 @@ final class FinalGoalStoreTests: XCTestCase {
         XCTAssertNil(fixture.store.errorMessage)
     }
 
+    func testSelectDefaultFinalGoalPrefersFirstActiveGoal() throws {
+        let fixture = try makeFixture()
+        fixture.store.createFinalGoal(title: "Archived", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(title: "Active", goalDescription: nil, targetCalendarDays: nil)
+        let archivedID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Archived" }?.id)
+        let activeID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Active" }?.id)
+        fixture.store.toggleFinalGoalArchive(finalGoalID: archivedID)
+
+        fixture.store.selectDefaultFinalGoalIfNeeded()
+
+        XCTAssertEqual(fixture.store.selectedFinalGoalID, activeID)
+    }
+
+    func testSelectDefaultFinalGoalFallsBackToFirstArchivedGoal() throws {
+        let fixture = try makeFixture()
+        fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(title: "Second", goalDescription: nil, targetCalendarDays: nil)
+        let firstID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "First" }?.id)
+        let secondID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Second" }?.id)
+        fixture.store.toggleFinalGoalArchive(finalGoalID: firstID)
+        fixture.store.toggleFinalGoalArchive(finalGoalID: secondID)
+
+        fixture.store.selectDefaultFinalGoalIfNeeded()
+
+        XCTAssertEqual(fixture.store.selectedFinalGoalID, firstID)
+    }
+
+    func testSelectDefaultFinalGoalDoesNotOverrideExistingSelection() throws {
+        let fixture = try makeFixture()
+        fixture.store.createFinalGoal(title: "First", goalDescription: nil, targetCalendarDays: nil)
+        fixture.store.createFinalGoal(title: "Second", goalDescription: nil, targetCalendarDays: nil)
+        let secondID = try XCTUnwrap(fixture.store.finalGoals.first { $0.title == "Second" }?.id)
+
+        fixture.store.select(secondID)
+        fixture.store.selectDefaultFinalGoalIfNeeded()
+
+        XCTAssertEqual(fixture.store.selectedFinalGoalID, secondID)
+    }
+
+    func testSelectDefaultFinalGoalLeavesSelectionEmptyWhenListIsEmpty() throws {
+        let fixture = try makeFixture()
+
+        fixture.store.refresh()
+        fixture.store.selectDefaultFinalGoalIfNeeded()
+
+        XCTAssertNil(fixture.store.selectedFinalGoalID)
+    }
+
     func testCreateFinalGoalMarksFirstGoalAndRefreshes() throws {
         let fixture = try makeFixture()
 
@@ -390,6 +438,22 @@ final class MilestoneGoalStoreTests: XCTestCase {
 
         XCTAssertNil(finalGoalStore.selectedFinalGoalID)
         XCTAssertTrue(fixture.store.milestones.isEmpty)
+    }
+
+    func testInitialGoalDataLoadSelectsDefaultGoalAndRefreshesMilestones() throws {
+        let fixture = try makeFixture()
+        let fgID = try fixture.createFinalGoal()
+        _ = try fixture.createMilestone(title: "Phase 1", targetDays: 1, finalGoalID: fgID)
+        let finalGoalStore = FinalGoalStore(repository: fixture.fgRepo)
+
+        GoalDataRefreshCoordinator.loadInitialGoalData(
+            finalGoalStore: finalGoalStore,
+            milestoneStore: fixture.store,
+            day: fixture.day
+        )
+
+        XCTAssertEqual(finalGoalStore.selectedFinalGoalID, fgID)
+        XCTAssertEqual(fixture.store.milestones.map(\.title), ["Phase 1"])
     }
 
     func testExternalGoalDataChangeRefreshesCompletionWrittenBySeparateContainer() throws {
