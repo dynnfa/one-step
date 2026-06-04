@@ -120,6 +120,11 @@ final class FinalGoalStore {
         selectedFinalGoalID = id
     }
 
+    func selectDefaultFinalGoalIfNeeded() {
+        guard selectedFinalGoalID == nil else { return }
+        selectedFinalGoalID = finalGoals.first { $0.archivedAt == nil }?.id ?? finalGoals.first?.id
+    }
+
     private func reorderLocally(activeGoals: [FinalGoalListSnapshot], source: Int, destination: Int) {
         var reordered = activeGoals
         guard reordered.indices.contains(source) else { return }
