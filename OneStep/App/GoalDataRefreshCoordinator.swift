@@ -10,6 +10,21 @@ enum GoalDataRefreshCoordinator {
         }
     }
 
+    static func loadInitialGoalData(
+        finalGoalStore: FinalGoalStore,
+        milestoneStore: MilestoneGoalStore,
+        day: LocalDay = .today
+    ) {
+        finalGoalStore.refresh()
+        finalGoalStore.selectDefaultFinalGoalIfNeeded()
+
+        if let selectedID = finalGoalStore.selectedFinalGoalID {
+            milestoneStore.refresh(finalGoalID: selectedID, day: day)
+        } else {
+            milestoneStore.milestones = []
+        }
+    }
+
     static func refreshAfterGoalDataChange(
         finalGoalStore: FinalGoalStore,
         milestoneStore: MilestoneGoalStore,

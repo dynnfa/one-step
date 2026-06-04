@@ -52,20 +52,23 @@ struct ContentView: View {
                 try backfillLegacyActiveMilestonesIfNeeded(repository: milestoneRepository)
 
                 let fgStore = FinalGoalStore(repository: FinalGoalRepository(modelContext: modelContext))
-                fgStore.refresh()
-                finalGoalStore = fgStore
-
                 let msStore = MilestoneGoalStore(repository: milestoneRepository)
                 GoalDataRefreshCoordinator.connect(finalGoalStore: fgStore, milestoneStore: msStore)
+                GoalDataRefreshCoordinator.loadInitialGoalData(
+                    finalGoalStore: fgStore,
+                    milestoneStore: msStore
+                )
                 goalDataChangeObservation = GoalDataChangeNotifier.observe {
                     GoalDataRefreshCoordinator.refreshAfterGoalDataChange(
                         finalGoalStore: fgStore,
                         milestoneStore: msStore
                     )
                 }
-                milestoneStore = msStore
+                let dpStore = DataPortStore(repository: OneStepBackupRepository(modelContext: modelContext))
 
-                dataPortStore = DataPortStore(repository: OneStepBackupRepository(modelContext: modelContext))
+                dataPortStore = dpStore
+                milestoneStore = msStore
+                finalGoalStore = fgStore
             } catch {
                 startupError = error.localizedDescription
             }
